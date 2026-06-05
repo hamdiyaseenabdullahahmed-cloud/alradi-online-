@@ -2,204 +2,436 @@
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>الرعدي أون لاين</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرعدي بلس - المتجر العالمي</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{background:linear-gradient(135deg,#0a0a0a,#1a1a2e);color:#fff;font-family:'Cairo',sans-serif;}
-        .header{background:linear-gradient(90deg,#ff0066,#ff6600);padding:12px;overflow:hidden;white-space:nowrap;position:fixed;top:0;width:100%;}
-        .header span{display:inline-block;animation:slide 15s linear infinite;}
-        @keyframes slide{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+        body{background:linear-gradient(135deg,#0a0a0a,#1a1a2e);color:#fff;font-family:'Cairo',Tahoma,sans-serif;min-height:100vh;}
+        .header{background:linear-gradient(90deg,#ff0066,#ff6600);padding:12px;text-align:center;position:fixed;top:0;width:100%;z-index:100;}
         .logo{text-align:center;margin:80px 0 20px;font-size:3em;background:linear-gradient(45deg,#ff0066,#ffcc00);-webkit-background-clip:text;background-clip:text;color:transparent;}
-        .eagle{text-align:center;font-size:3em;filter:drop-shadow(0 0 20px gold);}
+        .eagle{text-align:center;font-size:3em;margin-bottom:20px;}
         .auth-box{max-width:400px;margin:50px auto;background:rgba(255,255,255,0.1);padding:30px;border-radius:20px;text-align:center;}
-        input{width:100%;padding:12px;margin:10px 0;border-radius:10px;background:rgba(255,255,255,0.2);color:#fff;border:0;}
-        button{background:linear-gradient(45deg,#ff0066,#ff6600);padding:12px;border:0;border-radius:10px;color:#fff;cursor:pointer;margin:5px;}
+        input{width:100%;padding:12px;margin:10px 0;border-radius:10px;background:rgba(255,255,255,0.2);color:#fff;border:0;font-size:1em;}
+        button{background:linear-gradient(45deg,#ff0066,#ff6600);padding:12px 25px;border:0;border-radius:10px;color:#fff;font-weight:bold;cursor:pointer;margin:5px;transition:0.3s;}
+        button:hover{transform:scale(1.05);}
         .store{display:none;padding:20px;margin-top:60px;}
         .admin-panel{display:none;padding:20px;margin-top:60px;}
-        .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
-        .product-card{background:rgba(255,255,255,0.1);padding:15px;border-radius:15px;}
+        .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:20px;}
+        .product-card{background:rgba(255,255,255,0.1);padding:15px;border-radius:15px;transition:0.3s;}
+        .product-card:hover{transform:translateY(-5px);box-shadow:0 0 20px #ff0066;}
         .product-image{width:100%;height:180px;object-fit:cover;border-radius:10px;}
-        .cart-icon{position:fixed;top:80px;right:20px;background:#ff0066;padding:12px;border-radius:50%;cursor:pointer;}
-        .cart-sidebar{position:fixed;top:0;right:-380px;width:380px;height:100%;background:#000;padding:20px;transition:0.3s;z-index:1000;}
+        .product-price{font-size:1.5em;color:#ff0066;font-weight:bold;}
+        .cart-icon{position:fixed;top:80px;right:20px;background:#ff0066;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;}
+        .cart-count{position:absolute;top:-5px;right:-5px;background:#ffcc00;color:#000;border-radius:50%;width:22px;height:22px;font-size:0.7em;display:flex;align-items:center;justify-content:center;}
+        .cart-sidebar{position:fixed;top:0;right:-380px;width:380px;height:100%;background:#000;padding:20px;transition:0.3s;z-index:1001;overflow-y:auto;}
         .cart-sidebar.open{right:0;}
-        .nav-btn{position:fixed;top:80px;left:20px;background:#ff0066;padding:8px 15px;border-radius:20px;cursor:pointer;margin:5px;}
+        .nav-btn{position:fixed;top:80px;left:20px;background:#ff0066;padding:8px 15px;border-radius:20px;cursor:pointer;margin:5px;z-index:1000;}
         .admin-form{background:rgba(255,255,255,0.1);padding:20px;border-radius:15px;margin-bottom:20px;}
+        .message{color:#00ff88;text-align:center;margin-top:10px;}
+        .error{color:#ff0066;}
     </style>
 </head>
 <body>
-<div class="header"><span>⚡ متجر الرعدي أون لاين - عالمي بالكامل ⚡</span></div>
-<div class="logo">الرعـــــدي أون لاين</div>
+<div class="header">⚡ الرعدي بلس - متجر عالمي متكامل | خصم 50% على أول طلب ⚡</div>
+<div class="logo">الرعـــــدي بـــلس</div>
 <div class="eagle">🦅⚡</div>
 
+<!-- شاشة تسجيل الدخول -->
 <div id="authBox" class="auth-box">
-    <h2>مرحباً بك</h2>
+    <h2 style="margin-bottom:20px;">مرحباً بك في الرعدي بلس</h2>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
     <input type="password" id="loginPassword" placeholder="كلمة المرور">
-    <button onclick="login()">تسجيل الدخول</button>
-    <button onclick="showRegister()" style="background:transparent;border:1px solid #ff0066;">إنشاء حساب</button>
+    <button onclick="doLogin()">تسجيل الدخول</button>
+    <button onclick="showReg()" style="background:transparent;border:1px solid #ff0066;">إنشاء حساب جديد</button>
+    <div id="loginMessage" class="error"></div>
 </div>
 
+<!-- المتجر -->
 <div id="mainStore" class="store">
-    <div class="cart-icon" onclick="toggleCart()">🛒 <span id="cartCount">0</span></div>
-    <div class="nav-btn" onclick="logout()">تسجيل خروج</div>
-    <div class="nav-btn" id="adminBtn" onclick="showAdmin()" style="display:none;">👑 لوحة التحكم</div>
+    <div class="cart-icon" onclick="toggleCart()">🛒<span class="cart-count" id="cartCount">0</span></div>
+    <div class="nav-btn" onclick="doLogout()">🚪 تسجيل خروج</div>
+    <div class="nav-btn" id="adminBtn" onclick="showAdminPanel()" style="display:none;">👑 لوحة التحكم</div>
     <div class="products" id="productsList"></div>
 </div>
 
+<!-- لوحة تحكم المدير -->
 <div id="adminPanel" class="admin-panel">
-    <div class="nav-btn" onclick="backToStore()">← العودة</div>
-    <div class="nav-btn" onclick="logout()">تسجيل خروج</div>
+    <div class="nav-btn" onclick="backToStore()">← العودة للمتجر</div>
+    <div class="nav-btn" onclick="doLogout()">🚪 تسجيل خروج</div>
     <div class="admin-form">
-        <h3>➕ إضافة منتج</h3>
-        <input type="text" id="productName" placeholder="الاسم">
-        <input type="text" id="productDesc" placeholder="الوصف">
-        <input type="number" id="productPrice" placeholder="السعر">
-        <input type="number" id="productStock" placeholder="الكمية">
-        <input type="text" id="productImage" placeholder="رابط الصورة">
-        <button onclick="addProduct()">إضافة</button>
+        <h3>➕ إضافة منتج جديد</h3>
+        <input type="text" id="pName" placeholder="اسم المنتج">
+        <textarea id="pDesc" placeholder="وصف المنتج" rows="2"></textarea>
+        <input type="number" id="pPrice" placeholder="السعر">
+        <input type="number" id="pStock" placeholder="الكمية">
+        <input type="text" id="pImage" placeholder="رابط الصورة (اختياري)">
+        <button onclick="addNewProduct()">✨ إضافة المنتج</button>
     </div>
+    <h3>📦 قائمة المنتجات</h3>
     <div id="adminProductsList"></div>
 </div>
 
+<!-- سلة المشتريات -->
 <div id="cartSidebar" class="cart-sidebar">
-    <h2>سلة المشتريات</h2>
+    <h2>🛍️ سلتك</h2>
     <div id="cartItems"></div>
     <div id="cartTotal"></div>
-    <button onclick="checkout()">إتمام الطلب</button>
+    <button onclick="doCheckout()" style="width:100%;margin-top:20px;">✅ إتمام الشراء</button>
+    <button onclick="toggleCart()" style="width:100%;margin-top:10px;background:#333;">❌ إغلاق</button>
 </div>
 
 <script>
-    const SUPABASE_URL = "https://basdejkwtzmcdclvkpyym.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhc2Rlamt3dHptY2RjbHZrcHl5bSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzQ5MDU2MTI0LCJleHAiOjIwNjQ2MzIxMjR9.lZQrGLKpZfAWh6WYk9D6Yx5O3i-hXVtnyFuYbK45zIE";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
+    // ========== البيانات ==========
+    let products = [];
     let currentUser = null;
     let cart = [];
     
-    async function loadProducts() {
-        const { data, error } = await supabase.from('products').select('*');
-        if(error) { console.log(error); return; }
-        const container = document.getElementById('productsList');
-        if(data.length === 0) { container.innerHTML = "<div style='padding:50px;text-align:center'>📦 لا توجد منتجات</div>"; return; }
-        container.innerHTML = data.map(p => `
-            <div class="product-card">
-                <img src="${p.image || 'https://via.placeholder.com/200'}" class="product-image">
-                <h3>${p.name}</h3>
-                <p>${p.description || ''}</p>
-                <div style="font-size:1.5em;color:#ff0066">${p.price} ريال</div>
-                <button onclick="addToCart(${p.id}, '${p.name}', ${p.price})">🛒 أضف</button>
-            </div>
-        `).join('');
-    }
-    
-    function addToCart(id, name, price) {
-        let existing = cart.find(i => i.id === id);
-        if(existing) existing.qty++;
-        else cart.push({ id, name, price, qty: 1 });
-        saveCart();
+    // ========== تحميل البيانات من localStorage ==========
+    function loadData() {
+        let savedProducts = localStorage.getItem('raadi_products');
+        if(savedProducts) {
+            products = JSON.parse(savedProducts);
+        } else {
+            products = [
+                {id:1, name:"هاتف ذكي X", price:1500, stock:10, image:"https://via.placeholder.com/200", description:"هاتف حديث بشاشة 6.5 بوصة"},
+                {id:2, name:"قميص قطني", price:80, stock:5, image:"https://via.placeholder.com/200", description:"قميص مريح 100% قطن"},
+                {id:3, name:"خلاط كهربائي", price:200, stock:3, image:"https://via.placeholder.com/200", description:"خلاط 500 واط مع 2 سرعة"}
+            ];
+            localStorage.setItem('raadi_products', JSON.stringify(products));
+        }
+        
+        let savedCart = localStorage.getItem('raadi_cart');
+        if(savedCart) cart = JSON.parse(savedCart);
         updateCartUI();
     }
     
-    function updateCartUI() {
-        let count = cart.reduce((s,i) => s + i.qty, 0);
-        document.getElementById('cartCount').innerText = count;
-        let total = 0;
-        document.getElementById('cartItems').innerHTML = cart.map(i => {
-            total += i.price * i.qty;
-            return `<div>${i.name} x ${i.qty} = ${i.price * i.qty} ريال <button onclick="removeFromCart(${i.id})">حذف</button></div>`;
-        }).join('');
-        document.getElementById('cartTotal').innerHTML = `<h3>الإجمالي: ${total} ريال</h3>`;
+    function saveProducts() {
+        localStorage.setItem('raadi_products', JSON.stringify(products));
     }
     
-    function removeFromCart(id) { cart = cart.filter(i => i.id !== id); saveCart(); updateCartUI(); }
-    function saveCart() { localStorage.setItem('cart', JSON.stringify(cart)); }
-    function loadCart() { let s = localStorage.getItem('cart'); if(s) cart = JSON.parse(s); updateCartUI(); }
-    function toggleCart() { document.getElementById('cartSidebar').classList.toggle('open'); }
-    
-    async function checkout() {
-        if(cart.length === 0) return alert("السلة فارغة");
-        let name = prompt("اسمك:");
-        let address = prompt("عنوانك:");
-        let phone = prompt("هاتفك:");
-        let total = cart.reduce((s,i) => s + (i.price * i.qty), 0);
-        let win = window.open();
-        win.document.write(`<html><body style="padding:20px"><h1>فاتورة</h1><p>العميل: ${name}</p><p>العنوان: ${address}</p><p>الهاتف: ${phone}</p><table border="1">${cart.map(i => `<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price * i.qty}</td></tr>`).join('')}</table><h3>الإجمالي: ${total}</h3><button onclick="window.print()">طباعة</button></body></html>`);
-        cart = []; saveCart(); updateCartUI(); toggleCart();
-        alert("تم الإرسال");
-    }
-    
-    async function addProduct() {
-        if(!currentUser || currentUser.type !== 'admin') return alert("غير مصرح");
-        let name = document.getElementById('productName').value;
-        let desc = document.getElementById('productDesc').value;
-        let price = parseFloat(document.getElementById('productPrice').value);
-        let stock = parseInt(document.getElementById('productStock').value);
-        let image = document.getElementById('productImage').value;
-        if(!name || !price) return alert("أدخل الاسم والسعر");
-        await supabase.from('products').insert({ name, description: desc, price, stock, image });
-        loadProducts();
-        loadAdminProducts();
-        alert("تمت الإضافة");
-    }
-    
-    async function loadAdminProducts() {
-        const { data } = await supabase.from('products').select('*');
-        document.getElementById('adminProductsList').innerHTML = (data || []).map(p => `
-            <div style="background:rgba(255,255,255,0.1);margin:10px;padding:10px;">
-                ${p.name} - ${p.price} ريال
-                <button onclick="deleteProduct(${p.id})">حذف</button>
+    // ========== عرض المنتجات ==========
+    function displayProducts() {
+        let container = document.getElementById('productsList');
+        if(!container) return;
+        
+        if(products.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:50px;">📦 لا توجد منتجات حالياً</div>';
+            return;
+        }
+        
+        container.innerHTML = products.map(p => `
+            <div class="product-card">
+                <img src="${p.image}" class="product-image" onerror="this.src='https://via.placeholder.com/200'">
+                <h3 style="margin:10px 0;">${p.name}</h3>
+                <p style="color:#ccc;">${p.description || ''}</p>
+                <div class="product-price">${p.price} ريال</div>
+                <div style="margin:10px 0;">📦 المخزون: ${p.stock}</div>
+                <button onclick="addToCart(${p.id})" style="width:100%;">🛒 أضف للسلة</button>
             </div>
         `).join('');
     }
     
-    async function deleteProduct(id) { await supabase.from('products').delete().eq('id', id); loadProducts(); loadAdminProducts(); }
+    // ========== سلة المشتريات ==========
+    function addToCart(productId) {
+        let product = products.find(p => p.id === productId);
+        if(!product) return;
+        if(product.stock <= 0) {
+            alert("❌ هذا المنتج غير متوفر حالياً");
+            return;
+        }
+        
+        let existing = cart.find(item => item.id === productId);
+        if(existing) {
+            existing.quantity++;
+        } else {
+            cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: 1,
+                image: product.image
+            });
+        }
+        
+        localStorage.setItem('raadi_cart', JSON.stringify(cart));
+        updateCartUI();
+        alert("✅ تمت إضافة المنتج إلى سلتك");
+    }
     
-    function login() {
-        let email = document.getElementById('loginEmail').value;
-        let pass = document.getElementById('loginPassword').value;
-        if(email === "admin@raadi.com" && pass === "admin123") {
-            currentUser = { email, type: "admin" };
-            localStorage.setItem('user', JSON.stringify(currentUser));
+    function updateCartUI() {
+        let count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        let cartCount = document.getElementById('cartCount');
+        if(cartCount) cartCount.innerText = count;
+        
+        let container = document.getElementById('cartItems');
+        if(!container) return;
+        
+        if(cart.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;">سلتك فارغة</div>';
+            document.getElementById('cartTotal').innerHTML = '';
+            return;
+        }
+        
+        let total = 0;
+        container.innerHTML = cart.map(item => {
+            let itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+                <div style="border-bottom:1px solid #333;padding:10px;margin-bottom:5px;">
+                    <div><strong>${item.name}</strong></div>
+                    <div>${item.price} ريال × ${item.quantity} = ${itemTotal} ريال</div>
+                    <div style="margin-top:5px;">
+                        <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                        <span style="margin:0 10px;">${item.quantity}</span>
+                        <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                        <button onclick="removeFromCart(${item.id})" style="margin-right:10px;">🗑️ حذف</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById('cartTotal').innerHTML = `<h3>💰 الإجمالي: ${total} ريال</h3>`;
+    }
+    
+    function changeQuantity(productId, delta) {
+        let item = cart.find(i => i.id === productId);
+        if(item) {
+            let product = products.find(p => p.id === productId);
+            let newQty = item.quantity + delta;
+            if(newQty < 1) {
+                removeFromCart(productId);
+                return;
+            }
+            if(product && newQty > product.stock) {
+                alert(`لا يتوفر إلا ${product.stock} قطع فقط`);
+                return;
+            }
+            item.quantity = newQty;
+            localStorage.setItem('raadi_cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+    }
+    
+    function removeFromCart(productId) {
+        cart = cart.filter(item => item.id !== productId);
+        localStorage.setItem('raadi_cart', JSON.stringify(cart));
+        updateCartUI();
+    }
+    
+    function toggleCart() {
+        document.getElementById('cartSidebar').classList.toggle('open');
+    }
+    
+    function doCheckout() {
+        if(cart.length === 0) {
+            alert("🛒 سلتك فارغة");
+            return;
+        }
+        if(!currentUser) {
+            alert("🔐 الرجاء تسجيل الدخول أولاً");
+            return;
+        }
+        
+        let name = prompt("📝 أدخل اسمك الرباعي:") || "عميل";
+        let address = prompt("📍 أدخل عنوانك:");
+        let phone = prompt("📞 رقم هاتفك:");
+        if(!address || !phone) {
+            alert("العنوان والهاتف مطلوبان");
+            return;
+        }
+        
+        let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // إنشاء الفاتورة
+        let invoice = window.open();
+        invoice.document.write(`
+            <html dir="rtl"><head><title>فاتورة الرعدي بلس</title></head>
+            <body style="padding:20px;font-family:Arial;max-width:800px;margin:auto;">
+                <div style="text-align:center;border-bottom:2px solid #ff0066;padding-bottom:10px;">
+                    <h1 style="color:#ff0066;">🦅 الرعدي بلس</h1>
+                    <p>متجرك العالمي الموثوق</p>
+                </div>
+                <h2 style="margin-top:20px;">🧾 فاتورة شراء</h2>
+                <p><strong>رقم الطلب:</strong> #${Date.now()}</p>
+                <p><strong>التاريخ:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>العميل:</strong> ${name}</p>
+                <p><strong>العنوان:</strong> ${address}</p>
+                <p><strong>الهاتف:</strong> ${phone}</p>
+                <table border="1" style="width:100%;border-collapse:collapse;margin:15px 0;">
+                    <tr style="background:#f0f0f0;"><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>
+                    ${cart.map(item => `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.price} ريال</td><td>${item.price * item.quantity} ريال</td></tr>`).join('')}
+                </table>
+                <h3 style="text-align:left;">💰 الإجمالي النهائي: ${total} ريال</h3>
+                <hr>
+                <small>📋 سياسة الإرجاع: يمكن الإرجاع خلال 14 يوماً في حالة وجود عيب صناعي.</small><br/>
+                <small>📞 للاستفسارات: اتصل بنا على ${phone}</small><br/><br/>
+                <button onclick="window.print()" style="background:#ff0066;color:#fff;padding:10px 20px;border:0;border-radius:5px;">🖨️ طباعة الفاتورة</button>
+            </body></html>
+        `);
+        
+        // تقليل المخزون
+        cart.forEach(item => {
+            let product = products.find(p => p.id === item.id);
+            if(product) {
+                product.stock -= item.quantity;
+            }
+        });
+        saveProducts();
+        
+        // تفريغ السلة
+        cart = [];
+        localStorage.setItem('raadi_cart', JSON.stringify(cart));
+        updateCartUI();
+        toggleCart();
+        displayProducts();
+        
+        alert("🎉 تم إرسال طلبك بنجاح! شكراً لتسوقك مع الرعدي بلس");
+    }
+    
+    // ========== إدارة المنتجات (للمدير) ==========
+    function addNewProduct() {
+        if(!currentUser || currentUser.type !== 'admin') {
+            alert("⛔ غير مصرح - فقط المدير يمكنه إضافة منتجات");
+            return;
+        }
+        
+        let name = document.getElementById('pName').value.trim();
+        let desc = document.getElementById('pDesc').value.trim();
+        let price = parseFloat(document.getElementById('pPrice').value);
+        let stock = parseInt(document.getElementById('pStock').value);
+        let image = document.getElementById('pImage').value.trim();
+        
+        if(!name) { alert("⚠️ أدخل اسم المنتج"); return; }
+        if(isNaN(price) || price <= 0) { alert("⚠️ أدخل سعراً صحيحاً"); return; }
+        if(isNaN(stock) || stock < 0) stock = 0;
+        
+        let newId = Date.now();
+        products.push({
+            id: newId,
+            name: name,
+            description: desc,
+            price: price,
+            stock: stock,
+            image: image || "https://via.placeholder.com/200"
+        });
+        
+        saveProducts();
+        displayProducts();
+        loadAdminProducts();
+        
+        // تفريغ الحقول
+        document.getElementById('pName').value = '';
+        document.getElementById('pDesc').value = '';
+        document.getElementById('pPrice').value = '';
+        document.getElementById('pStock').value = '';
+        document.getElementById('pImage').value = '';
+        
+        alert("✅ تمت إضافة المنتج بنجاح!");
+    }
+    
+    function deleteProduct(productId) {
+        if(!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
+        products = products.filter(p => p.id !== productId);
+        saveProducts();
+        displayProducts();
+        loadAdminProducts();
+        alert("🗑️ تم حذف المنتج");
+    }
+    
+    function loadAdminProducts() {
+        let container = document.getElementById('adminProductsList');
+        if(!container) return;
+        
+        if(products.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;">لا توجد منتجات</div>';
+            return;
+        }
+        
+        container.innerHTML = products.map(p => `
+            <div style="background:rgba(255,255,255,0.1);margin:10px;padding:15px;border-radius:10px;">
+                <div><strong>📦 ${p.name}</strong></div>
+                <div>💰 ${p.price} ريال | 📊 المخزون: ${p.stock}</div>
+                <button onclick="deleteProduct(${p.id})" style="margin-top:10px;background:#ff0066;">🗑️ حذف المنتج</button>
+            </div>
+        `).join('');
+    }
+    
+    // ========== نظام المصادقة ==========
+    function doLogin() {
+        let email = document.getElementById('loginEmail').value.trim();
+        let password = document.getElementById('loginPassword').value.trim();
+        let msgDiv = document.getElementById('loginMessage');
+        
+        if(!email || !password) {
+            msgDiv.innerText = "⚠️ الرجاء إدخال البريد الإلكتروني وكلمة المرور";
+            return;
+        }
+        
+        // حساب المدير الافتراضي
+        if(email === "admin@raadi.com" && password === "admin123") {
+            currentUser = { email: email, name: "المدير", type: "admin" };
+            localStorage.setItem('raadi_user', JSON.stringify(currentUser));
             document.getElementById('authBox').style.display = 'none';
             document.getElementById('mainStore').style.display = 'block';
             document.getElementById('adminBtn').style.display = 'block';
-            loadProducts();
+            displayProducts();
+            msgDiv.innerText = "";
             return;
         }
-        let users = JSON.parse(localStorage.getItem('users') || '[]');
-        let user = users.find(u => u.email === email && u.pass === pass);
+        
+        // فحص المستخدمين المسجلين
+        let users = JSON.parse(localStorage.getItem('raadi_users') || '[]');
+        let user = users.find(u => u.email === email && u.password === password);
+        
         if(user) {
-            currentUser = { email, type: "user" };
-            localStorage.setItem('user', JSON.stringify(currentUser));
+            currentUser = { email: email, name: user.name, type: "user" };
+            localStorage.setItem('raadi_user', JSON.stringify(currentUser));
             document.getElementById('authBox').style.display = 'none';
             document.getElementById('mainStore').style.display = 'block';
-            loadProducts();
-        } else alert("بيانات غير صحيحة");
-    }
-    
-    function showRegister() {
-        let email = prompt("البريد:");
-        let pass = prompt("كلمة المرور:");
-        let name = prompt("الاسم:");
-        if(email && pass && name) {
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
-            users.push({ email, pass, name });
-            localStorage.setItem('users', JSON.stringify(users));
-            alert("تم التسجيل");
+            displayProducts();
+            msgDiv.innerText = "";
+        } else {
+            msgDiv.innerText = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة";
         }
     }
     
-    function logout() {
+    function showReg() {
+        let email = prompt("📧 أدخل بريدك الإلكتروني:");
+        if(!email) return;
+        let password = prompt("🔑 أدخل كلمة المرور:");
+        if(!password) return;
+        let name = prompt("👤 أدخل اسمك:");
+        if(!name) return;
+        
+        let users = JSON.parse(localStorage.getItem('raadi_users') || '[]');
+        
+        // التحقق من عدم تكرار البريد
+        if(users.find(u => u.email === email)) {
+            alert("⚠️ هذا البريد مسجل بالفعل");
+            return;
+        }
+        
+        users.push({ email: email, password: password, name: name });
+        localStorage.setItem('raadi_users', JSON.stringify(users));
+        alert("✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.");
+    }
+    
+    function doLogout() {
         currentUser = null;
-        localStorage.removeItem('user');
+        localStorage.removeItem('raadi_user');
         document.getElementById('authBox').style.display = 'block';
         document.getElementById('mainStore').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginMessage').innerText = '';
     }
     
-    function showAdmin() {
-        if(currentUser?.type !== 'admin') return alert("غير مصرح");
+    function showAdminPanel() {
+        if(currentUser?.type !== 'admin') {
+            alert("⛔ غير مصرح - هذه الصفحة للمدير فقط");
+            return;
+        }
         document.getElementById('mainStore').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
         loadAdminProducts();
@@ -208,12 +440,26 @@
     function backToStore() {
         document.getElementById('mainStore').style.display = 'block';
         document.getElementById('adminPanel').style.display = 'none';
-        loadProducts();
+        displayProducts();
     }
     
-    let u = localStorage.getItem('user');
-    if(u) { currentUser = JSON.parse(u); document.getElementById('authBox').style.display = 'none'; document.getElementById('mainStore').style.display = 'block'; if(currentUser.type === 'admin') document.getElementById('adminBtn').style.display = 'block'; loadProducts(); }
-    loadCart();
+    // ========== تهيئة التطبيق ==========
+    function init() {
+        loadData();
+        
+        let savedUser = localStorage.getItem('raadi_user');
+        if(savedUser) {
+            currentUser = JSON.parse(savedUser);
+            document.getElementById('authBox').style.display = 'none';
+            document.getElementById('mainStore').style.display = 'block';
+            if(currentUser.type === 'admin') {
+                document.getElementById('adminBtn').style.display = 'block';
+            }
+            displayProducts();
+        }
+    }
+    
+    init();
 </script>
 </body>
 </html>
