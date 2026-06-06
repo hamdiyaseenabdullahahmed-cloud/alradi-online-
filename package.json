@@ -1,7 +1,7 @@
 {
   "name": "raadi-store",
-  "version": "4.4.0",
-  "description": "متجر الرعدي أونلاين - النسخة الفاخرة النهائية الآمنة",
+  "version": "4.5.0",
+  "description": "متجر الرعدي أونلاين الفاخر - النسخة السحابية المتوافقة مع Render",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
   "dependencies": {
