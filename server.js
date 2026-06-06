@@ -16,7 +16,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === 'production', // تفعيل جدار الحماية للجلسات في بيئة الإنتاج السحابية
+        secure: process.env.NODE_ENV === 'production', // تفعيل حدار الحماية للجلسات في بيئة الإنتاج السحابية
         sameSite: 'lax'
     }
 }));
@@ -47,10 +47,10 @@ db.serialize(() => {
     db.get("SELECT COUNT(*) as count FROM products", (err, row) => {
         if (row && row.count === 0) {
             const sample = [
-                ['هاتف الرعدي برو X', 'هواتف', 2999, 3499, 15, 'أسود تيتانيوم', 'معالج تيتانيوم كاميرا فائقة الدقة والوضوح', 12, 'https://picsum.photos/id/0/300/300'],
-                ['سامسونج S24 الترا', 'هواتف', 4940, 5200, 12, 'رمادي تيتانيوم', 'قلم ذكي مدمج وشاشة عالية السطوع', 8, 'https://picsum.photos/id/1/300/300'],
-                ['سماعة إيربودز برو', 'إكسسوارات', 899, 1099, 18, 'أبيض ناصع', 'تقنية نشطة لعزل الضوضاء المحيطة', 20, 'https://picsum.photos/id/3/300/300'],
-                ['عطر بلو دي شانيل', 'عطور', 4140, 4600, 10, 'كحلي داكن', 'عبق فريد يدوم طويلاً لأصحاب الفخامة', 6, 'https://picsum.photos/id/2/300/300']
+                ['هاتف الرعدي برو X', 'هواتف', 2999, 3499, 15, 'أسود تيتانيوم', 'معالج تيتانيوم كاميرا فائقة الدقة والوضوح شاشة ممتازة 6.8 بوصة', 12, 'https://picsum.photos/id/0/300/300'],
+                ['سامسونج S24 الترا', 'هواتف', 4940, 5200, 12, 'رمادي تيتانيوم', 'قلم ذكي مدمج وشاشة عالية السطوع بمواصفات جبارة', 8, 'https://picsum.photos/id/1/300/300'],
+                ['سماعة إيربودز برو', 'إكسسوارات', 899, 1099, 18, 'أبيض ناصع', 'تقنية نشطة لعزل الضوضاء المحيطة وصوت محيطي فخم', 20, 'https://picsum.photos/id/3/300/300'],
+                ['عطر بلو دي شانيل', 'عطور', 4140, 4600, 10, 'كحلي داكن', 'عبق فريد يدوم طويلاً لأصحاب الفخامة والروعة الملوكية', 6, 'https://picsum.photos/id/2/300/300']
             ];
             const stmt = db.prepare("INSERT INTO products (name, category, price, oldPrice, discount, color, features, stock, image, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             sample.forEach(p => stmt.run(...p, new Date().toISOString()));
@@ -155,6 +155,7 @@ app.post('/api/profile/update', async (req, res) => {
 app.get('/api/me', (req, res) => req.session.userId ? res.json(req.session.user) : res.status(401).json({ error: 'غير مسجل' }));
 app.post('/api/logout', (req, res) => { req.session.destroy(); res.json({ success: true }); });
 
+// الطلبات
 app.post('/api/orders', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'سجل دخولك أولاً' });
     const { customer, email, phone, address, country, items, subtotal, discount, discountAmount, shipping, total } = req.body;
@@ -182,6 +183,7 @@ app.put('/api/orders/:id/status', async (req, res) => {
     try { await run("UPDATE orders SET status = ? WHERE id = ?", [req.body.status, req.params.id]); res.json({ success: true }); } catch { res.status(500).json({ error: 'خطأ' }); }
 });
 
+// المجموعات والمراسلة
 app.get('/api/groups', async (req, res) => {
     if (!req.session.userId || req.session.user.role !== 'admin') return res.status(403).json([]);
     try { res.json(await query("SELECT * FROM groups ORDER BY id DESC")); } catch { res.status(500).json([]); }
@@ -215,6 +217,7 @@ app.delete('/api/coupons/:code', async (req, res) => {
     try { await run("DELETE FROM coupons WHERE code = ?", [req.params.code]); res.json({ success: true }); } catch { res.status(500).json({ error: 'خطأ' }); }
 });
 
+// الدردشة المباشرة
 app.get('/api/messages', async (req, res) => {
     if (!req.session.userId) return res.status(401).json([]);
     try {
