@@ -7,7 +7,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', system-ui; }
         body {
-            background: linear-gradient(135deg, #1a2a3a, #0f1724);
+            background: linear-gradient(135deg, #0f1724, #1e293b);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -17,28 +17,17 @@
         .login-card {
             background: white;
             border-radius: 48px;
-            padding: 40px 35px;
+            padding: 40px;
             width: 100%;
-            max-width: 480px;
+            max-width: 450px;
+            text-align: center;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
         }
-        h1 { color: #b87333; text-align: center; margin-bottom: 10px; }
-        .logo { font-size: 3rem; text-align: center; margin-bottom: 15px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            background: #f1f5f9;
-            border-radius: 60px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .tab.active { background: #b87333; color: white; }
-        .form-group { margin-bottom: 18px; }
+        h1 { color: #b87333; margin-bottom: 10px; }
         input {
             width: 100%;
-            padding: 14px 18px;
+            padding: 15px;
+            margin: 12px 0;
             border: 1px solid #ddd;
             border-radius: 60px;
             font-size: 1rem;
@@ -51,106 +40,83 @@
             width: 100%;
             border-radius: 60px;
             font-size: 1.1rem;
-            font-weight: bold;
             cursor: pointer;
             margin-top: 10px;
         }
-        .message {
+        .error {
+            background: #fee2e2;
+            color: #ef4444;
             padding: 12px;
             border-radius: 30px;
             margin: 15px 0;
-            font-size: 0.85rem;
             display: none;
         }
-        .error { background: #fee2e2; color: #ef4444; }
-        .success { background: #dcfce7; color: #22c55e; }
-        hr { margin: 20px 0; border: none; border-top: 1px solid #eee; }
+        .tab {
+            display: inline-block;
+            width: 48%;
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 60px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .tab.active { background: #b87333; color: white; }
+        hr { margin: 20px 0; }
     </style>
 </head>
 <body>
     <div class="login-card">
-        <div class="logo">🛍️</div>
-        <h1>الرعدي أونلاين</h1>
+        <h1>🛍️ الرعدي أونلاين</h1>
         
-        <div class="tabs">
+        <div>
             <div class="tab active" onclick="showTab('login')">تسجيل دخول</div>
             <div class="tab" onclick="showTab('register')">حساب جديد</div>
         </div>
         
-        <div id="messageBox" class="message"></div>
+        <div id="errorMsg" class="error"></div>
         
-        <!-- نموذج تسجيل الدخول -->
-        <div id="loginForm">
-            <div class="form-group">
-                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
-            </div>
-            <div class="form-group">
-                <input type="password" id="loginPassword" placeholder="كلمة المرور">
-            </div>
+        <!-- تسجيل الدخول -->
+        <div id="loginDiv">
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" value="admin@system.com">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور" value="admin123">
             <button onclick="login()">دخول</button>
         </div>
         
-        <!-- نموذج تسجيل حساب جديد -->
-        <div id="registerForm" style="display:none;">
-            <div class="form-group">
-                <input type="text" id="regName" placeholder="الاسم الكامل">
-            </div>
-            <div class="form-group">
-                <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
-            </div>
-            <div class="form-group">
-                <input type="tel" id="regPhone" placeholder="رقم الهاتف (اختياري)">
-            </div>
-            <div class="form-group">
-                <input type="password" id="regPassword" placeholder="كلمة المرور">
-            </div>
-            <div class="form-group">
-                <input type="password" id="regConfirmPassword" placeholder="تأكيد كلمة المرور">
-            </div>
+        <!-- تسجيل حساب جديد -->
+        <div id="registerDiv" style="display:none;">
+            <input type="text" id="regName" placeholder="الاسم الكامل">
+            <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+            <input type="tel" id="regPhone" placeholder="رقم الهاتف">
+            <input type="password" id="regPassword" placeholder="كلمة المرور">
+            <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور">
             <button onclick="register()">إنشاء حساب</button>
         </div>
         
         <hr>
-        <p style="font-size: 0.7rem; text-align: center; color: #94a3b8;">
-            🔐 أول مستخدم يسجل يصبح مدير النظام
-        </p>
+        <p style="font-size: 0.7rem; color: #666;">👑 المدير: admin@system.com / admin123</p>
     </div>
 
     <script>
         function showTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             if (tab === 'login') {
-                document.querySelector('.tab:first-child').classList.add('active');
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginDiv').style.display = 'block';
+                document.getElementById('registerDiv').style.display = 'none';
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.querySelectorAll('.tab')[1].classList.remove('active');
             } else {
-                document.querySelector('.tab:last-child').classList.add('active');
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
+                document.getElementById('loginDiv').style.display = 'none';
+                document.getElementById('registerDiv').style.display = 'block';
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.querySelectorAll('.tab')[0].classList.remove('active');
             }
-            hideMessage();
-        }
-        
-        function showMessage(text, type) {
-            const msg = document.getElementById('messageBox');
-            msg.textContent = text;
-            msg.className = `message ${type}`;
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 4000);
-        }
-        
-        function hideMessage() {
-            document.getElementById('messageBox').style.display = 'none';
         }
         
         async function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('errorMsg');
             
-            if (!email || !password) {
-                showMessage('❌ الرجاء إدخال البريد الإلكتروني وكلمة المرور', 'error');
-                return;
-            }
+            errorDiv.style.display = 'none';
             
             try {
                 const res = await fetch('/api/login', {
@@ -168,30 +134,33 @@
                         window.location.href = '/dashboard.html';
                     }
                 } else {
-                    showMessage('❌ ' + data.error, 'error');
+                    errorDiv.innerHTML = '❌ ' + data.error;
+                    errorDiv.style.display = 'block';
                 }
             } catch(err) {
-                showMessage('❌ خطأ في الاتصال بالخادم', 'error');
+                errorDiv.innerHTML = '❌ خطأ في الاتصال بالخادم';
+                errorDiv.style.display = 'block';
             }
         }
         
         async function register() {
-            const name = document.getElementById('regName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const phone = document.getElementById('regPhone').value.trim();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const phone = document.getElementById('regPhone').value;
             const password = document.getElementById('regPassword').value;
-            const confirm = document.getElementById('regConfirmPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            const errorDiv = document.getElementById('errorMsg');
+            
+            errorDiv.style.display = 'none';
             
             if (!name || !email || !password) {
-                showMessage('❌ الاسم والبريد وكلمة المرور مطلوبة', 'error');
+                errorDiv.innerHTML = '❌ جميع الحقول مطلوبة';
+                errorDiv.style.display = 'block';
                 return;
             }
             if (password !== confirm) {
-                showMessage('❌ كلمة المرور غير متطابقة', 'error');
-                return;
-            }
-            if (password.length < 6) {
-                showMessage('❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error');
+                errorDiv.innerHTML = '❌ كلمة المرور غير متطابقة';
+                errorDiv.style.display = 'block';
                 return;
             }
             
@@ -199,27 +168,21 @@
                 const res = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password, phone, role: 'client' })
+                    body: JSON.stringify({ name, email, password, phone })
                 });
                 const data = await res.json();
                 
                 if (data.success) {
-                    showMessage('✅ ' + data.message, 'success');
-                    if (data.isAdmin) {
-                        setTimeout(() => window.location.href = '/client.html', 2000);
-                    } else {
-                        setTimeout(() => showTab('login'), 2000);
-                    }
-                    document.getElementById('regName').value = '';
-                    document.getElementById('regEmail').value = '';
-                    document.getElementById('regPhone').value = '';
-                    document.getElementById('regPassword').value = '';
-                    document.getElementById('regConfirmPassword').value = '';
+                    alert('✅ تم إنشاء الحساب بنجاح، يمكنك تسجيل الدخول الآن');
+                    showTab('login');
+                    document.getElementById('loginEmail').value = email;
                 } else {
-                    showMessage('❌ ' + data.error, 'error');
+                    errorDiv.innerHTML = '❌ ' + data.error;
+                    errorDiv.style.display = 'block';
                 }
             } catch(err) {
-                showMessage('❌ خطأ في الاتصال بالخادم', 'error');
+                errorDiv.innerHTML = '❌ خطأ في الاتصال';
+                errorDiv.style.display = 'block';
             }
         }
     </script>
