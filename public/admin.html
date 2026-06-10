@@ -7,8 +7,8 @@
   <style>
     body {margin:0;font-family:Tahoma,Arial;background:#f5f5f5;}
     header {background:#203a43;color:#fff;padding:15px;text-align:center;font-size:20px;font-weight:bold;}
-    nav {background:#2c5364;color:#fff;padding:10px;display:flex;justify-content:space-around;}
-    nav a {color:#fff;text-decoration:none;padding:8px;}
+    nav {background:#2c5364;color:#fff;padding:10px;display:flex;flex-wrap:wrap;justify-content:center;}
+    nav a {color:#fff;text-decoration:none;padding:8px 15px;margin:5px;}
     nav a:hover {background:gold;color:#000;border-radius:5px;}
     .container {padding:20px;}
     .stats {display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;}
@@ -21,6 +21,7 @@
     .edit {background:blue;color:#fff;}
     .delete {background:red;color:#fff;}
     .add {background:green;color:#fff;}
+    .report {background:purple;color:#fff;}
     footer {background:#203a43;color:#fff;text-align:center;padding:10px;margin-top:20px;}
   </style>
 </head>
@@ -59,3 +60,114 @@
         <th>الصورة</th>
         <th>الاسم</th>
         <th>السعر</th>
+        <th>المخزون</th>
+        <th>القسم</th>
+        <th>الإجراءات</th>
+      </tr>
+      <tr>
+        <td><img src="product1.jpg" alt="منتج" width="50"></td>
+        <td>هاتف ذكي فاخر</td>
+        <td>999 ر.س</td>
+        <td>20</td>
+        <td>إلكترونيات</td>
+        <td class="actions">
+          <button class="edit">تعديل</button>
+          <button class="delete">حذف</button>
+        </td>
+      </tr>
+      <tr>
+        <td><img src="product2.jpg" alt="منتج" width="50"></td>
+        <td>عطر مميز</td>
+        <td>250 ر.س</td>
+        <td>50</td>
+        <td>عطور</td>
+        <td class="actions">
+          <button class="edit">تعديل</button>
+          <button class="delete">حذف</button>
+        </td>
+      </tr>
+    </table>
+
+    <!-- جدول الطلبات -->
+    <h2>إدارة الطلبات</h2>
+    <table class="table">
+      <tr>
+        <th>رقم الطلب</th>
+        <th>العميل</th>
+        <th>المنتج</th>
+        <th>الحالة</th>
+        <th>الإجراءات</th>
+      </tr>
+      <tr>
+        <td>#1001</td>
+        <td>أحمد</td>
+        <td>هاتف ذكي فاخر</td>
+        <td>قيد المعالجة</td>
+        <td class="actions">
+          <button class="edit">تحديث الحالة</button>
+        </td>
+      </tr>
+      <tr>
+        <td>#1002</td>
+        <td>سارة</td>
+        <td>عطر مميز</td>
+        <td>تم الشحن</td>
+        <td class="actions">
+          <button class="edit">تحديث الحالة</button>
+        </td>
+      </tr>
+    </table>
+
+    <!-- جدول العملاء -->
+    <h2>إدارة العملاء</h2>
+    <table class="table">
+      <tr>
+        <th>الاسم</th>
+        <th>البريد الإلكتروني</th>
+        <th>عدد الطلبات</th>
+        <th>الإجراءات</th>
+      </tr>
+      <tr>
+        <td>أحمد</td>
+        <td>ahmed@example.com</td>
+        <td>5</td>
+        <td class="actions"><button class="edit">عرض</button></td>
+      </tr>
+      <tr>
+        <td>سارة</td>
+        <td>sara@example.com</td>
+        <td>3</td>
+        <td class="actions"><button class="edit">عرض</button></td>
+      </tr>
+    </table>
+
+    <!-- الكوبونات -->
+    <h2>إدارة الكوبونات</h2>
+    <button class="add">➕ إنشاء كوبون جديد</button>
+    <table class="table">
+      <tr>
+        <th>الكود</th>
+        <th>الخصم</th>
+        <th>تاريخ الانتهاء</th>
+        <th>الإجراءات</th>
+      </tr>
+      <tr>
+        <td>SALE50</td>
+        <td>50%</td>
+        <td>30/06/2026</td>
+        <td class="actions"><button class="delete">حذف</button></td>
+      </tr>
+    </table>
+
+    <!-- التقارير -->
+    <h2>التقارير</h2>
+    <button class="report">📊 عرض تقرير المبيعات</button>
+    <button class="report">📈 تقرير العملاء</button>
+
+  </div>
+
+  <!-- الفوتر -->
+  <footer>© 2026 الرعدي أونلاين - لوحة المدير</footer>
+
+</body>
+</html>
