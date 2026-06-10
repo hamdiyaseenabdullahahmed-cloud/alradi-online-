@@ -1,19 +1,13 @@
 {
-  "name": "alraadi-store",
+  "name": "alradi-plus",
   "version": "1.0.0",
-  "description": "متجر الرعدي أونلاين - منافس عالمي",
+  "description": "متجر الرعدي أون لاين (Alradi Online Store) مع اسم التطبيق الداخلي الرعدي بلاس",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "author": "Alraadi Online",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "body-parser": "^1.20.2",
-    "pg": "^8.11.1",
-    "bcrypt": "^5.1.1",
-    "jsonwebtoken": "^9.0.2",
-    "cors": "^2.8.5"
+    "pg": "^8.11.1"
   }
 }
