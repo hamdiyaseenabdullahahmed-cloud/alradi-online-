@@ -1,31 +1,24 @@
 {
-  "name": "alradi-plus",
+  "name": "alraadi-online-store",
   "version": "1.0.0",
-  "description": "متجر الرعدي أون لاين - مشروع متكامل",
+  "description": "متجر الرعدي أونلاين باستخدام Node.js و Express و PostgreSQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "compression": "^1.7.4",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "express-rate-limit": "^6.7.0",
-    "helmet": "^7.0.0",
-    "jsonwebtoken": "^9.0.0",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
-    "pdfkit": "^0.13.0",
-    "pg": "^8.11.1",
-    "uuid": "^9.0.0"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.0"
+    "nodemon": "^3.0.2"
   },
   "engines": {
     "node": ">=18"
   }
-  }
+}
