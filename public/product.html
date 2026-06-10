@@ -1,92 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>الرعدي أونلاين - صفحة المنتج</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {margin:0;font-family:Tahoma,Arial;background:#f5f5f5;}
-    header {background:#203a43;color:#fff;padding:10px;display:flex;justify-content:space-between;align-items:center;}
-    header img {height:40px;}
-    .container {padding:20px;display:flex;flex-wrap:wrap;}
-    .gallery {flex:1;min-width:300px;}
-    .gallery img {width:100%;border-radius:8px;margin-bottom:10px;transition:0.3s;}
-    .gallery img:hover {transform:scale(1.05);}
-    .colors {display:flex;margin-top:10px;}
-    .colors div {width:30px;height:30px;border-radius:50%;margin:5px;cursor:pointer;border:2px solid #fff;box-shadow:0 0 5px #000;}
-    .details {flex:1;min-width:300px;padding:20px;}
-    .details h2 {margin-top:0;color:#203a43;}
-    .price {font-size:20px;color:#203a43;font-weight:bold;}
-    .old-price {text-decoration:line-through;color:#888;margin-right:10px;}
-    .actions button {padding:10px;margin:5px;width:160px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;}
-    .add-cart {background:green;color:#fff;}
-    .buy-now {background:blue;color:#fff;}
-    .fav {background:gold;color:#000;}
-    .reviews {margin-top:20px;}
-    .review {background:#fff;padding:10px;margin-bottom:10px;border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-    footer {background:#203a43;color:#fff;text-align:center;padding:10px;margin-top:20px;}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تفاصيل المنتج — الرعدي بلاس</title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-
-  <!-- الشريط العلوي -->
-  <header>
-    <img src="logo.png" alt="شعار الرعدي">
-    <span>🛒 سلة التسوق</span>
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <img src="/assets/logo.png" alt="logo" class="logo-img" />
+      <div>
+        <h1>الرعدي بلاس</h1>
+        <p class="tag">تفاصيل المنتج</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button onclick="location.href='/'" class="btn secondary">الرئيسية</button>
+      <button onclick="location.href='/checkout.html'" class="btn">السلة</button>
+    </div>
   </header>
 
-  <!-- محتوى الصفحة -->
-  <div class="container">
-    <!-- معرض الصور -->
-    <div class="gallery">
-      <img id="mainImage" src="product1.jpg" alt="صورة المنتج">
-      <video controls width="100%">
-        <source src="product-video.mp4" type="video/mp4">
-        متصفحك لا يدعم تشغيل الفيديو.
-      </video>
-      <div class="colors">
-        <div style="background:red;" onclick="changeColor('red')"></div>
-        <div style="background:blue;" onclick="changeColor('blue')"></div>
-        <div style="background:black;" onclick="changeColor('black')"></div>
-      </div>
-      <button onclick="alert('ميزة الواقع المعزز قادمة!')">🔍 معاينة AR</button>
-    </div>
-
-    <!-- تفاصيل المنتج -->
-    <div class="details">
-      <h2>هاتف ذكي فاخر</h2>
-      <div class="price"><span class="old-price">1200 ر.س</span> 999 ر.س</div>
-      <p>هاتف ذكي بأحدث المواصفات، شاشة عالية الدقة، بطارية قوية، وكاميرا احترافية.</p>
-      <div class="actions">
-        <button class="add-cart">إضافة إلى السلة</button>
-        <button class="buy-now">شراء سريع</button>
-        <button class="fav">❤️ إضافة للمفضلة</button>
-      </div>
-
-      <!-- التقييمات -->
-      <div class="reviews">
-        <h3>التقييمات والمراجعات ⭐⭐⭐⭐☆</h3>
-        <div class="review">
-          <strong>أحمد</strong> - ⭐⭐⭐⭐⭐ <br>
-          منتج رائع جدًا، أنصح به بشدة!
+  <!-- Product Details -->
+  <main class="container">
+    <section id="productWrap" class="section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+        <div>
+          <img id="prodImg" src="/assets/product-placeholder.jpg" alt="product" style="width:100%;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
         </div>
-        <div class="review">
-          <strong>سارة</strong> - ⭐⭐⭐⭐☆ <br>
-          الهاتف ممتاز لكن الشحن كان بطيء قليلاً.
+        <div>
+          <h2 id="prodName">اسم المنتج</h2>
+          <p id="prodDesc" style="color:#6b7280">وصف المنتج</p>
+          <div style="margin:12px 0;font-weight:700;font-size:18px" id="prodPrice">0 ر.س</div>
+          <div style="display:flex;gap:10px">
+            <button class="btn primary" onclick="addToCartFromProduct()">أضف للسلة</button>
+            <button class="btn secondary" onclick="location.href='/checkout.html'">الدفع الآن</button>
+          </div>
         </div>
-        <button onclick="alert('أضف تقييمك بعد تسجيل الدخول')">أضف تقييمك</button>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <!-- الفوتر -->
-  <footer>© 2026 الرعدي أونلاين - جميع الحقوق محفوظة</footer>
+  <!-- Footer -->
+  <footer class="footer">© 2026 الرعدي أونلاين - جميع الحقوق محفوظة</footer>
 
+  <!-- Script -->
   <script>
-    function changeColor(color){
-      document.getElementById("mainImage").src = "product1-" + color + ".jpg";
+    function getQuery(name){
+      const url = new URL(location.href);
+      return url.searchParams.get(name);
     }
+    async function loadProduct(){
+      const id = getQuery('id');
+      try{
+        const res = await fetch('/api/products');
+        const items = await res.json();
+        const p = items.find(x => String(x.id) === String(id)) || items[0] || {name:'منتج تجريبي', price:0, image:'/assets/product-placeholder.jpg', description:'وصف تجريبي'};
+        document.getElementById('prodImg').src = p.image;
+        document.getElementById('prodName').textContent = p.name;
+        document.getElementById('prodDesc').textContent = p.description;
+        document.getElementById('prodPrice').textContent = Number(p.price).toFixed(2) + ' ر.س';
+      }catch(e){
+        console.error('فشل تحميل المنتج', e);
+      }
+    }
+    function addToCartFromProduct(){
+      const id = getQuery('id');
+      let cart = JSON.parse(localStorage.getItem('cart_v1') || '[]');
+      const found = cart.find(i=>String(i.id)===String(id));
+      if(found) found.qty++;
+      else cart.push({id, qty:1});
+      localStorage.setItem('cart_v1', JSON.stringify(cart));
+      alert('تمت إضافة المنتج إلى السلة');
+    }
+    loadProduct();
   </script>
-
 </body>
-        </html>
+</html>
