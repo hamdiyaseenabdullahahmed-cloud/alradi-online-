@@ -18,7 +18,7 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
+// ---------- Middlewares ----------
 app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
 app.use(limiter);
 
-// PostgreSQL pool (Render: set env vars DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT)
+// ---------- Database ----------
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -40,7 +40,7 @@ const pool = new Pool({
   port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432
 });
 
-// Multer for product image uploads
+// ---------- Multer for uploads ----------
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, 'public', 'assets')),
   filename: (req, file, cb) => {
@@ -50,7 +50,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Utility: authenticate middleware
+// ---------- JWT ----------
 const jwtSecret = process.env.JWT_SECRET || 'change_this_secret';
 function authenticate(req, res, next) {
   const auth = req.headers.authorization;
@@ -65,13 +65,13 @@ function authenticate(req, res, next) {
   }
 }
 
-// --- Auth routes ---
+// ---------- Auth ----------
 app.post('/api/auth/register', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, is_admin } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'username and password required' });
   try {
     const hashed = await bcrypt.hash(password, 10);
-    await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashed]);
+    await pool.query('INSERT INTO users (username, password, is_admin) VALUES ($1, $2, $3)', [username, hashed, is_admin || false]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -95,13 +95,13 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// --- Products API ---
+// ---------- Products ----------
 app.get('/api/products', async (req, res) => {
   try {
     const r = await pool.query('SELECT id, name, description, price, old_price, image, category FROM products ORDER BY created_at DESC');
     res.json(r.rows);
   } catch (err) {
-    console.warn('DB fetch failed, returning empty', err.message);
+    console.warn('DB fetch failed', err.message);
     res.json([]);
   }
 });
@@ -117,7 +117,6 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-// Admin: add product (requires auth and admin)
 app.post('/api/admin/products', authenticate, upload.single('image'), async (req, res) => {
   if (!req.user.is_admin) return res.status(403).json({ error: 'Forbidden' });
   const { name, description, price, old_price, category } = req.body;
@@ -131,9 +130,35 @@ app.post('/api/admin/products', authenticate, upload.single('image'), async (req
   }
 });
 
-// --- Orders and invoice generation ---
+app.put('/api/admin/products/:id', authenticate, upload.single('image'), async (req, res) => {
+  if (!req.user.is_admin) return res.status(403).json({ error: 'Forbidden' });
+  const id = req.params.id;
+  const { name, description, price, old_price, category } = req.body;
+  const image = req.file ? '/assets/' + req.file.filename : req.body.image;
+  try {
+    await pool.query('UPDATE products SET name=$1, description=$2, price=$3, old_price=$4, category=$5, image=$6 WHERE id=$7', [name, description, price, old_price, category, image, id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Update failed' });
+  }
+});
+
+app.delete('/api/admin/products/:id', authenticate, async (req, res) => {
+  if (!req.user.is_admin) return res.status(403).json({ error: 'Forbidden' });
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM products WHERE id=$1', [id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
+
+// ---------- Orders ----------
 app.post('/api/orders', authenticate, async (req, res) => {
-  const { items, address } = req.body; // items: [{productId, qty}]
+  const { items, address } = req.body;
   if (!items || !items.length) return res.status(400).json({ error: 'No items' });
   const client = await pool.connect();
   try {
@@ -156,34 +181,5 @@ app.post('/api/orders', authenticate, async (req, res) => {
   }
 });
 
-// Generate invoice PDF for an order
-app.get('/api/invoice/:orderId', authenticate, async (req, res) => {
-  const orderId = req.params.orderId;
-  try {
-    const orderQ = await pool.query('SELECT o.id, o.created_at, o.address, u.username FROM orders o JOIN users u ON u.id=o.user_id WHERE o.id=$1', [orderId]);
-    if (!orderQ.rows.length) return res.status(404).json({ error: 'Order not found' });
-    const order = orderQ.rows[0];
-    const itemsQ = await pool.query('SELECT oi.qty, oi.price, p.name FROM order_items oi JOIN products p ON p.id=oi.product_id WHERE oi.order_id=$1', [orderId]);
-    const items = itemsQ.rows;
-
-    // Create PDF
-    const doc = new PDFDocument({ size: 'A4', margin: 50 });
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
-    doc.pipe(res);
-
-    // Header with logo if exists
-    const logoPath = path.join(__dirname, 'public', 'assets', 'logo.png');
-    if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, 50, 45, { width: 80 });
-    }
-    doc.fontSize(20).text('فاتورة شراء', 150, 50, { align: 'right' });
-    doc.moveDown();
-
-    doc.fontSize(12).text(`رقم الطلب: ${order.id}`, { align: 'right' });
-    doc.text(`التاريخ: ${new Date(order.created_at).toLocaleString()}`, { align: 'right' });
-    doc.text(`العميل: ${order.username}`, { align: 'right' });
-    doc.moveDown();
-
-    // Table header
-    doc.fontSize
+// ---------- Invoice PDF ----------
+app.get('/api/invoice/:orderId', authenticate, async (req
