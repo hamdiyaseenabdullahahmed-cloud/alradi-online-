@@ -40,7 +40,7 @@
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
 
-        /* ==================== الشريط الجانبي ==================== */
+        /* ========== الشريط الجانبي ========== */
         .sidebar {
             width: 280px;
             background: var(--card);
@@ -125,7 +125,7 @@
         }
         .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
 
-        /* ==================== المحتوى الرئيسي ==================== */
+        /* ========== المحتوى الرئيسي ========== */
         .main-content {
             margin-right: 280px;
             flex: 1;
@@ -145,7 +145,7 @@
         .page-title .icon { font-size: 32px; }
         .page-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        /* ==================== البطاقات الإحصائية ==================== */
+        /* ========== البطاقات ========== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -178,10 +178,8 @@
         .stat-icon { font-size: 28px; opacity: 0.7; }
         .stat-value { font-size: 32px; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
         .stat-footer { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
-        .stat-trend-up { color: var(--success); }
-        .stat-trend-down { color: var(--danger); }
 
-        /* ==================== الجداول ==================== */
+        /* ========== الجداول ========== */
         .table-container {
             overflow-x: auto;
             background: var(--card);
@@ -234,7 +232,7 @@
             vertical-align: middle;
         }
         .data-table tr:hover { background: rgba(201,168,76,0.03); }
-        .data-table .product-img {
+        .product-img {
             width: 45px;
             height: 45px;
             border-radius: var(--radius-sm);
@@ -242,7 +240,7 @@
             background: #0A0A15;
         }
 
-        /* ==================== الأزرار ==================== */
+        /* ========== الأزرار ========== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -268,7 +266,7 @@
         .btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 6px; }
         .btn-icon { width: 35px; height: 35px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
 
-        /* ==================== الفورم ==================== */
+        /* ========== الفورم ========== */
         .form-card {
             background: var(--card);
             border-radius: var(--radius);
@@ -305,7 +303,7 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
         .form-hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
 
-        /* ==================== البادجات ==================== */
+        /* ========== البادجات ========== */
         .badge {
             display: inline-block;
             padding: 5px 12px;
@@ -321,12 +319,12 @@
         .badge-delivered { background: rgba(39,174,96,0.2); color: #27AE60; }
         .badge-cancelled { background: rgba(231,76,60,0.2); color: var(--danger); }
 
-        /* ==================== الألسنة ==================== */
+        /* ========== الألسنة ========== */
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } }
 
-        /* ==================== الرسم البياني ==================== */
+        /* ========== الرسم البياني ========== */
         .chart-card {
             background: var(--card);
             border-radius: var(--radius);
@@ -336,7 +334,7 @@
         }
         .chart-card h3 { margin-bottom: 20px; color: var(--primary); }
 
-        /* ==================== الفوتر ==================== */
+        /* ========== الفوتر ========== */
         .main-footer {
             text-align: center;
             padding: 20px;
@@ -346,7 +344,7 @@
             margin-top: 40px;
         }
 
-        /* ==================== Responsive ==================== */
+        /* ========== Responsive ========== */
         @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
         @media (max-width: 992px) { .sidebar { width: 240px; } .main-content { margin-right: 240px; } }
         @media (max-width: 768px) {
@@ -427,6 +425,7 @@ const API = '/api';
 let adminToken = localStorage.getItem('adminToken') || '';
 let currentTab = 'dashboard';
 let editingProductId = null;
+let allProductsCache = [];
 
 // ==================== المصادقة ====================
 async function initAuth() {
@@ -437,7 +436,7 @@ async function initAuth() {
                 const res = await fetch(`${API}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: 'laradi@gmail.com', password: pass })
+                    body: JSON.stringify({ email: 'alradi@gmail.com', password: pass })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -504,9 +503,7 @@ async function buildDashboard() {
                 <button class="btn btn-primary btn-sm" onclick="showTab('products')">➕ إضافة منتج</button>
             </div>
         </div>
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card"><div class="stat-label">جاري التحميل...</div></div>
-        </div>
+        <div class="stats-grid" id="statsGrid"><div class="stat-card"><div class="stat-label">جاري التحميل...</div></div></div>
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
             <div class="table-container">
                 <div class="table-header"><span class="table-title">📋 آخر الطلبات</span></div>
@@ -534,12 +531,12 @@ async function loadDashboard() {
                 <div class="stat-card">
                     <div class="stat-header"><span class="stat-label">إجمالي المبيعات</span><span class="stat-icon">💰</span></div>
                     <div class="stat-value">${(d.totalRevenue || 0).toLocaleString()} ر.س</div>
-                    <div class="stat-footer"><span class="stat-trend-up">↑</span> جميع المبيعات</div>
+                    <div class="stat-footer">جميع المبيعات</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header"><span class="stat-label">مبيعات اليوم</span><span class="stat-icon">📅</span></div>
                     <div class="stat-value">${(d.todayRevenue || 0).toLocaleString()} ر.س</div>
-                    <div class="stat-footer"><span class="stat-trend-up">↑</span> اليوم</div>
+                    <div class="stat-footer">اليوم</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header"><span class="stat-label">الطلبات</span><span class="stat-icon">📋</span></div>
@@ -559,7 +556,7 @@ async function loadDashboard() {
                 <div class="stat-card">
                     <div class="stat-header"><span class="stat-label">نسبة النمو</span><span class="stat-icon">📈</span></div>
                     <div class="stat-value">+15%</div>
-                    <div class="stat-footer"><span class="stat-trend-up">↑</span> عن الشهر الماضي</div>
+                    <div class="stat-footer">عن الشهر الماضي</div>
                 </div>
             `;
             const recentOrders = d.recentOrders || [];
@@ -624,6 +621,8 @@ async function buildProducts() {
                 <div class="form-group"><label>رابط الصورة</label><input type="url" id="prodImage" placeholder="https://..."></div>
             </div>
             <div class="form-group"><label>الوصف</label><textarea id="prodDescription" rows="3"></textarea></div>
+            <div class="form-group"><label>الوسوم (تفصل بفواصل)</label><input type="text" id="prodTags" placeholder="ساعة, ذكية, إلكترونيات"></div>
+            <div class="form-group"><label>منتج مميز؟</label><select id="prodFeatured"><option value="false">لا</option><option value="true">نعم</option></select></div>
             <div style="display:flex; gap:10px;">
                 <button class="btn btn-primary" onclick="saveProduct()">💾 حفظ</button>
                 <button class="btn btn-outline" onclick="toggleProductForm()">إلغاء</button>
@@ -658,6 +657,8 @@ function toggleProductForm() {
             document.getElementById('prodStock').value = 10;
             document.getElementById('prodImage').value = '';
             document.getElementById('prodDescription').value = '';
+            document.getElementById('prodTags').value = '';
+            document.getElementById('prodFeatured').value = 'false';
             document.getElementById('prodDiscount').value = '';
         }
     }
@@ -689,7 +690,9 @@ async function saveProduct() {
         comparePrice: parseFloat(document.getElementById('prodComparePrice').value) || null,
         stock: parseInt(document.getElementById('prodStock').value) || 0,
         description: document.getElementById('prodDescription').value,
-        images: document.getElementById('prodImage').value ? [{url: document.getElementById('prodImage').value}] : []
+        images: document.getElementById('prodImage').value ? [{url: document.getElementById('prodImage').value}] : [],
+        tags: document.getElementById('prodTags').value.split(',').map(t => t.trim()).filter(Boolean),
+        isFeatured: document.getElementById('prodFeatured').value === 'true'
     };
     const url = editingProductId ? `${API}/products/${editingProductId}` : `${API}/products`;
     const method = editingProductId ? 'PUT' : 'POST';
@@ -703,7 +706,7 @@ async function loadProducts() {
     const res = await fetch(`${API}/products?limit=200`);
     const data = await res.json();
     if (data.success) {
-        window._allProducts = data.data;
+        allProductsCache = data.data;
         renderProducts(data.data);
     }
 }
@@ -714,7 +717,7 @@ function renderProducts(products) {
     tbody.innerHTML = products.map(p => `
         <tr>
             <td><img src="${p.images?.[0]?.url || ''}" class="product-img" onerror="this.style.display='none'"></td>
-            <td><strong>${p.name}</strong></td>
+            <td><strong>${p.name}</strong>${p.isFeatured ? ' ⭐' : ''}</td>
             <td>${p.price} ر.س ${p.comparePrice ? `<br><s style="color:var(--muted);">${p.comparePrice} ر.س</s>` : ''}</td>
             <td style="color:${p.stock<=5?'var(--danger)':'var(--success)'}"><strong>${p.stock}</strong></td>
             <td>${p.category || 'عام'}</td>
@@ -728,8 +731,7 @@ function renderProducts(products) {
 }
 
 function filterProducts(query) {
-    const all = window._allProducts || [];
-    renderProducts(query ? all.filter(p => p.name.includes(query)) : all);
+    renderProducts(query ? allProductsCache.filter(p => p.name?.includes(query)) : allProductsCache);
 }
 
 async function editProduct(id) {
@@ -744,6 +746,8 @@ async function editProduct(id) {
         document.getElementById('prodStock').value = p.stock;
         document.getElementById('prodImage').value = p.images?.[0]?.url || '';
         document.getElementById('prodDescription').value = p.description || '';
+        document.getElementById('prodTags').value = (p.tags || []).join(', ');
+        document.getElementById('prodFeatured').value = p.isFeatured ? 'true' : 'false';
         calcDiscount();
         document.getElementById('productForm').classList.add('active');
         editingProductId = p._id;
@@ -765,7 +769,7 @@ async function buildOrders() {
                 <option value="all">الكل</option><option value="pending">قيد الانتظار</option><option value="processing">معالجة</option><option value="shipped">تم الشحن</option><option value="delivered">تم التسليم</option>
             </select>
         </div>
-        <div class="table-container"><table class="data-table" id="ordersTable"><thead><tr><th>رقم</th><th>العميل</th><th>إجمالي</th><th>حالة</th><th>تاريخ</th><th>تغيير</th></tr></thead><tbody id="ordersBody"></tbody></table></div>`;
+        <div class="table-container"><table class="data-table"><thead><tr><th>رقم</th><th>العميل</th><th>إجمالي</th><th>حالة</th><th>تاريخ</th><th>تغيير</th></tr></thead><tbody id="ordersBody"></tbody></table></div>`;
     loadOrders();
 }
 async function loadOrders(f='all') {
@@ -780,13 +784,14 @@ async function loadOrders(f='all') {
 }
 async function updateOrderStatus(id,s){if(!s)return;await fetch(`${API}/orders/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminToken}`},body:JSON.stringify({status:s})});loadOrders();}
 
-// ==================== باقي التبويبات (كاملة) ====================
+// ==================== العملاء ====================
 async function buildCustomers() {
     document.getElementById('mainContent').innerHTML = `<div class="page-header"><h1>👥 العملاء</h1></div><div class="table-container"><table class="data-table"><thead><tr><th>الاسم</th><th>البريد</th><th>نقاط</th><th>مستوى</th></tr></thead><tbody id="custBody"></tbody></table></div>`;
     const r=await fetch(`${API}/users?role=customer`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();
     if(d.success) document.getElementById('custBody').innerHTML = d.data.map(u=>`<tr><td>${u.fullName}</td><td>${u.email}</td><td>${u.loyaltyPoints||0}</td><td>${u.loyaltyTier||'برونزي'}</td></tr>`).join('');
 }
 
+// ==================== الكوبونات ====================
 async function buildCoupons() {
     document.getElementById('mainContent').innerHTML = `<div class="page-header"><h1>🎫 الكوبونات</h1><button class="btn btn-primary" onclick="toggleCouponForm()">➕ جديد</button></div>
     <div class="form-card" id="cpForm"><div class="form-row"><div class="form-group"><label>الكود</label><input id="cpCode"></div><div class="form-group"><label>نوع</label><select id="cpType"><option value="percentage">نسبة</option><option value="fixed">ثابت</option></select></div></div>
@@ -806,17 +811,77 @@ async function loadCoupons(){
     if(d.success) document.getElementById('cpBody').innerHTML = d.data.map(c=>`<tr><td><strong>${c.code}</strong></td><td>${c.discountType}</td><td>${c.discountValue}</td><td>${c.usedCount||0}</td></tr>`).join('');
 }
 
-// تبويبات إضافية
-async function buildBanners(){document.getElementById('mainContent').innerHTML='<h1>🖼️ البانرات</h1><p>قيد التطوير</p>';}
-async function buildSounds(){document.getElementById('mainContent').innerHTML='<h1>🔊 الصوتيات</h1><p>قيد التطوير</p>';}
-async function buildReports(){document.getElementById('mainContent').innerHTML='<h1>📈 التقارير</h1><p>قيد التطوير</p>';}
-async function buildTrash(){document.getElementById('mainContent').innerHTML='<h1>🗑️ سلة المحذوفات</h1><p>قيد التطوير</p>';}
-async function buildLogs(){document.getElementById('mainContent').innerHTML='<h1>📝 سجل النشاطات</h1><p>قيد التطوير</p>';}
-async function buildMaintenance(){document.getElementById('mainContent').innerHTML='<h1>🔧 الصيانة التنبؤية</h1><p>قيد التطوير</p>';}
-async function buildSettings(){document.getElementById('mainContent').innerHTML='<h1>⚙️ الإعدادات</h1><p>قيد التطوير</p>';}
-async function buildCustomize(){document.getElementById('mainContent').innerHTML='<h1>🎨 التخصيص</h1><p>قيد التطوير</p>';}
-async function buildBackup(){document.getElementById('mainContent').innerHTML='<h1>💾 النسخ الاحتياطي</h1><p>قيد التطوير</p>';}
-async function buildRoles(){document.getElementById('mainContent').innerHTML='<h1>🔐 الصلاحيات</h1><p>قيد التطوير</p>';}
+// ==================== باقي التبويبات ====================
+async function buildBanners(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>🖼️ البانرات</h1></div><div class="table-container"><table class="data-table"><thead><tr><th>الصورة</th><th>العنوان</th><th>الرابط</th><th>الحالة</th></tr></thead><tbody id="bannersBody"></tbody></table></div>';loadBanners();}
+async function loadBanners(){const r=await fetch(`${API}/banners`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();if(d.success)document.getElementById('bannersBody').innerHTML=d.data.map(b=>`<tr><td><img src="${b.imageUrl||''}" width="60"></td><td>${b.title||''}</td><td>${b.link||''}</td><td>${b.isActive?'نشط':'غير نشط'}</td></tr>`).join('');}
+
+async function buildSounds(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>🔊 الصوتيات</h1></div><div class="table-container"><table class="data-table"><thead><tr><th>الاسم</th><th>الرابط</th><th>تشغيل</th></tr></thead><tbody id="soundsBody"></tbody></table></div>';loadSounds();}
+async function loadSounds(){const r=await fetch(`${API}/sounds`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();if(d.success)document.getElementById('soundsBody').innerHTML=d.data.map(s=>`<tr><td>${s.name}</td><td>${s.url}</td><td><audio controls src="${s.url}"></audio></td></tr>`).join('');}
+
+async function buildReports(){
+    document.getElementById('mainContent').innerHTML=`<div class="page-header"><h1>📈 التقارير</h1><div><button class="btn btn-primary" onclick="exportReport('pdf')">📄 PDF</button><button class="btn btn-outline" onclick="exportReport('csv')">📊 CSV</button></div></div>
+    <div class="form-row"><div class="form-group"><label>نوع</label><select id="reportType" onchange="loadReport()"><option value="sales">المبيعات</option><option value="products">المنتجات</option></select></div><div class="form-group"><label>فترة</label><select id="reportPeriod" onchange="loadReport()"><option value="daily">يومي</option><option value="monthly">شهري</option></select></div></div>
+    <div id="reportContent" class="table-container" style="padding:20px;"><p style="color:var(--muted);">اختر النوع والفترة</p></div>`;
+}
+async function loadReport(){
+    const type=document.getElementById('reportType').value,period=document.getElementById('reportPeriod').value;
+    const r=await fetch(`${API}/admin/reports?type=${type}&period=${period}`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();
+    if(d.success&&d.data.length){let h='<table class="data-table"><thead><tr><th>التاريخ</th><th>الطلبات</th><th>الإيرادات</th></tr></thead><tbody>';
+    d.data.forEach(r=>{h+=`<tr><td>${r._id}</td><td>${r.orders}</td><td>${(r.revenue||0).toLocaleString()} ر.س</td></tr>`;});h+='</tbody></table>';
+    document.getElementById('reportContent').innerHTML=h;}else document.getElementById('reportContent').innerHTML='<p style="color:var(--muted);">لا بيانات</p>';
+}
+function exportReport(f){alert(`تصدير ${f.toUpperCase()} قيد التطوير`);}
+
+async function buildTrash(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>🗑️ سلة المحذوفات</h1></div><div class="table-container"><table class="data-table"><thead><tr><th>العنصر</th><th>تاريخ</th><th>استعادة</th></tr></thead><tbody id="trashBody"></tbody></table></div>';loadTrash();}
+async function loadTrash(){const r=await fetch(`${API}/trash`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();if(d.success)document.getElementById('trashBody').innerHTML=d.data.map(i=>`<tr><td>${i.name||i._id}</td><td>${new Date(i.deletedAt).toLocaleString('ar-SA')}</td><td><button class="btn btn-sm btn-success" onclick="restoreItem('${i._id}')">استعادة</button></td></tr>`).join('');}
+async function restoreItem(id){await fetch(`${API}/trash/restore/${id}`,{method:'POST',headers:{'Authorization':`Bearer ${adminToken}`}});loadTrash();loadProducts();}
+
+async function buildLogs(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>📝 سجل النشاطات</h1></div><div class="table-container"><table class="data-table"><thead><tr><th>المستخدم</th><th>الإجراء</th><th>التفاصيل</th><th>التاريخ</th></tr></thead><tbody id="logsBody"></tbody></table></div>';loadLogs();}
+async function loadLogs(){const r=await fetch(`${API}/audit-logs`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();if(d.success)document.getElementById('logsBody').innerHTML=d.data.map(l=>`<tr><td>${l.userId||'نظام'}</td><td>${l.action}</td><td>${l.details||''}</td><td>${new Date(l.createdAt).toLocaleString('ar-SA')}</td></tr>`).join('');}
+
+async function buildMaintenance(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>🔧 الصيانة التنبؤية</h1></div><div class="table-container"><table class="data-table"><thead><tr><th>الطلب</th><th>المنتج</th><th>تاريخ</th><th>متبقي</th></tr></thead><tbody id="maintBody"></tbody></table></div>';loadMaintenance();}
+async function loadMaintenance(){const r=await fetch(`${API}/admin/maintenance-alerts`,{headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();if(d.success)document.getElementById('maintBody').innerHTML=d.data.map(a=>`<tr><td>${a.orderNumber}</td><td>${a.product}</td><td>${new Date(a.dueDate).toLocaleDateString('ar-SA')}</td><td>${a.daysLeft} يوم</td></tr>`).join('');}
+
+async function buildSettings(){
+    document.getElementById('mainContent').innerHTML=`<div class="page-header"><h1>⚙️ الإعدادات</h1><button class="btn btn-primary" onclick="saveSettings()">💾 حفظ</button></div>
+    <h3>📦 الشحن</h3><div class="form-row"><div class="form-group"><label>داخلي (%)</label><input type="number" id="internalRate" value="5"></div><div class="form-group"><label>خارجي (%)</label><input type="number" id="externalRate" value="10"></div></div>
+    <h3>📝 الاسترجاع</h3><div class="form-group"><label>النص</label><textarea id="returnPolicy" rows="3">الاستبدال خلال 14 يوم</textarea></div><div class="form-group"><label>المدة (أيام)</label><input type="number" id="returnWindow" value="14"></div>`;
+    loadSettings();
+}
+async function loadSettings(){
+    const[s,r]=await Promise.all([fetch(`${API}/admin/settings/shipping`,{headers:{'Authorization':`Bearer ${adminToken}`}}),fetch(`${API}/admin/settings/return_policy`,{headers:{'Authorization':`Bearer ${adminToken}`}})]);
+    const sd=await s.json(),rd=await r.json();
+    if(sd.success&&sd.data){document.getElementById('internalRate').value=sd.data.internalRate||5;document.getElementById('externalRate').value=sd.data.externalRate||10;}
+    if(rd.success&&rd.data){document.getElementById('returnPolicy').value=rd.data.text||'';document.getElementById('returnWindow').value=rd.data.window||14;}
+}
+async function saveSettings(){
+    await fetch(`${API}/admin/settings`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminToken}`},body:JSON.stringify({type:'shipping',data:{internalRate:+document.getElementById('internalRate').value,externalRate:+document.getElementById('externalRate').value}})});
+    await fetch(`${API}/admin/settings`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminToken}`},body:JSON.stringify({type:'return_policy',data:{text:document.getElementById('returnPolicy').value,window:+document.getElementById('returnWindow').value}})});
+    alert('✅ تم الحفظ');
+}
+
+async function buildCustomize(){
+    document.getElementById('mainContent').innerHTML=`<div class="page-header"><h1>🎨 التخصيص</h1><button class="btn btn-primary" onclick="applyCustom()">✅ تطبيق</button></div>
+    <h3>🎨 الألوان</h3><div style="display:flex;gap:20px;"><div><label>الرئيسي</label><input type="color" id="priColor" value="#C9A84C"></div><div><label>الخلفية</label><input type="color" id="bgColor" value="#0F0F1A"></div><div><label>النص</label><input type="color" id="txtColor" value="#FFFFFF"></div></div>
+    <h3>🖼️ الشعار</h3><div class="form-group"><input type="file" id="logoFile" accept="image/*"></div><button class="btn btn-outline" onclick="uploadLogo()">رفع الشعار</button>`;
+}
+function applyCustom(){
+    const c={primary:document.getElementById('priColor').value,bg:document.getElementById('bgColor').value,text:document.getElementById('txtColor').value};
+    document.documentElement.style.setProperty('--primary',c.primary);document.documentElement.style.setProperty('--bg',c.bg);document.documentElement.style.setProperty('--text',c.text);
+    fetch(`${API}/admin/settings`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':`Bearer ${adminToken}`},body:JSON.stringify({type:'theme',data:c})});
+    alert('✅ تم');
+}
+async function uploadLogo(){
+    const file=document.getElementById('logoFile').files[0];if(!file)return;
+    const form=new FormData();form.append('file',file);form.append('type','logo');
+    const r=await fetch(`${API}/upload`,{method:'POST',headers:{'Authorization':`Bearer ${adminToken}`},body:form});
+    const d=await r.json();if(d.success)alert('✅ تم رفع الشعار');
+}
+
+async function buildBackup(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>💾 النسخ الاحتياطي</h1><button class="btn btn-primary" onclick="createBackup()">إنشاء نسخة</button></div><div id="backupStatus"></div>';}
+async function createBackup(){const r=await fetch(`${API}/backup`,{method:'POST',headers:{'Authorization':`Bearer ${adminToken}`}});const d=await r.json();document.getElementById('backupStatus').innerHTML=d.success?'<p style="color:var(--success);">✅ تم</p>':'<p style="color:var(--danger);">❌ فشل</p>';}
+
+async function buildRoles(){document.getElementById('mainContent').innerHTML='<div class="page-header"><h1>🔐 الصلاحيات</h1></div><p style="color:var(--muted);">قيد التطوير</p>';}
 
 // ==================== بدء التشغيل ====================
 (async () => {
