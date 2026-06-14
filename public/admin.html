@@ -40,6 +40,7 @@
             min-height: 100vh;
         }
 
+        /* الشريط الجانبي */
         .sidebar {
             width: 280px;
             background: var(--bg-card);
@@ -110,6 +111,7 @@
             border-radius: 20px;
         }
 
+        /* المحتوى الرئيسي */
         .main-content {
             margin-right: 280px;
             flex: 1;
@@ -117,6 +119,7 @@
             min-height: 100vh;
         }
 
+        /* الهيدر العلوي */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -144,6 +147,7 @@
             flex-wrap: wrap;
         }
 
+        /* البطاقات الإحصائية */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -199,6 +203,7 @@
         .change-up { color: var(--success); }
         .change-down { color: var(--danger); }
 
+        /* الجداول */
         .table-container {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -258,6 +263,7 @@
             background: rgba(201,168,76,0.05);
         }
 
+        /* الأزرار */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -318,6 +324,7 @@
             font-size: 11px;
         }
 
+        /* النماذج */
         .form-card {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -333,14 +340,8 @@
         }
 
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .form-card h3 {
@@ -387,6 +388,7 @@
             gap: 18px;
         }
 
+        /* البادجات */
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -402,6 +404,7 @@
         .badge-delivered { background: #27AE60; color: white; }
         .badge-cancelled { background: var(--danger); color: white; }
 
+        /* الرسم البياني */
         .chart-card {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -420,6 +423,7 @@
             height: auto;
         }
 
+        /* المودالات */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -439,7 +443,7 @@
             background: var(--bg-card);
             border-radius: var(--radius);
             width: 90%;
-            max-width: 700px;
+            max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
             padding: 25px;
@@ -457,6 +461,7 @@
             color: var(--text-muted);
         }
 
+        /* زر القائمة للجوال */
         .mobile-menu-btn {
             display: none;
             position: fixed;
@@ -473,6 +478,7 @@
             box-shadow: var(--shadow);
         }
 
+        /* التبديل */
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -518,6 +524,7 @@
             transform: translateX(26px);
         }
 
+        /* الإشعارات */
         .admin-toast {
             position: fixed;
             bottom: 30px;
@@ -528,16 +535,11 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
+        /* استجابة للجوال */
         @media (max-width: 768px) {
             .sidebar {
                 display: none;
@@ -585,6 +587,7 @@
 
 <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
 
+<!-- الشريط الجانبي -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <h2>🦅 الرعدي أونلاين</h2>
@@ -646,6 +649,7 @@
     </div>
 </aside>
 
+<!-- المحتوى الرئيسي -->
 <main class="main-content" id="mainContent">
     <div class="top-bar">
         <div class="page-title">
@@ -669,8 +673,6 @@
     let allOrders = [];
     let allCustomers = [];
     let allCoupons = [];
-    let allCategories = [];
-    let allBanners = [];
 
     async function initAuth() {
         if (!adminToken) {
@@ -817,7 +819,7 @@
                     <div class="stat-card"><div class="stat-header"><span class="stat-label">👥 العملاء</span><span class="stat-icon">👥</span></div><div class="stat-value">${stats.totalCustomers || 0}</div></div>
                     <div class="stat-card"><div class="stat-header"><span class="stat-label">📦 المنتجات</span><span class="stat-icon">📦</span></div><div class="stat-value">${stats.totalProducts || 0}</div><div class="stat-change">منخفض: ${stats.lowStockProducts || 0}</div></div>
                 `;
-                document.getElementById('recentOrdersBody').innerHTML = (stats.recentOrders || []).map(o => `<tr><td><strong>${o.orderNumber}</strong></td><td>${o.user?.fullName || 'غير معروف'}</td><td>${(o.pricing?.total || 0).toFixed(2)} ر.س</td><td><span class="badge badge-${o.status || 'pending'}">${o.status || 'pending'}</span></td><td>${new Date(o.createdAt).toLocaleDateString('ar-SA')}</td></tr>`).join('');
+                document.getElementById('recentOrdersBody').innerHTML = (stats.recentOrders || []).map(o => `<tr><td><strong>${o.orderNumber}</strong></td><td>${o.userName || 'غير معروف'}</td><td>${(o.total || 0).toFixed(2)} ر.س</td><td><span class="badge badge-${o.status || 'pending'}">${o.status || 'pending'}</span></td><td>${new Date(o.createdAt).toLocaleDateString('ar-SA')}</td></tr>`).join('');
                 document.getElementById('lowStockBody').innerHTML = (stats.lowStockProductsList || []).map(p => `<tr><td><strong>${p.name}</strong></td><td style="color: var(--danger);">${p.stock} قطعة</td><td><span class="badge badge-warning">⚠️ منخفض</span></td></tr>`).join('');
                 drawChart(stats.recentOrders || []);
                 if (stats.lowStockProducts > 0) { document.getElementById('lowStockBadge').textContent = stats.lowStockProducts; document.getElementById('lowStockBadge').style.display = 'inline'; }
@@ -831,7 +833,7 @@
         if (!canvas || !orders.length) return;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const values = orders.map(o => o.pricing?.total || 0);
+        const values = orders.map(o => o.total || 0);
         const maxVal = Math.max(...values, 1);
         ctx.beginPath();
         ctx.strokeStyle = '#C9A84C';
@@ -853,7 +855,7 @@
         const container = document.getElementById('tabContent');
         container.innerHTML = `
             <div class="form-card" id="productForm"><h3 id="productFormTitle">➕ إضافة منتج جديد</h3><div class="form-row"><div class="form-group"><label>اسم المنتج *</label><input type="text" id="productName"></div><div class="form-group"><label>القسم *</label><select id="productCategory"></select></div></div><div class="form-row"><div class="form-group"><label>السعر (ر.س) *</label><input type="number" id="productPrice" step="0.01"></div><div class="form-group"><label>السعر قبل الخصم</label><input type="number" id="productComparePrice" step="0.01"></div></div><div class="form-row"><div class="form-group"><label>المخزون *</label><input type="number" id="productStock" value="10"></div><div class="form-group"><label>رابط الصورة</label><input type="url" id="productImage"></div></div><div class="form-group"><label>الوصف</label><textarea id="productDescription" rows="4"></textarea></div><div class="form-row"><div class="form-group"><label>الوسوم</label><input type="text" id="productTags"></div><div class="form-group"><label>منتج مميز؟</label><select id="productFeatured"><option value="false">لا</option><option value="true">نعم</option></select></div></div><div style="display: flex; gap: 10px;"><button class="btn btn-primary" onclick="saveProduct()">💾 حفظ</button><button class="btn btn-outline" onclick="hideProductForm()">إلغاء</button></div></div>
-            <div class="table-container"><div class="table-header"><span class="table-title">قائمة المنتجات</span><div class="table-search"><input type="text" id="productSearch" placeholder="🔍 بحث..." oninput="searchProducts(this.value)"></div></div><table class="data-table"><thead><tr><th>الصورة</th><th>الاسم</th><th>السعر</th><th>المخزون</th><th>القسم</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="productsTableBody"><tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr></tbody></table></div>
+            <div class="table-container"><div class="table-header"><span class="table-title">قائمة المنتجات</span><div class="table-search"><input type="text" id="productSearch" placeholder="🔍 بحث..." oninput="searchProducts(this.value)"></div></div><table class="data-table"><thead><tr><th>الصورة</th><th>الاسم</th><th>السعر</th><th>المخزون</th><th>القسم</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="productsTableBody"><tr><td colspan="7" style="text-align: center;">جاري التحميل...<\/td><\/tr><\/tbody></table></div>
         `;
         await loadCategoriesSelect();
         await fetchProducts();
@@ -872,7 +874,7 @@
 
     async function fetchProducts() {
         try {
-            const res = await fetch(`${API}/products?limit=100`);
+            const res = await fetch(`${API}/admin/products`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
             const data = await res.json();
             if (data.success) { allProducts = data.data; renderProductsTable(allProducts); }
         } catch (error) { console.error(error); }
@@ -896,7 +898,7 @@
         const body = { name, category, price, stock, description: document.getElementById('productDescription').value, tags: document.getElementById('productTags').value.split(',').map(t=>t.trim()).filter(Boolean), isFeatured: document.getElementById('productFeatured').value === 'true' };
         if (document.getElementById('productComparePrice').value) body.comparePrice = parseFloat(document.getElementById('productComparePrice').value);
         if (document.getElementById('productImage').value) body.images = [{ url: document.getElementById('productImage').value, type: 'main' }];
-        const url = editingId ? `${API}/products/${editingId}` : `${API}/products`;
+        const url = editingId ? `${API}/admin/products/${editingId}` : `${API}/admin/products`;
         const method = editingId ? 'PUT' : 'POST';
         try {
             const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) });
@@ -931,7 +933,7 @@
     async function deleteProduct(id) {
         if (!confirm('هل أنت متأكد؟')) return;
         try {
-            const res = await fetch(`${API}/products/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+            const res = await fetch(`${API}/admin/products/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
             const data = await res.json();
             if (data.success) { showToast('تم الحذف', 'success'); fetchProducts(); }
             else showToast(data.error || 'فشل', 'error');
@@ -939,7 +941,7 @@
     }
 
     async function toggleProductStatus(id, isActive) {
-        try { await fetch(`${API}/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ isActive }) }); }
+        try { await fetch(`${API}/admin/products/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ isActive }) }); }
         catch (error) { console.error(error); }
     }
 
@@ -965,12 +967,10 @@
         if (!tbody) return;
         const pending = orders.filter(o => o.status === 'pending').length;
         const today = orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
-        const totalRevenue = orders.reduce((s, o) => s + (o.pricing?.total || 0), 0);
+        const totalRevenue = orders.reduce((s, o) => s + (o.total || 0), 0);
         document.getElementById('ordersStats').innerHTML = `<div class="stat-card"><div class="stat-header"><span class="stat-label">⏳ قيد الانتظار</span></div><div class="stat-value" style="color:var(--warning);">${pending}</div></div><div class="stat-card"><div class="stat-header"><span class="stat-label">📅 طلبات اليوم</span></div><div class="stat-value">${today}</div></div><div class="stat-card"><div class="stat-header"><span class="stat-label">💰 إجمالي الإيرادات</span></div><div class="stat-value">${totalRevenue.toLocaleString()} ر.س</div></div>`;
-        tbody.innerHTML = orders.map(o => `<tr><td><strong>${o.orderNumber}</strong></td><td>${o.user?.fullName || 'غير معروف'}<br><small>${o.user?.phone || ''}</small></td><td>${o.items?.length || 0} منتج</td><td style="color:var(--primary);font-weight:bold;">${(o.pricing?.total || 0).toFixed(2)} ر.س</td><td>${getPaymentMethodText(o.payment?.method)}</td><td><select onchange="updateOrderStatus('${o._id}', this.value)" style="padding:5px 10px;border-radius:20px;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-light);"><option value="pending" ${o.status === 'pending' ? 'selected' : ''}>⏳ قيد الانتظار</option><option value="confirmed" ${o.status === 'confirmed' ? 'selected' : ''}>✅ مؤكد</option><option value="processing" ${o.status === 'processing' ? 'selected' : ''}>🔄 قيد المعالجة</option><option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>🚚 تم الشحن</option><option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>📦 تم التسليم</option><option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>❌ ملغي</option></select></td><td>${new Date(o.createdAt).toLocaleDateString('ar-SA')}</td><td><button class="btn btn-outline btn-xs" onclick="viewOrderDetails('${o._id}')">👁️</button></td></tr>`).join('');
+        tbody.innerHTML = orders.map(o => `<tr><td><strong>${o.orderNumber}</strong></td><td>${o.userName || 'غير معروف'}<br><small>${o.shippingAddress?.phone || ''}</small></td><td>${o.items?.length || 0} منتج</td><td style="color:var(--primary);font-weight:bold;">${(o.total || 0).toFixed(2)} ر.س</td><td>${o.paymentMethod === 'cod' ? '💵 عند الاستلام' : '💳 بطاقة'}</td><td><select onchange="updateOrderStatus('${o._id}', this.value)" style="padding:5px 10px;border-radius:20px;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-light);"><option value="pending" ${o.status === 'pending' ? 'selected' : ''}>⏳ قيد الانتظار</option><option value="confirmed" ${o.status === 'confirmed' ? 'selected' : ''}>✅ مؤكد</option><option value="processing" ${o.status === 'processing' ? 'selected' : ''}>🔄 قيد المعالجة</option><option value="shipped" ${o.status === 'shipped' ? 'selected' : ''}>🚚 تم الشحن</option><option value="delivered" ${o.status === 'delivered' ? 'selected' : ''}>📦 تم التسليم</option><option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>❌ ملغي</option></select></td><td>${new Date(o.createdAt).toLocaleDateString('ar-SA')}</td><td><button class="btn btn-outline btn-xs" onclick="viewOrderDetails('${o._id}')">👁️</button></td></tr>`).join('');
     }
-
-    function getPaymentMethodText(method) { const m = { cod: '💵 عند الاستلام', card: '💳 بطاقة', bank: '🏦 تحويل', wallet: '📱 محفظة' }; return m[method] || method || '—'; }
 
     async function updateOrderStatus(orderId, status) {
         try {
@@ -989,18 +989,18 @@
                 const o = data.data;
                 const modal = document.createElement('div');
                 modal.className = 'modal-overlay active';
-                modal.innerHTML = `<div class="modal" style="max-width:800px;"><button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button><h2 style="color:var(--primary);">📋 تفاصيل الطلب #${o.orderNumber}</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0;"><div><strong>العميل:</strong> ${o.user?.fullName || 'غير معروف'}</div><div><strong>الجوال:</strong> ${o.user?.phone || '—'}</div><div><strong>البريد:</strong> ${o.user?.email || '—'}</div><div><strong>الدفع:</strong> ${getPaymentMethodText(o.payment?.method)}</div><div><strong>العنوان:</strong> ${o.shipping?.address?.city || ''}</div><div><strong>ملاحظات:</strong> ${o.notes || '—'}</div></div><table class="data-table"><thead><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${(o.items || []).map(i => `<tr><td>${i.name}</td><td>${i.quantity}</td><td>${i.price.toFixed(2)} ر.س</td><td>${(i.price * i.quantity).toFixed(2)} ر.س</td></tr>`).join('')}</tbody></table><div style="text-align:left;margin-top:20px;font-size:20px;font-weight:bold;color:var(--primary);">الإجمالي: ${(o.pricing?.total || 0).toFixed(2)} ر.س</div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn btn-primary" onclick="window.open('${o.invoice?.pdfUrl || ''}', '_blank')">📄 الفاتورة</button><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">إغلاق</button></div></div>`;
+                modal.innerHTML = `<div class="modal"><button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button><h2 style="color:var(--primary);">📋 تفاصيل الطلب #${o.orderNumber}</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0;"><div><strong>العميل:</strong> ${o.userName}</div><div><strong>الجوال:</strong> ${o.shippingAddress?.phone || '—'}</div><div><strong>العنوان:</strong> ${o.shippingAddress?.city || ''} ${o.shippingAddress?.street || ''}</div><div><strong>الدفع:</strong> ${o.paymentMethod === 'cod' ? '💵 عند الاستلام' : '💳 بطاقة'}</div><div><strong>ملاحظات:</strong> ${o.notes || '—'}</div></div><table class="data-table"><thead><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${(o.items || []).map(i => `<tr><td>${i.name}</td><td>${i.quantity}</td><td>${i.price.toFixed(2)} ر.س</td><td>${(i.price * i.quantity).toFixed(2)} ر.س</td></tr>`).join('')}</tbody></table><div style="text-align:left;margin-top:20px;font-size:20px;font-weight:bold;color:var(--primary);">الإجمالي: ${(o.total || 0).toFixed(2)} ر.س</div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn btn-primary" onclick="window.print()">🖨️ طباعة</button><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">إغلاق</button></div></div>`;
                 document.body.appendChild(modal);
             }
         } catch (error) { showToast('فشل جلب التفاصيل', 'error'); }
     }
 
-    function searchOrders(query) { renderOrdersTable(allOrders.filter(o => o.orderNumber?.toLowerCase().includes(query.toLowerCase()) || o.user?.fullName?.toLowerCase().includes(query.toLowerCase()))); }
+    function searchOrders(query) { renderOrdersTable(allOrders.filter(o => o.orderNumber?.toLowerCase().includes(query.toLowerCase()) || o.userName?.toLowerCase().includes(query.toLowerCase()))); }
 
     // ==================== Customers ====================
     async function loadCustomers() {
         const container = document.getElementById('tabContent');
-        container.innerHTML = `<div class="stats-grid" id="customersStats"></div><div class="table-container"><div class="table-header"><span class="table-title">قائمة العملاء</span><div class="table-search"><input type="text" id="customerSearch" placeholder="🔍 بحث..." oninput="searchCustomers(this.value)"></div></div><table class="data-table"><thead><tr><th>الاسم</th><th>الجوال</th><th>البريد</th><th>المدينة</th><th>الطلبات</th><th>نقاط الولاء</th><th>المستوى</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="customersTableBody"><tr><td colspan="9" style="text-align: center;">جاري التحميل...<\/td><\/tr><\/tbody><\/table><\/div>`;
+        container.innerHTML = `<div class="stats-grid" id="customersStats"></div><div class="table-container"><div class="table-header"><span class="table-title">قائمة العملاء</span><div class="table-search"><input type="text" id="customerSearch" placeholder="🔍 بحث..." oninput="searchCustomers(this.value)"></div></div><table class="data-table"><thead><tr><th>الاسم</th><th>الجوال</th><th>البريد</th><th>المدينة</th><th>الطلبات</th><th>نقاط الولاء</th><th>المستوى</th><th>الحالة</th><th>إجراءات</th></td></thead><tbody id="customersTableBody"><tr><td colspan="9" style="text-align: center;">جاري التحميل...<\/td><\/tr><\/tbody><\/table><\/div>`;
         await fetchCustomers();
     }
 
@@ -1012,53 +1012,19 @@
         } catch (error) { console.error(error); }
     }
 
-    function getTierColor(tier) { const colors = { 'برونزي':'#CD7F32','فضي':'#C0C0C0','ذهبي':'#FFD700','بلاتيني':'#E5E4E2','ماسي':'#B9F2FF','أسطوري':'#FF6B6B' }; return colors[tier] || '#CD7F32'; }
-
     function renderCustomersTable(customers) {
         const tbody = document.getElementById('customersTableBody');
         if (!tbody) return;
         const total = customers.length, active = customers.filter(c => c.isActive && !c.isBanned).length, gold = customers.filter(c => c.loyaltyTier === 'ذهبي').length;
         document.getElementById('customersStats').innerHTML = `<div class="stat-card"><div class="stat-header"><span class="stat-label">👥 إجمالي العملاء</span></div><div class="stat-value">${total}</div></div><div class="stat-card"><div class="stat-header"><span class="stat-label">🟢 نشط</span></div><div class="stat-value" style="color:var(--success);">${active}</div></div><div class="stat-card"><div class="stat-header"><span class="stat-label">🥇 ذهبيين</span></div><div class="stat-value" style="color:#FFD700;">${gold}</div></div>`;
-        tbody.innerHTML = customers.map(c => `<td><td><strong>${c.fullName}</strong><br><small>${c.username || ''}</small></td><td>${c.phone}</td><td>${c.email || '—'}</td><td>${c.city || '—'}</td><td>${c.orderCount || 0}</td><td style="color:var(--primary);font-weight:bold;">${c.loyaltyPoints || 0}</td><td><span style="color:${getTierColor(c.loyaltyTier)};">${c.loyaltyTier || 'برونزي'}</span></td><td>${c.isBanned ? '<span style="color:var(--danger);">⛔ محظور</span>' : '<span style="color:var(--success);">✅ نشط</span>'}</td><td><button class="btn btn-outline btn-xs" onclick="viewCustomerDetails('${c._id}')">👁️</button> <button class="btn btn-warning btn-xs" onclick="addPoints('${c._id}')">⭐</button> ${!c.isBanned ? `<button class="btn btn-danger btn-xs" onclick="banCustomer('${c._id}')">⛔</button>` : `<button class="btn btn-success btn-xs" onclick="unbanCustomer('${c._id}')">✅</button>`}</td></tr>`).join('');
+        tbody.innerHTML = customers.map(c => `</tr><td><strong>${c.fullName}</strong><br><small>${c.email || ''}</small></td><td>${c.phone}</td><td>${c.email || '—'}</td><td>${c.city || '—'}</td><td>${c.orderCount || 0}</td><td style="color:var(--primary);font-weight:bold;">${c.loyaltyPoints || 0}</td><td><span style="color:${c.loyaltyTier === 'ذهبي' ? '#FFD700' : c.loyaltyTier === 'فضي' ? '#C0C0C0' : '#CD7F32'};">${c.loyaltyTier || 'برونزي'}</span></td><td>${c.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-outline btn-xs" onclick="viewCustomerDetails('${c._id}')">👁️</button></td></tr>`).join('');
     }
 
     async function viewCustomerDetails(id) {
         try {
             const res = await fetch(`${API}/admin/customers/${id}`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
             const data = await res.json();
-            if (data.success) { const c = data.data; alert(`👤 ${c.fullName}\n📱 ${c.phone}\n📧 ${c.email || '—'}\n📍 ${c.city || '—'}\n⭐ المستوى: ${c.loyaltyTier}\n🎁 النقاط: ${c.loyaltyPoints}\n📦 الطلبات: ${c.orderCount || 0}\n💰 المشتريات: ${(c.totalSpent || 0).toLocaleString()} ر.س`); }
-        } catch (error) { showToast('فشل', 'error'); }
-    }
-
-    async function addPoints(id) {
-        const points = prompt('عدد النقاط (استخدم - للخصم):');
-        if (points === null) return;
-        const reason = prompt('السبب:');
-        try {
-            const res = await fetch(`${API}/admin/customers/${id}/points`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ points: parseInt(points), reason }) });
-            const data = await res.json();
-            if (data.success) { showToast(data.message, 'success'); fetchCustomers(); }
-            else showToast(data.error || 'فشل', 'error');
-        } catch (error) { showToast('فشل', 'error'); }
-    }
-
-    async function banCustomer(id) {
-        const reason = prompt('سبب الحظر:');
-        if (!reason) return;
-        try {
-            const res = await fetch(`${API}/admin/customers/${id}/ban`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ isBanned: true, banReason: reason }) });
-            const data = await res.json();
-            if (data.success) { showToast('تم حظر العميل', 'success'); fetchCustomers(); }
-            else showToast(data.error || 'فشل', 'error');
-        } catch (error) { showToast('فشل', 'error'); }
-    }
-
-    async function unbanCustomer(id) {
-        try {
-            const res = await fetch(`${API}/admin/customers/${id}/ban`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ isBanned: false }) });
-            const data = await res.json();
-            if (data.success) { showToast('تم إلغاء الحظر', 'success'); fetchCustomers(); }
-            else showToast(data.error || 'فشل', 'error');
+            if (data.success) { const c = data.data; alert(`👤 ${c.fullName}\n📱 ${c.phone}\n📧 ${c.email || '—'}\n📍 ${c.city || '—'}\n⭐ المستوى: ${c.loyaltyTier}\n🎁 النقاط: ${c.loyaltyPoints}\n📅 تاريخ التسجيل: ${new Date(c.createdAt).toLocaleDateString('ar-SA')}`); }
         } catch (error) { showToast('فشل', 'error'); }
     }
 
@@ -1067,7 +1033,7 @@
     // ==================== Coupons ====================
     async function loadCoupons() {
         const container = document.getElementById('tabContent');
-        container.innerHTML = `<div class="form-card" id="couponForm"><h3>➕ إضافة كوبون</h3><div class="form-row"><div class="form-group"><label>الكود *</label><input type="text" id="couponCode"></div><div class="form-group"><label>النوع</label><select id="couponType"><option value="percentage">نسبة</option><option value="fixed">ثابت</option></select></div></div><div class="form-row"><div class="form-group"><label>القيمة *</label><input type="number" id="couponValue"></div><div class="form-group"><label>الحد الأدنى</label><input type="number" id="couponMinOrder" value="0"></div></div><div class="form-row"><div class="form-group"><label>تاريخ الانتهاء</label><input type="date" id="couponExpiry"></div><div class="form-group"><label>الوصف</label><input type="text" id="couponDescription"></div></div><div style="display:flex;gap:10px;"><button class="btn btn-primary" onclick="saveCoupon()">💾 حفظ</button><button class="btn btn-outline" onclick="hideCouponForm()">إلغاء</button></div></div><div class="table-container"><div class="table-header"><span class="table-title">الكوبونات</span></div><table class="data-table"><thead><tr><th>الكود</th><th>النوع</th><th>القيمة</th><th>الحد الأدنى</th><th>الاستخدامات</th><th>تاريخ الانتهاء</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="couponsTableBody"><table><td colspan="8" style="text-align: center;">جاري التحميل...<\/td><\/tr><\/tbody><\/table><\/div>`;
+        container.innerHTML = `<div class="form-card" id="couponForm"><h3>➕ إضافة كوبون</h3><div class="form-row"><div class="form-group"><label>الكود *</label><input type="text" id="couponCode"></div><div class="form-group"><label>النوع</label><select id="couponType"><option value="percentage">نسبة</option><option value="fixed">ثابت</option></select></div></div><div class="form-row"><div class="form-group"><label>القيمة *</label><input type="number" id="couponValue"></div><div class="form-group"><label>الحد الأدنى</label><input type="number" id="couponMinOrder" value="0"></div></div><div class="form-row"><div class="form-group"><label>تاريخ الانتهاء</label><input type="date" id="couponExpiry"></div><div class="form-group"><label>الوصف</label><input type="text" id="couponDescription"></div></div><div style="display:flex;gap:10px;"><button class="btn btn-primary" onclick="saveCoupon()">💾 حفظ</button><button class="btn btn-outline" onclick="hideCouponForm()">إلغاء</button></div></div><div class="table-container"><div class="table-header"><span class="table-title">الكوبونات</span></div><table class="data-table"><thead><tr><th>الكود</th><th>النوع</th><th>القيمة</th><th>الحد الأدنى</th><th>الاستخدامات</th><th>تاريخ الانتهاء</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody id="couponsTableBody"><tr><td colspan="8" style="text-align: center;">جاري التحميل...<\/td><\/tr><\/tbody><\/table><\/div>`;
         await fetchCoupons();
     }
 
@@ -1085,7 +1051,7 @@
     function renderCouponsTable(coupons) {
         const tbody = document.getElementById('couponsTableBody');
         if (!tbody) return;
-        tbody.innerHTML = coupons.map(c => `<td><td><strong>${c.code}</strong></td><td>${c.discountType === 'percentage' ? 'نسبة' : 'ثابت'}</td><td>${c.discountValue}${c.discountType === 'percentage' ? '%' : ' ر.س'}</td><td>${c.minOrderAmount || 0} ر.س</td><td>${c.usedCount || 0} / ${c.maxUses || '∞'}</td><td>${c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('ar-SA') : 'مفتوح'}</td><td>${c.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-danger btn-xs" onclick="deleteCoupon('${c.code}')">🗑️</button></td></tr>`).join('');
+        tbody.innerHTML = coupons.map(c => `<tr><td><strong>${c.code}</strong></td><td>${c.discountType === 'percentage' ? 'نسبة' : 'ثابت'}</td><td>${c.discountValue}${c.discountType === 'percentage' ? '%' : ' ر.س'}</td><td>${c.minOrder || 0} ر.س</td><td>${c.usedCount || 0} / ${c.maxUses || '∞'}</td><td>${c.expiryDate ? new Date(c.expiryDate).toLocaleDateString('ar-SA') : 'مفتوح'}</td><td>${c.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-danger btn-xs" onclick="deleteCoupon('${c.code}')">🗑️</button></td></tr>`).join('');
     }
 
     async function saveCoupon() {
@@ -1094,7 +1060,7 @@
         const value = parseFloat(document.getElementById('couponValue').value);
         if (!code || !value) { showToast('الكود والقيمة مطلوبة', 'error'); return; }
         try {
-            const res = await fetch(`${API}/coupons`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ code, discountType: type, discountValue: value, minOrderAmount: parseFloat(document.getElementById('couponMinOrder').value) || 0, expiryDate: document.getElementById('couponExpiry').value || null, description: document.getElementById('couponDescription').value, isActive: true }) });
+            const res = await fetch(`${API}/coupons`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify({ code, discountType: type, discountValue: value, minOrder: parseFloat(document.getElementById('couponMinOrder').value) || 0, expiryDate: document.getElementById('couponExpiry').value || null, description: document.getElementById('couponDescription').value, isActive: true }) });
             const data = await res.json();
             if (data.success) { showToast('تمت الإضافة', 'success'); hideCouponForm(); fetchCoupons(); }
             else showToast(data.error || 'فشل', 'error');
@@ -1126,12 +1092,11 @@
             const res = await fetch(`${API}/categories`);
             const data = await res.json();
             if (data.success) {
-                allCategories = data.data;
                 const productsRes = await fetch(`${API}/products?limit=1000`);
                 const productsData = await productsRes.json();
                 const products = productsData.data || [];
                 const tbody = document.getElementById('categoriesTableBody');
-                tbody.innerHTML = allCategories.map(c => `<td><td style="font-size:28px;">${c.icon || '📦'}</td><td><strong>${c.name}</strong></td><td>${products.filter(p => p.category === c.name).length} منتج</td><td>${c.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-danger btn-xs" onclick="deleteCategory('${c._id}')">🗑️</button></td></tr>`).join('');
+                tbody.innerHTML = data.data.map(c => `<tr><td style="font-size:28px;">${c.icon || '📦'}</td><td><strong>${c.name}</strong></td><td>${products.filter(p => p.category === c.name).length} منتج</td><td>${c.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-danger btn-xs" onclick="deleteCategory('${c._id}')">🗑️</button></td></tr>`).join('');
             }
         } catch (error) { console.error(error); }
     }
@@ -1171,14 +1136,14 @@
         try {
             const res = await fetch(`${API}/banners`);
             const data = await res.json();
-            if (data.success) { allBanners = data.data; renderBannersTable(allBanners); }
+            if (data.success) { renderBannersTable(data.data); }
         } catch (error) { console.error(error); }
     }
 
     function renderBannersTable(banners) {
         const tbody = document.getElementById('bannersTableBody');
         if (!tbody) return;
-        tbody.innerHTML = banners.map(b => `<td><td><img src="${b.imageUrl || 'https://placehold.co/100x50'}" style="height:50px;border-radius:8px;" onerror="this.src='https://placehold.co/100x50'"></td><td><strong>${b.title || '—'}</strong><br><small>${b.subtitle || ''}</small></td><td><a href="${b.link || '#'}" target="_blank">${b.link || '—'}</a></td><td>${b.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-danger btn-xs" onclick="deleteBanner('${b._id}')">🗑️</button></td></tr>`).join('');
+        tbody.innerHTML = banners.map(b => `<tr><td><img src="${b.imageUrl || 'https://placehold.co/100x50'}" style="height:50px;border-radius:8px;" onerror="this.src='https://placehold.co/100x50'"></td><td><strong>${b.title || '—'}</strong><br><small>${b.subtitle || ''}</small></td><td><a href="${b.link || '#'}" target="_blank">${b.link || '—'}</a></td><td>${b.isActive ? '<span style="color:var(--success);">✅ نشط</span>' : '<span style="color:var(--danger);">❌ غير نشط</span>'}</td><td><button class="btn btn-danger btn-xs" onclick="deleteBanner('${b._id}')">🗑️</button></td></tr>`).join('');
     }
 
     async function saveBanner() {
@@ -1237,7 +1202,7 @@
     // ==================== Reports ====================
     async function loadReports() {
         const container = document.getElementById('tabContent');
-        container.innerHTML = `<div class="chart-card"><h3>📊 تقرير المبيعات</h3><canvas id="reportsChart" width="800" height="300"></canvas></div><div class="table-container"><div class="table-header"><span class="table-title">أفضل المنتجات مبيعاً</span></div><table class="data-table"><thead><tr><th>#</th><th>المنتج</th><th>عدد المبيعات</th><th>الإيرادات</th></tr></thead><tbody id="topProductsBody"></tbody></table></div>`;
+        container.innerHTML = `<div class="chart-card"><h3>📊 تقرير المبيعات</h3><canvas id="reportsChart" width="800" height="300"></canvas></div><div class="table-container"><div class="table-header"><span class="table-title">أفضل المنتجات مبيعاً</span></div><table class="data-table"><thead><tr><th>#</th><th>المنتج</th><th>عدد المبيعات</th><th>الإيرادات</th></tr></thead><tbody id="topProductsBody"></tbody><tr></div>`;
         await fetchReports();
     }
 
@@ -1246,7 +1211,7 @@
             const res = await fetch(`${API}/admin/stats`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
             const data = await res.json();
             if (data.success) {
-                const topProducts = data.data.bestSellingProducts || [];
+                const topProducts = data.data.bestSelling || [];
                 document.getElementById('topProductsBody').innerHTML = topProducts.map((p, i) => `<tr><td>${i+1}</td><td><strong>${p.name}</strong></td><td>${p.salesCount || 0}</td><td style="color:var(--primary);">${((p.salesCount || 0) * p.price).toLocaleString()} ر.س</td></tr>`).join('');
                 const canvas = document.getElementById('reportsChart');
                 if (canvas && topProducts.length) {
@@ -1284,8 +1249,8 @@
             const data = await res.json();
             if (data.success) {
                 const items = data.data;
-                document.getElementById('trashStats').innerHTML = `<div class="stat-card"><div class="stat-header"><span class="stat-label">🗑️ إجمالي العناصر</span></div><div class="stat-value">${items.length}</div></div><div class="stat-card"><div class="stat-header"><span class="stat-label">📦 منتجات</span></div><div class="stat-value">${items.filter(i => i.originalCollection === 'products').length}</div></div>`;
-                document.getElementById('trashTableBody').innerHTML = items.map(item => `<tr><td><strong>${item.name || item._id}</strong></td><td>${item.originalCollection === 'products' ? '📦 منتج' : '📋 آخر'}</td><td>${item.price ? item.price + ' ر.س' : '—'}</td><td>${item.deletedAt ? new Date(item.deletedAt).toLocaleDateString('ar-SA') : '—'}</td><td><button class="btn btn-success btn-xs" onclick="restoreFromTrash('${item._id}')">↩️</button> <button class="btn btn-danger btn-xs" onclick="deleteFromTrash('${item._id}')">💀</button></td></tr>`).join('');
+                document.getElementById('trashStats').innerHTML = `<div class="stat-card"><div class="stat-header"><span class="stat-label">🗑️ إجمالي العناصر</span></div><div class="stat-value">${items.length}</div></div>`;
+                document.getElementById('trashTableBody').innerHTML = items.map(item => `</td><td>${item.name || item._id}</td><td>${item.type || 'منتج'}</td><td>${item.price || '—'}</td><td>${new Date(item.deletedAt).toLocaleDateString('ar-SA')}</td><td><button class="btn btn-success btn-xs" onclick="restoreFromTrash('${item._id}')">↩️</button> <button class="btn btn-danger btn-xs" onclick="deleteFromTrash('${item._id}')">💀</button></td></tr>`).join('');
             }
         } catch (error) { console.error(error); }
     }
