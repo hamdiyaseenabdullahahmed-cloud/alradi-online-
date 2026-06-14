@@ -1,4 +1,6 @@
-// ⚡ الرعدي أونلاين – الخادم الأسطوري v16.0 FIXED
+// ⚡ الرعدي أونلاين – النظام المتكامل النهائي v20.0
+// 🦅 منصة تجارة إلكترونية عالمية – جميع الحقوق محفوظة
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -11,312 +13,130 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
-// ==================== Middleware ====================
+// Middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
-app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(morgan('dev'));
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'alradi-super-secret-key-2024';
+const JWT_SECRET = 'alradi-ultimate-secret-2024';
 
-// ==================== قاعدة بيانات محلية مبسطة ====================
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+// ==================== قاعدة البيانات المتقدمة ====================
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-// دوال مساعدة للقراءة والكتابة
-function readDB(collection) {
-    const filePath = path.join(dataDir, `${collection}.json`);
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, JSON.stringify([], null, 2));
-        return [];
+class AdvancedDatabase {
+    constructor() {
+        this.collections = ['users', 'products', 'orders', 'coupons', 'categories', 'banners', 'settings'];
+        this.init();
     }
-    try {
-        return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    } catch {
-        return [];
+
+    init() {
+        this.collections.forEach(coll => {
+            const file = path.join(DATA_DIR, `${coll}.json`);
+            if (!fs.existsSync(file)) {
+                fs.writeFileSync(file, JSON.stringify([], null, 2));
+            }
+        });
+    }
+
+    read(collection) {
+        try {
+            return JSON.parse(fs.readFileSync(path.join(DATA_DIR, `${collection}.json`), 'utf8'));
+        } catch {
+            return [];
+        }
+    }
+
+    write(collection, data) {
+        fs.writeFileSync(path.join(DATA_DIR, `${collection}.json`), JSON.stringify(data, null, 2));
+    }
+
+    async find(collection, filter = {}) {
+        let data = this.read(collection);
+        
+        if (filter.id) data = data.filter(item => item.id === filter.id);
+        if (filter._id) data = data.filter(item => item._id === filter._id);
+        if (filter.email) data = data.filter(item => item.email === filter.email);
+        if (filter.phone) data = data.filter(item => item.phone === filter.phone);
+        if (filter.role) data = data.filter(item => item.role === filter.role);
+        if (filter.isActive !== undefined) data = data.filter(item => item.isActive === filter.isActive);
+        if (filter.category) data = data.filter(item => item.category === filter.category);
+        if (filter.status) data = data.filter(item => item.status === filter.status);
+        
+        if (filter.$or) {
+            data = data.filter(item => 
+                filter.$or.some(cond => 
+                    (cond.email && item.email === cond.email) ||
+                    (cond.phone && item.phone === cond.phone)
+                )
+            );
+        }
+        
+        return data;
+    }
+
+    async findOne(collection, filter) {
+        const data = await this.find(collection, filter);
+        return data[0] || null;
+    }
+
+    async insert(collection, doc) {
+        const data = this.read(collection);
+        const newDoc = {
+            ...doc,
+            _id: Date.now().toString() + Math.random().toString(36).substring(2, 10),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        data.push(newDoc);
+        this.write(collection, data);
+        return newDoc;
+    }
+
+    async update(collection, filter, update) {
+        const data = this.read(collection);
+        const index = data.findIndex(item => 
+            (filter._id && item._id === filter._id) ||
+            (filter.email && item.email === filter.email)
+        );
+        
+        if (index !== -1) {
+            if (update.$set) Object.assign(data[index], update.$set);
+            if (update.$inc) {
+                Object.keys(update.$inc).forEach(key => {
+                    data[index][key] = (data[index][key] || 0) + update.$inc[key];
+                });
+            }
+            data[index].updatedAt = new Date().toISOString();
+            this.write(collection, data);
+            return { modified: 1 };
+        }
+        return { modified: 0 };
+    }
+
+    async delete(collection, filter) {
+        let data = this.read(collection);
+        const newData = data.filter(item => item._id !== filter._id);
+        this.write(collection, newData);
+        return { deleted: data.length - newData.length };
+    }
+
+    async count(collection, filter = {}) {
+        const data = await this.find(collection, filter);
+        return data.length;
     }
 }
 
-function writeDB(collection, data) {
-    fs.writeFileSync(path.join(dataDir, `${collection}.json`), JSON.stringify(data, null, 2));
-}
+const db = new AdvancedDatabase();
 
-// عمليات قاعدة البيانات المبسطة
-const DB = {
-    users: {
-        find: (filter) => {
-            let data = readDB('users');
-            if (filter.email) data = data.filter(u => u.email === filter.email);
-            if (filter.phone) data = data.filter(u => u.phone === filter.phone);
-            if (filter._id) data = data.filter(u => u._id === filter._id);
-            if (filter.role) data = data.filter(u => u.role === filter.role);
-            return {
-                toArray: () => data,
-                limit: (n) => data.slice(0, n)
-            };
-        },
-        findOne: (filter) => {
-            let data = readDB('users');
-            if (filter.email) return data.find(u => u.email === filter.email) || null;
-            if (filter.phone) return data.find(u => u.phone === filter.phone) || null;
-            if (filter._id) return data.find(u => u._id === filter._id) || null;
-            return null;
-        },
-        insertOne: async (doc) => {
-            const data = readDB('users');
-            const newDoc = { ...doc, _id: Date.now().toString() + Math.random().toString(36).substring(2, 8) };
-            data.push(newDoc);
-            writeDB('users', data);
-            return newDoc;
-        },
-        updateOne: async (filter, update) => {
-            const data = readDB('users');
-            const index = data.findIndex(u => u.email === filter.email || u._id === filter._id);
-            if (index !== -1) {
-                if (update.$set) Object.assign(data[index], update.$set);
-                writeDB('users', data);
-                return { modifiedCount: 1 };
-            }
-            return { modifiedCount: 0 };
-        },
-        countDocuments: async () => readDB('users').length
-    },
-    products: {
-        find: (filter = {}) => {
-            let data = readDB('products');
-            if (filter.category && filter.category !== 'all') data = data.filter(p => p.category === filter.category);
-            if (filter.isActive !== undefined) data = data.filter(p => p.isActive === filter.isActive);
-            return {
-                sort: (sortObj) => {
-                    const key = Object.keys(sortObj)[0];
-                    data.sort((a, b) => sortObj[key] === -1 ? (b[key] || 0) - (a[key] || 0) : (a[key] || 0) - (b[key] || 0));
-                    return this;
-                },
-                toArray: () => data,
-                limit: (n) => data.slice(0, n)
-            };
-        },
-        findOne: async (filter) => {
-            const data = readDB('products');
-            if (filter._id) return data.find(p => p._id === filter._id) || null;
-            return null;
-        },
-        insertOne: async (doc) => {
-            const data = readDB('products');
-            const newDoc = { ...doc, _id: Date.now().toString() + Math.random().toString(36).substring(2, 8), createdAt: new Date(), updatedAt: new Date() };
-            data.push(newDoc);
-            writeDB('products', data);
-            return newDoc;
-        },
-        updateOne: async (filter, update) => {
-            const data = readDB('products');
-            const index = data.findIndex(p => p._id === filter._id);
-            if (index !== -1) {
-                if (update.$set) Object.assign(data[index], update.$set);
-                if (update.$inc) {
-                    Object.keys(update.$inc).forEach(key => {
-                        data[index][key] = (data[index][key] || 0) + update.$inc[key];
-                    });
-                }
-                data[index].updatedAt = new Date();
-                writeDB('products', data);
-                return { modifiedCount: 1 };
-            }
-            return { modifiedCount: 0 };
-        },
-        deleteOne: async (filter) => {
-            let data = readDB('products');
-            const newData = data.filter(p => p._id !== filter._id);
-            writeDB('products', newData);
-            return { deletedCount: data.length - newData.length };
-        },
-        countDocuments: async () => readDB('products').length
-    },
-    orders: {
-        find: (filter = {}) => {
-            let data = readDB('orders');
-            if (filter.user) data = data.filter(o => o.user === filter.user);
-            if (filter.status) data = data.filter(o => o.status === filter.status);
-            return {
-                sort: (sortObj) => {
-                    const key = Object.keys(sortObj)[0];
-                    data.sort((a, b) => sortObj[key] === -1 ? new Date(b[key]) - new Date(a[key]) : new Date(a[key]) - new Date(b[key]));
-                    return this;
-                },
-                toArray: () => data
-            };
-        },
-        findOne: async (filter) => {
-            const data = readDB('orders');
-            if (filter._id) return data.find(o => o._id === filter._id) || null;
-            if (filter.orderNumber) return data.find(o => o.orderNumber === filter.orderNumber) || null;
-            return null;
-        },
-        insertOne: async (doc) => {
-            const data = readDB('orders');
-            const newDoc = { ...doc, _id: Date.now().toString() + Math.random().toString(36).substring(2, 8), createdAt: new Date(), updatedAt: new Date() };
-            data.push(newDoc);
-            writeDB('orders', data);
-            return newDoc;
-        },
-        updateOne: async (filter, update) => {
-            const data = readDB('orders');
-            const index = data.findIndex(o => o._id === filter._id);
-            if (index !== -1) {
-                if (update.$set) Object.assign(data[index], update.$set);
-                data[index].updatedAt = new Date();
-                writeDB('orders', data);
-                return { modifiedCount: 1 };
-            }
-            return { modifiedCount: 0 };
-        },
-        countDocuments: async (filter = {}) => {
-            let data = readDB('orders');
-            if (filter.status) data = data.filter(o => o.status === filter.status);
-            return data.length;
-        }
-    },
-    coupons: {
-        find: (filter = {}) => {
-            let data = readDB('coupons');
-            if (filter.isActive !== undefined) data = data.filter(c => c.isActive === filter.isActive);
-            return { toArray: () => data };
-        },
-        findOne: async (filter) => {
-            const data = readDB('coupons');
-            if (filter.code) return data.find(c => c.code === filter.code) || null;
-            return null;
-        },
-        insertOne: async (doc) => {
-            const data = readDB('coupons');
-            const newDoc = { ...doc, _id: Date.now().toString() + Math.random().toString(36).substring(2, 8), usedCount: 0, createdAt: new Date() };
-            data.push(newDoc);
-            writeDB('coupons', data);
-            return newDoc;
-        },
-        updateOne: async (filter, update) => {
-            const data = readDB('coupons');
-            const index = data.findIndex(c => c.code === filter.code);
-            if (index !== -1) {
-                if (update.$set) Object.assign(data[index], update.$set);
-                if (update.$inc) data[index].usedCount = (data[index].usedCount || 0) + update.$inc.usedCount;
-                writeDB('coupons', data);
-                return { modifiedCount: 1 };
-            }
-            return { modifiedCount: 0 };
-        },
-        deleteOne: async (filter) => {
-            let data = readDB('coupons');
-            const newData = data.filter(c => c.code !== filter.code);
-            writeDB('coupons', newData);
-            return { deletedCount: data.length - newData.length };
-        }
-    },
-    categories: {
-        find: (filter = {}) => {
-            let data = readDB('categories');
-            if (filter.isActive !== undefined) data = data.filter(c => c.isActive === filter.isActive);
-            return {
-                sort: () => ({ toArray: () => data }),
-                toArray: () => data
-            };
-        },
-        findOne: async (filter) => {
-            const data = readDB('categories');
-            if (filter._id) return data.find(c => c._id === filter._id) || null;
-            if (filter.name) return data.find(c => c.name === filter.name) || null;
-            return null;
-        },
-        insertOne: async (doc) => {
-            const data = readDB('categories');
-            const newDoc = { ...doc, _id: Date.now().toString() + Math.random().toString(36).substring(2, 8), createdAt: new Date() };
-            data.push(newDoc);
-            writeDB('categories', data);
-            return newDoc;
-        },
-        updateOne: async (filter, update) => {
-            const data = readDB('categories');
-            const index = data.findIndex(c => c._id === filter._id);
-            if (index !== -1) {
-                if (update.$set) Object.assign(data[index], update.$set);
-                writeDB('categories', data);
-                return { modifiedCount: 1 };
-            }
-            return { modifiedCount: 0 };
-        },
-        deleteOne: async (filter) => {
-            let data = readDB('categories');
-            const newData = data.filter(c => c._id !== filter._id);
-            writeDB('categories', newData);
-            return { deletedCount: data.length - newData.length };
-        }
-    },
-    banners: {
-        find: (filter = {}) => {
-            let data = readDB('banners');
-            if (filter.isActive !== undefined) data = data.filter(b => b.isActive === filter.isActive);
-            return {
-                sort: () => ({ toArray: () => data }),
-                toArray: () => data
-            };
-        },
-        insertOne: async (doc) => {
-            const data = readDB('banners');
-            const newDoc = { ...doc, _id: Date.now().toString() + Math.random().toString(36).substring(2, 8), createdAt: new Date() };
-            data.push(newDoc);
-            writeDB('banners', data);
-            return newDoc;
-        },
-        deleteOne: async (filter) => {
-            let data = readDB('banners');
-            const newData = data.filter(b => b._id !== filter._id);
-            writeDB('banners', newData);
-            return { deletedCount: data.length - newData.length };
-        }
-    },
-    settings: {
-        findOne: async (filter) => {
-            const data = readDB('settings');
-            if (filter.type) return data.find(s => s.type === filter.type) || null;
-            return null;
-        },
-        updateOne: async (filter, update, options) => {
-            let data = readDB('settings');
-            const index = data.findIndex(s => s.type === filter.type);
-            if (index !== -1) {
-                if (update.$set) Object.assign(data[index], update.$set);
-                writeDB('settings', data);
-                return { modifiedCount: 1 };
-            } else {
-                const newDoc = { type: filter.type, data: update.$set, createdAt: new Date() };
-                data.push(newDoc);
-                writeDB('settings', data);
-                return { modifiedCount: 1 };
-            }
-        },
-        insertOne: async (doc) => {
-            const data = readDB('settings');
-            data.push(doc);
-            writeDB('settings', data);
-            return doc;
-        }
-    },
-    trash: {
-        find: () => ({ toArray: () => [] }),
-        insertOne: async () => ({}),
-        deleteOne: async () => ({})
-    }
-};
-
-console.log('💾 استخدام التخزين المحلي (LocalDB)');
-
-// ==================== Middleware للمصادقة ====================
-function authMiddleware(req, res, next) {
+// ==================== Middleware ====================
+const auth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         req.user = null;
@@ -329,133 +149,135 @@ function authMiddleware(req, res, next) {
         req.user = null;
         next();
     }
-}
+};
 
-function adminRequired(req, res, next) {
-    if (!req.user || !['admin', 'superadmin', 'manager'].includes(req.user.role)) {
-        return res.status(403).json({ error: 'صلاحيات المدير مطلوبة' });
+const adminOnly = (req, res, next) => {
+    if (!req.user || !['admin', 'superadmin'].includes(req.user.role)) {
+        return res.status(403).json({ error: 'غير مصرح به - صلاحيات المدير مطلوبة' });
     }
     next();
-}
+};
 
-app.use(authMiddleware);
+app.use(auth);
 
-// ==================== إنشاء البيانات الافتراضية ====================
-async function seedDatabase() {
-    try {
-        // إنشاء حساب المدير
-        const adminExists = await DB.users.findOne({ email: 'alradi@gmail.com' });
-        if (!adminExists) {
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            await DB.users.insertOne({
-                fullName: 'الرعدي',
-                email: 'alradi@gmail.com',
-                phone: '+966500000000',
-                password: hashedPassword,
-                role: 'superadmin',
-                isActive: true,
-                loyaltyPoints: 9999,
-                loyaltyTier: 'أسطوري',
-                createdAt: new Date()
-            });
-            console.log('✅ تم إنشاء حساب المدير: alradi@gmail.com / admin123');
+// ==================== تهيئة البيانات الأساسية ====================
+async function initializeData() {
+    // إنشاء المدير
+    const admin = await db.findOne('users', { email: 'alradi@gmail.com' });
+    if (!admin) {
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+        await db.insert('users', {
+            fullName: 'الرعدي',
+            email: 'alradi@gmail.com',
+            phone: '+966500000000',
+            password: hashedPassword,
+            role: 'superadmin',
+            isActive: true,
+            loyaltyPoints: 10000,
+            loyaltyTier: 'أسطوري',
+            createdAt: new Date().toISOString()
+        });
+        console.log('✅ تم إنشاء حساب المدير: alradi@gmail.com / admin123');
+    }
+
+    // إنشاء عملاء تجريبيين
+    const customer = await db.findOne('users', { email: 'customer@alradi.com' });
+    if (!customer) {
+        const hashedPassword = await bcrypt.hash('customer123', 10);
+        await db.insert('users', {
+            fullName: 'أبو يزن',
+            email: 'customer@alradi.com',
+            phone: '+966511111111',
+            password: hashedPassword,
+            role: 'customer',
+            isActive: true,
+            loyaltyPoints: 1250,
+            loyaltyTier: 'ذهبي',
+            createdAt: new Date().toISOString()
+        });
+        console.log('✅ تم إنشاء حساب العميل: customer@alradi.com / customer123');
+    }
+
+    // إنشاء المنتجات
+    const productsCount = await db.count('products');
+    if (productsCount === 0) {
+        const products = [
+            { name: '📱 ساعة ذكية فاخرة Pro Max', price: 599, comparePrice: 899, stock: 50, category: 'إلكترونيات', description: 'شاشة AMOLED، مقاومة للماء، GPS، مراقبة الصحة', isActive: true, isFeatured: true, salesCount: 45, rating: 4.5, ratingCount: 120, images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'] },
+            { name: '🎧 سماعات لاسلكية بريميوم ANC', price: 349, stock: 100, category: 'إلكترونيات', description: 'إلغاء الضوضاء، جودة Hi-Res، بطارية 30 ساعة', isActive: true, isFeatured: true, salesCount: 72, rating: 4.2, ratingCount: 85, images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'] },
+            { name: '🧴 عطر شرقي فاخر 100ml', price: 450, comparePrice: 600, stock: 30, category: 'عطور', description: 'العود، المسك، العنبر، الورد، الزعفران', isActive: true, salesCount: 150, rating: 4.8, ratingCount: 200, images: ['https://images.unsplash.com/photo-1541643600914-78b084683601?w=400'] },
+            { name: '👜 حقيبة يد جلد طبيعي', price: 799, stock: 15, category: 'أزياء', description: 'جلد طبيعي 100%، صناعة يدوية', isActive: true, salesCount: 20, rating: 4.0, ratingCount: 45, images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400'] },
+            { name: '📱 هاتف ذكي Ultra 5G', price: 2999, comparePrice: 3499, stock: 12, category: 'إلكترونيات', description: 'شاشة 6.8 بوصة، كاميرا 200MP', isActive: true, isFeatured: true, salesCount: 90, rating: 4.7, ratingCount: 310, images: ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400'] },
+            { name: '⌚ ساعة رياضية ذكية', price: 299, stock: 75, category: 'ساعات', description: 'مقاومة للماء 50 متر، تتبع اللياقة', isActive: true, salesCount: 234, rating: 4.3, ratingCount: 89, images: ['https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400'] },
+            { name: '👟 حذاء رياضي', price: 399, stock: 45, category: 'أحذية', description: 'خفيف الوزن، نعل مريح', isActive: true, salesCount: 67, rating: 4.4, ratingCount: 56, images: ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400'] }
+        ];
+        
+        for (const p of products) {
+            await db.insert('products', p);
         }
+        console.log('✅ تم إنشاء 7 منتجات افتراضية');
+    }
 
-        // إنشاء حساب العميل التجريبي
-        const customerExists = await DB.users.findOne({ phone: '+966511111111' });
-        if (!customerExists) {
-            const hashedPassword = await bcrypt.hash('customer123', 10);
-            await DB.users.insertOne({
-                fullName: 'أبو يزن',
-                email: 'customer@alradi.com',
-                phone: '+966511111111',
-                password: hashedPassword,
-                role: 'customer',
-                isActive: true,
-                loyaltyPoints: 1250,
-                loyaltyTier: 'ذهبي',
-                createdAt: new Date()
-            });
-            console.log('✅ تم إنشاء حساب العميل: customer@alradi.com / customer123');
+    // إنشاء الأقسام
+    const categoriesCount = await db.count('categories');
+    if (categoriesCount === 0) {
+        const categories = [
+            { name: 'إلكترونيات', icon: '📱', isActive: true, order: 1 },
+            { name: 'أزياء', icon: '👕', isActive: true, order: 2 },
+            { name: 'عطور', icon: '🧴', isActive: true, order: 3 },
+            { name: 'ساعات', icon: '⌚', isActive: true, order: 4 },
+            { name: 'أحذية', icon: '👟', isActive: true, order: 5 }
+        ];
+        for (const c of categories) {
+            await db.insert('categories', c);
         }
+        console.log('✅ تم إنشاء 5 أقسام افتراضية');
+    }
 
-        // إنشاء المنتجات الافتراضية
-        const productsCount = await DB.products.countDocuments();
-        if (productsCount === 0) {
-            const products = [
-                { name: '📱 ساعة ذكية فاخرة Pro Max', price: 599, comparePrice: 899, stock: 50, category: 'إلكترونيات', description: 'شاشة AMOLED، مقاومة للماء، GPS', isActive: true, isFeatured: true, salesCount: 45, images: [{ url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400', type: 'main' }], rating: 4.5, ratingCount: 120 },
-                { name: '🎧 سماعات لاسلكية بريميوم ANC', price: 349, stock: 100, category: 'إلكترونيات', description: 'إلغاء الضوضاء، جودة Hi-Res', isActive: true, isFeatured: true, salesCount: 72, images: [{ url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400', type: 'main' }], rating: 4.2, ratingCount: 85 },
-                { name: '🧴 عطر شرقي فاخر 100ml', price: 450, comparePrice: 600, stock: 30, category: 'عطور', description: 'العود، المسك، العنبر', isActive: true, salesCount: 150, images: [{ url: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400', type: 'main' }], rating: 4.8, ratingCount: 200 },
-                { name: '👜 حقيبة يد جلد طبيعي', price: 799, stock: 15, category: 'أزياء', description: 'جلد طبيعي 100%', isActive: true, salesCount: 20, images: [{ url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400', type: 'main' }], rating: 4.0, ratingCount: 45 },
-                { name: '📱 هاتف ذكي Ultra 5G', price: 2999, comparePrice: 3499, stock: 12, category: 'إلكترونيات', description: 'شاشة 6.8 بوصة، كاميرا 200MP', isActive: true, isFeatured: true, salesCount: 90, images: [{ url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400', type: 'main' }], rating: 4.7, ratingCount: 310 }
-            ];
-            for (const p of products) {
-                await DB.products.insertOne(p);
-            }
-            console.log('✅ تم إنشاء 5 منتجات افتراضية');
+    // إنشاء الكوبونات
+    const couponsCount = await db.count('coupons');
+    if (couponsCount === 0) {
+        const coupons = [
+            { code: 'WELCOME10', discountType: 'percentage', discountValue: 10, minOrder: 100, maxUses: 1000, usedCount: 0, isActive: true, description: 'خصم 10% للعملاء الجدد' },
+            { code: 'RAAD40', discountType: 'percentage', discountValue: 40, minOrder: 200, maxUses: 500, usedCount: 0, isActive: true, description: 'خصم 40% على جميع المنتجات' },
+            { code: 'FLASH50', discountType: 'fixed', discountValue: 50, minOrder: 500, maxUses: 500, usedCount: 0, isActive: true, description: 'خصم 50 ريال' }
+        ];
+        for (const c of coupons) {
+            await db.insert('coupons', c);
         }
-
-        // إنشاء الأقسام الافتراضية
-        const categoriesCount = (await DB.categories.find().toArray()).length;
-        if (categoriesCount === 0) {
-            const categories = [
-                { name: 'إلكترونيات', icon: '📱', isActive: true, order: 1 },
-                { name: 'أزياء', icon: '👕', isActive: true, order: 2 },
-                { name: 'عطور', icon: '🧴', isActive: true, order: 3 },
-                { name: 'منزل', icon: '🏠', isActive: true, order: 4 },
-                { name: 'ساعات', icon: '⌚', isActive: true, order: 5 },
-                { name: 'أحذية', icon: '👟', isActive: true, order: 6 },
-                { name: 'رياضة', icon: '⚽', isActive: true, order: 7 }
-            ];
-            for (const cat of categories) {
-                await DB.categories.insertOne(cat);
-            }
-            console.log('✅ تم إنشاء 7 أقسام افتراضية');
-        }
-
-        // إنشاء الكوبونات الافتراضية
-        const couponsCount = (await DB.coupons.find().toArray()).length;
-        if (couponsCount === 0) {
-            const coupons = [
-                { code: 'WELCOME10', discountType: 'percentage', discountValue: 10, minOrderAmount: 100, maxUses: 1000, usedCount: 0, isActive: true, description: 'خصم 10% للعملاء الجدد' },
-                { code: 'RAAD40', discountType: 'percentage', discountValue: 40, minOrderAmount: 200, maxUses: 500, usedCount: 0, isActive: true, description: 'خصم 40% على جميع المنتجات' },
-                { code: 'FLASH50', discountType: 'fixed', discountValue: 50, minOrderAmount: 500, maxUses: 500, usedCount: 0, isActive: true, description: 'خصم 50 ريال' }
-            ];
-            for (const c of coupons) {
-                await DB.coupons.insertOne(c);
-            }
-            console.log('✅ تم إنشاء 3 كوبونات افتراضية');
-        }
-
-        // إنشاء الإعدادات الافتراضية
-        const shippingSetting = await DB.settings.findOne({ type: 'shipping' });
-        if (!shippingSetting) {
-            await DB.settings.insertOne({ type: 'shipping', data: { freeShippingThreshold: 500, internalCost: 25 } });
-            await DB.settings.insertOne({ type: 'tax', data: { rate: 15 } });
-            console.log('✅ تم إنشاء الإعدادات الافتراضية');
-        }
-
-    } catch (error) {
-        console.error('❌ خطأ في إنشاء البيانات:', error.message);
+        console.log('✅ تم إنشاء 3 كوبونات افتراضية');
     }
 }
 
-// ==================== API: المصادقة ====================
+// ==================== API Routes ====================
+
+// المصادقة
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
-        if (!identifier || !password) return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
-
-        const user = await DB.users.findOne({ $or: [{ email: identifier }, { phone: identifier }] });
-        if (!user) return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
-
+        
+        const user = await db.findOne('users', { 
+            $or: [{ email: identifier }, { phone: identifier }] 
+        });
+        
+        if (!user) {
+            return res.status(401).json({ error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
+        }
+        
         const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
-
-        if (!user.isActive) return res.status(403).json({ error: 'الحساب معطل' });
-
-        const token = jwt.sign({ id: user._id, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
-
+        if (!isValid) {
+            return res.status(401).json({ error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
+        }
+        
+        if (!user.isActive) {
+            return res.status(403).json({ error: 'الحساب معطل، يرجى التواصل مع الدعم' });
+        }
+        
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '30d' }
+        );
+        
         res.json({
             success: true,
             token,
@@ -470,199 +292,375 @@ app.post('/api/auth/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('خطأ في تسجيل الدخول:', error);
-        res.status(500).json({ error: 'فشل تسجيل الدخول' });
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'حدث خطأ في الخادم' });
     }
 });
 
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const { fullName, phone, password, country, city, email } = req.body;
-        if (!fullName || !phone || !password) return res.status(400).json({ error: 'الاسم والجوال وكلمة المرور مطلوبة' });
-
-        const existing = await DB.users.findOne({ $or: [{ phone }, { email }] });
-        if (existing) return res.status(400).json({ error: 'رقم الجوال أو البريد مسجل مسبقاً' });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await DB.users.insertOne({
-            fullName, phone, email: email || `${phone}@temp.com`, password: hashedPassword,
-            role: 'customer', country: country || 'السعودية', city: city || '',
-            isActive: true, loyaltyPoints: 100, loyaltyTier: 'برونزي', createdAt: new Date()
+        const { fullName, phone, password, email, country, city } = req.body;
+        
+        if (!fullName || !phone || !password) {
+            return res.status(400).json({ error: 'الاسم الكامل ورقم الجوال وكلمة المرور مطلوبة' });
+        }
+        
+        const existingUser = await db.findOne('users', { 
+            $or: [{ phone }, { email }] 
         });
-
-        const token = jwt.sign({ id: newUser._id, role: newUser.role, email: newUser.email }, JWT_SECRET, { expiresIn: '30d' });
-
+        
+        if (existingUser) {
+            return res.status(400).json({ error: 'رقم الجوال أو البريد الإلكتروني مسجل مسبقاً' });
+        }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const newUser = await db.insert('users', {
+            fullName,
+            phone,
+            email: email || `${phone}@alradi.com`,
+            password: hashedPassword,
+            role: 'customer',
+            country: country || 'السعودية',
+            city: city || '',
+            isActive: true,
+            loyaltyPoints: 100,
+            loyaltyTier: 'برونزي'
+        });
+        
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email, role: newUser.role },
+            JWT_SECRET,
+            { expiresIn: '30d' }
+        );
+        
         res.status(201).json({
-            success: true, token,
-            user: { id: newUser._id, fullName, email: newUser.email, phone, role: 'customer', loyaltyPoints: 100, loyaltyTier: 'برونزي' }
+            success: true,
+            token,
+            user: {
+                id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                phone: newUser.phone,
+                role: newUser.role,
+                loyaltyPoints: 100,
+                loyaltyTier: 'برونزي'
+            }
         });
     } catch (error) {
-        console.error('خطأ في التسجيل:', error);
-        res.status(500).json({ error: 'فشل إنشاء الحساب' });
+        console.error('Register error:', error);
+        res.status(500).json({ error: 'حدث خطأ في الخادم' });
     }
 });
 
-// ==================== API: المنتجات ====================
+// المنتجات
 app.get('/api/products', async (req, res) => {
     try {
         const { page = 1, limit = 12, category, search, sort = '-createdAt' } = req.query;
-        let products = await DB.products.find({ isActive: true }).toArray();
-
-        if (category && category !== 'all' && category !== 'undefined') products = products.filter(p => p.category === category);
+        
+        let products = await db.find('products', { isActive: true });
+        
+        if (category && category !== 'all') {
+            products = products.filter(p => p.category === category);
+        }
+        
         if (search) {
             const term = search.toLowerCase();
-            products = products.filter(p => p.name?.toLowerCase().includes(term) || p.description?.toLowerCase().includes(term));
+            products = products.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                (p.description && p.description.toLowerCase().includes(term))
+            );
         }
-
-        products.sort((a, b) => {
-            if (sort === 'price-asc') return a.price - b.price;
-            if (sort === 'price-desc') return b.price - a.price;
-            if (sort === 'bestselling') return (b.salesCount || 0) - (a.salesCount || 0);
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-
+        
+        // الترتيب
+        if (sort === 'price-asc') products.sort((a, b) => a.price - b.price);
+        else if (sort === 'price-desc') products.sort((a, b) => b.price - a.price);
+        else if (sort === 'bestselling') products.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
+        else products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
         const total = products.length;
-        const paginated = products.slice((page - 1) * limit, page * limit);
-
-        res.json({ success: true, data: paginated, pagination: { page: parseInt(page), limit: parseInt(limit), total, pages: Math.ceil(total / limit) } });
+        const start = (page - 1) * limit;
+        const paginated = products.slice(start, start + limit);
+        
+        res.json({
+            success: true,
+            data: paginated,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
-        console.error('خطأ في جلب المنتجات:', error);
-        res.status(500).json({ error: 'فشل جلب المنتجات' });
+        console.error('Products error:', error);
+        res.status(500).json({ error: 'حدث خطأ في جلب المنتجات' });
     }
 });
 
 app.get('/api/products/:id', async (req, res) => {
     try {
-        const product = await DB.products.findOne({ _id: req.params.id });
-        if (!product) return res.status(404).json({ error: 'المنتج غير موجود' });
+        const product = await db.findOne('products', { _id: req.params.id });
+        if (!product) {
+            return res.status(404).json({ error: 'المنتج غير موجود' });
+        }
         res.json({ success: true, data: product });
     } catch (error) {
-        res.status(500).json({ error: 'فشل جلب المنتج' });
+        res.status(500).json({ error: 'حدث خطأ' });
     }
 });
 
-// ==================== API: الأقسام ====================
+// الأقسام
 app.get('/api/categories', async (req, res) => {
     try {
-        const categories = await DB.categories.find({ isActive: true }).toArray();
+        const categories = await db.find('categories', { isActive: true });
         res.json({ success: true, data: categories });
     } catch (error) {
         res.json({ success: true, data: [] });
     }
 });
 
-// ==================== API: البانرات ====================
+// البانرات
 app.get('/api/banners', async (req, res) => {
     try {
-        const banners = await DB.banners.find({ isActive: true }).toArray();
+        const banners = await db.find('banners', { isActive: true });
         res.json({ success: true, data: banners });
     } catch (error) {
         res.json({ success: true, data: [] });
     }
 });
 
-// ==================== API: الكوبونات ====================
+// الكوبونات
 app.get('/api/coupons', async (req, res) => {
     try {
-        const coupons = await DB.coupons.find({ isActive: true }).toArray();
+        const coupons = await db.find('coupons', { isActive: true });
         res.json({ success: true, data: coupons });
     } catch (error) {
         res.json({ success: true, data: [] });
     }
 });
 
-// ==================== API: الطلبات (للمدير) ====================
-app.get('/api/admin/orders', adminRequired, async (req, res) => {
+app.post('/api/coupons/validate', async (req, res) => {
     try {
-        const orders = await DB.orders.find().sort({ createdAt: -1 }).toArray();
-        res.json({ success: true, data: orders });
+        const { code, subtotal } = req.body;
+        const coupon = await db.findOne('coupons', { code: code.toUpperCase(), isActive: true });
+        
+        if (!coupon) {
+            return res.status(400).json({ error: 'الكوبون غير صالح' });
+        }
+        
+        if (coupon.minOrder && subtotal < coupon.minOrder) {
+            return res.status(400).json({ error: `الحد الأدنى للطلب ${coupon.minOrder} ريال` });
+        }
+        
+        let discount = 0;
+        if (coupon.discountType === 'percentage') {
+            discount = subtotal * (coupon.discountValue / 100);
+        } else {
+            discount = coupon.discountValue;
+        }
+        
+        res.json({
+            success: true,
+            data: {
+                code: coupon.code,
+                discountType: coupon.discountType,
+                discountValue: coupon.discountValue,
+                discount
+            }
+        });
     } catch (error) {
-        res.json({ success: true, data: [] });
+        res.status(500).json({ error: 'حدث خطأ' });
     }
 });
 
-// ==================== API: العملاء (للمدير) ====================
-app.get('/api/admin/customers', adminRequired, async (req, res) => {
+// الطلبات
+app.post('/api/orders', auth, async (req, res) => {
     try {
-        const customers = await DB.users.find({ role: 'customer' }).toArray();
-        res.json({ success: true, data: customers });
+        const { items, shippingAddress, paymentMethod, notes } = req.body;
+        
+        if (!items || items.length === 0) {
+            return res.status(400).json({ error: 'السلة فارغة' });
+        }
+        
+        const user = await db.findOne('users', { _id: req.user.id });
+        if (!user) {
+            return res.status(404).json({ error: 'المستخدم غير موجود' });
+        }
+        
+        let subtotal = 0;
+        for (const item of items) {
+            const product = await db.findOne('products', { _id: item.productId });
+            if (!product) {
+                return res.status(400).json({ error: `المنتج ${item.name} غير موجود` });
+            }
+            subtotal += product.price * item.quantity;
+        }
+        
+        const shippingCost = subtotal >= 500 ? 0 : 25;
+        const tax = subtotal * 0.15;
+        const total = subtotal + shippingCost + tax;
+        
+        const orderNumber = `RAAD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        
+        const newOrder = await db.insert('orders', {
+            orderNumber,
+            userId: req.user.id,
+            userName: user.fullName,
+            items,
+            shippingAddress,
+            paymentMethod,
+            subtotal,
+            shippingCost,
+            tax,
+            total,
+            status: 'pending',
+            notes: notes || ''
+        });
+        
+        res.status(201).json({
+            success: true,
+            message: 'تم إنشاء الطلب بنجاح',
+            data: { orderNumber, total }
+        });
     } catch (error) {
-        res.json({ success: true, data: [] });
+        console.error('Order error:', error);
+        res.status(500).json({ error: 'حدث خطأ في إنشاء الطلب' });
     }
 });
 
-// ==================== API: الإحصائيات (للمدير) ====================
-app.get('/api/admin/stats', adminRequired, async (req, res) => {
+// لوحة المدير - إحصائيات
+app.get('/api/admin/stats', adminOnly, async (req, res) => {
     try {
-        const orders = await DB.orders.find().toArray();
-        const products = await DB.products.find({ isActive: true }).toArray();
-        const customers = await DB.users.find({ role: 'customer' }).toArray();
-        const totalRevenue = orders.reduce((s, o) => s + (o.pricing?.total || 0), 0);
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        const todayOrders = orders.filter(o => new Date(o.createdAt) >= today).length;
-        const lowStockProducts = products.filter(p => p.stock <= 5).length;
-
+        const orders = await db.find('orders');
+        const products = await db.find('products');
+        const users = await db.find('users', { role: 'customer' });
+        
+        const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const pendingOrders = orders.filter(o => o.status === 'pending').length;
+        const lowStock = products.filter(p => p.stock <= 5).length;
+        
         res.json({
             success: true,
             data: {
                 totalOrders: orders.length,
                 totalProducts: products.length,
-                totalCustomers: customers.length,
+                totalCustomers: users.length,
                 totalRevenue,
-                todayOrders,
-                lowStockProducts,
-                pendingOrders: orders.filter(o => o.status === 'pending').length,
-                recentOrders: orders.slice(0, 10),
-                bestSellingProducts: products.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0)).slice(0, 10),
-                lowStockProductsList: products.filter(p => p.stock <= 5).slice(0, 10)
+                pendingOrders,
+                lowStockProducts: lowStock,
+                recentOrders: orders.slice(-10).reverse(),
+                bestSelling: products.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0)).slice(0, 5)
             }
         });
     } catch (error) {
-        res.json({ success: true, data: { totalOrders: 0, totalProducts: 0, totalCustomers: 0, totalRevenue: 0, todayOrders: 0, lowStockProducts: 0, pendingOrders: 0, recentOrders: [], bestSellingProducts: [], lowStockProductsList: [] } });
+        res.json({ success: true, data: {} });
     }
 });
 
-// ==================== API: الملف الشخصي ====================
-app.get('/api/user/profile', async (req, res) => {
-    if (!req.user) return res.status(401).json({ error: 'يرجى تسجيل الدخول' });
+// لوحة المدير - جميع الطلبات
+app.get('/api/admin/orders', adminOnly, async (req, res) => {
     try {
-        const user = await DB.users.findOne({ _id: req.user.id });
-        if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
-        res.json({ success: true, data: user });
+        const orders = await db.find('orders');
+        res.json({ success: true, data: orders.reverse() });
     } catch (error) {
-        res.status(500).json({ error: 'فشل جلب البيانات' });
+        res.json({ success: true, data: [] });
     }
 });
 
-// ==================== الصفحات ====================
+// لوحة المدير - جميع العملاء
+app.get('/api/admin/customers', adminOnly, async (req, res) => {
+    try {
+        const users = await db.find('users', { role: 'customer' });
+        res.json({ success: true, data: users });
+    } catch (error) {
+        res.json({ success: true, data: [] });
+    }
+});
+
+// لوحة المدير - جميع المنتجات
+app.get('/api/admin/products', adminOnly, async (req, res) => {
+    try {
+        const products = await db.find('products');
+        res.json({ success: true, data: products });
+    } catch (error) {
+        res.json({ success: true, data: [] });
+    }
+});
+
+// لوحة المدير - تحديث حالة الطلب
+app.put('/api/admin/orders/:id/status', adminOnly, async (req, res) => {
+    try {
+        const { status } = req.body;
+        await db.update('orders', { _id: req.params.id }, { $set: { status } });
+        res.json({ success: true, message: 'تم تحديث حالة الطلب' });
+    } catch (error) {
+        res.status(500).json({ error: 'فشل التحديث' });
+    }
+});
+
+// لوحة المدير - تحديث المنتج
+app.put('/api/admin/products/:id', adminOnly, async (req, res) => {
+    try {
+        await db.update('products', { _id: req.params.id }, { $set: req.body });
+        res.json({ success: true, message: 'تم تحديث المنتج' });
+    } catch (error) {
+        res.status(500).json({ error: 'فشل التحديث' });
+    }
+});
+
+// لوحة المدير - حذف المنتج
+app.delete('/api/admin/products/:id', adminOnly, async (req, res) => {
+    try {
+        await db.delete('products', { _id: req.params.id });
+        res.json({ success: true, message: 'تم حذف المنتج' });
+    } catch (error) {
+        res.status(500).json({ error: 'فشل الحذف' });
+    }
+});
+
+// ملف تعريف المستخدم
+app.get('/api/user/profile', auth, async (req, res) => {
+    try {
+        const user = await db.findOne('users', { _id: req.user.id });
+        if (!user) {
+            return res.status(404).json({ error: 'المستخدم غير موجود' });
+        }
+        const { password, ...userData } = user;
+        res.json({ success: true, data: userData });
+    } catch (error) {
+        res.status(500).json({ error: 'حدث خطأ' });
+    }
+});
+
+// الصفحات
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/admin/*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-// ==================== بدء التشغيل ====================
-(async () => {
-    const dirs = ['public', 'data'];
-    dirs.forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
-
-    await seedDatabase();
-
+// بدء التشغيل
+async function startServer() {
+    await initializeData();
+    
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║  🦅 الرعدي أونلاين – النسخة الأسطورية النهائية v16.0                        ║
-║  ⚡ سوق السعودية الأول – منصة تسوق عالمية متكاملة                           ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║  🌐 الخادم: http://localhost:${PORT}                                         ║
-║  👑 لوحة التحكم: http://localhost:${PORT}/admin                             ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║  🔐 بيانات الدخول:                                                          ║
-║  👤 المدير: alradi@gmail.com  |  كلمة السر: admin123                        ║
-║  👤 العميل: customer@alradi.com  |  كلمة السر: customer123                  ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║  💾 التخزين: LocalDB (ملفات JSON) – يعمل بدون MongoDB                       ║
-║  🚀 جاهز للإطلاق على Render                                                  ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════╗
+║  🦅 الرعدي أونلاين – النسخة النهائية v20.0                         ║
+║  ⚡ نظام تجارة إلكترونية متكامل                                     ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  🌐 الخادم: http://localhost:${PORT}                                 ║
+║  👑 لوحة المدير: http://localhost:${PORT}/admin                      ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  🔐 بيانات الدخول:                                                  ║
+║  👤 المدير: alradi@gmail.com  |  كلمة السر: admin123               ║
+║  👤 العميل: customer@alradi.com  |  كلمة السر: customer123         ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  💾 التخزين: JSON Files (LocalDB)                                   ║
+║  🚀 جاهز للتشغيل الفوري                                             ║
+╚══════════════════════════════════════════════════════════════════════╝
         `);
     });
-})();
+}
+
+startServer();
