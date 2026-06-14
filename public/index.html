@@ -9,66 +9,22 @@
     <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦅%3C/text%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #C9A84C;
-            --primary-dark: #A68A3E;
-            --primary-light: #E6C975;
-            --secondary: #1A1A2E;
-            --bg-dark: #0F0F1A;
-            --bg-card: #1A1A2E;
-            --bg-card-hover: #222240;
-            --text-light: #FFFFFF;
-            --text-muted: #A0A0B0;
-            --text-dark: #1A1A2E;
-            --success: #2ECC71;
-            --danger: #E74C3C;
-            --warning: #F39C12;
-            --info: #3498DB;
-            --border: #2A2A3E;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
-            --shadow: 0 10px 40px rgba(0,0,0,0.3);
-            --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
-            --radius-sm: 8px;
-            --radius: 16px;
-            --radius-lg: 24px;
+            --primary: #C9A84C; --primary-dark: #A68A3E; --primary-light: #E6C975;
+            --secondary: #1A1A2E; --bg-dark: #0F0F1A; --bg-card: #1A1A2E; --bg-card-hover: #222240;
+            --text-light: #FFFFFF; --text-muted: #A0A0B0; --text-dark: #1A1A2E;
+            --success: #2ECC71; --danger: #E74C3C; --warning: #F39C12; --info: #3498DB;
+            --border: #2A2A3E; --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+            --shadow: 0 10px 40px rgba(0,0,0,0.3); --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
+            --radius-sm: 8px; --radius: 16px; --radius-lg: 24px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        body.light-mode {
-            --bg-dark: #F8F9FA;
-            --bg-card: #FFFFFF;
-            --bg-card-hover: #F0F2F5;
-            --text-light: #1A1A2E;
-            --text-muted: #6C757D;
-            --border: #DEE2E6;
-        }
-
-        body {
-            font-family: 'Cairo', 'Segoe UI', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            line-height: 1.6;
-            overflow-x: hidden;
-            transition: var(--transition);
-        }
-
+        body.light-mode { --bg-dark: #F8F9FA; --bg-card: #FFFFFF; --bg-card-hover: #F0F2F5; --text-light: #1A1A2E; --text-muted: #6C757D; --border: #DEE2E6; }
+        body { font-family: 'Cairo', 'Segoe UI', sans-serif; background: var(--bg-dark); color: var(--text-light); line-height: 1.6; overflow-x: hidden; transition: var(--transition); }
+        
         /* شاشة التحميل */
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #0A0A15, #1A1A2E);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s, visibility 0.5s;
-        }
+        .loading-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #0A0A15, #1A1A2E); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s, visibility 0.5s; }
         .loading-screen.hidden { opacity: 0; visibility: hidden; }
         .loader { text-align: center; }
         .loader-logo { font-size: 80px; animation: pulse 2s infinite; }
@@ -76,39 +32,18 @@
         .loader-text { color: var(--text-muted); margin-top: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-
+        
         /* الهيدر الزجاجي */
-        .glass-header {
-            background: rgba(15, 15, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: var(--transition);
-        }
+        .glass-header { background: rgba(15,15,26,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; transition: var(--transition); }
         body.light-mode .glass-header { background: rgba(255,255,255,0.95); }
-
-        /* الشريط الإعلاني */
-        .marquee-container {
-            background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--primary-dark));
-            color: var(--text-dark);
-            padding: 10px;
-            overflow: hidden;
-            white-space: nowrap;
-        }
+        
+        /* الشريط الإعلاني المتحرك */
+        .marquee-container { background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--primary-dark)); color: var(--text-dark); padding: 10px; overflow: hidden; white-space: nowrap; position: relative; }
         .marquee { display: inline-block; animation: marquee 25s linear infinite; font-weight: bold; }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
+        
         /* الهيدر الرئيسي */
-        .header-main {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 30px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+        .header-main { display: flex; align-items: center; justify-content: space-between; padding: 15px 30px; flex-wrap: wrap; gap: 15px; }
         .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon { font-size: 36px; }
         .logo-text { font-size: 24px; font-weight: 900; color: var(--primary); }
@@ -117,226 +52,69 @@
         .search-container input { width: 100%; padding: 12px 20px; border-radius: 50px; border: none; background: var(--bg-card); color: var(--text-light); font-size: 14px; }
         .search-container input:focus { outline: none; box-shadow: 0 0 0 2px var(--primary); }
         .header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-        .header-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            color: var(--text-light);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .header-btn { display: flex; align-items: center; gap: 8px; padding: 8px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 50px; color: var(--text-light); font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition); }
         .header-btn:hover { background: var(--primary); color: var(--text-dark); transform: translateY(-2px); }
         .cart-count { background: var(--danger); color: white; border-radius: 50%; padding: 2px 8px; font-size: 11px; margin-right: 5px; }
-
+        
         /* الأزرار الـ 12 */
-        .action-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px 20px;
-            border-top: 1px solid var(--border);
-            background: rgba(15,15,26,0.5);
-        }
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            color: var(--text-light);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .action-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px 20px; border-top: 1px solid var(--border); background: rgba(15,15,26,0.5); }
+        .action-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 50px; color: var(--text-light); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); }
         .action-btn:hover { background: var(--primary); color: var(--text-dark); transform: translateY(-2px); }
-
+        
         /* السلايدر */
-        .hero-slider {
-            position: relative;
-            height: 500px;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            margin: 20px 30px 40px;
-        }
-        .hero-slide {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            padding: 60px;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-            background-size: cover;
-            background-position: center;
-        }
+        .hero-slider { position: relative; height: 500px; border-radius: var(--radius-lg); overflow: hidden; margin: 20px 30px 40px; }
+        .hero-slide { position: absolute; inset: 0; display: flex; align-items: center; padding: 60px; opacity: 0; transition: opacity 0.8s ease; background-size: cover; background-position: center; }
         .hero-slide.active { opacity: 1; }
         .hero-content { max-width: 550px; }
-        .hero-badge {
-            display: inline-block;
-            background: var(--primary);
-            color: var(--text-dark);
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+        .hero-badge { display: inline-block; background: var(--primary); color: var(--text-dark); padding: 8px 20px; border-radius: 50px; font-weight: bold; margin-bottom: 20px; }
         .hero-content h2 { font-size: 48px; margin-bottom: 15px; color: var(--primary); }
         .hero-content p { font-size: 18px; margin-bottom: 30px; color: var(--text-muted); }
-        .slider-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 45px;
-            height: 45px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-            z-index: 10;
-        }
+        .slider-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 45px; height: 45px; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; transition: var(--transition); z-index: 10; }
         .slider-nav:hover { background: var(--primary); color: var(--text-dark); }
         .slider-nav.prev { left: 20px; }
         .slider-nav.next { right: 20px; }
-        .slider-dots {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-            z-index: 10;
-        }
-        .slider-dot {
-            width: 10px;
-            height: 10px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .slider-dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; }
+        .slider-dot { width: 10px; height: 10px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer; transition: var(--transition); }
         .slider-dot.active { background: var(--primary); width: 25px; border-radius: 10px; }
-
+        
         /* المحتوى الرئيسي */
         .main-container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
-
+        
         /* الأقسام */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 40px 0 25px;
-        }
-        .section-title {
-            font-size: 28px;
-            font-weight: 900;
-            position: relative;
-            display: inline-block;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            right: 0;
-            width: 50%;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 3px;
-        }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 40px 0 25px; }
+        .section-title { font-size: 28px; font-weight: 900; position: relative; display: inline-block; }
+        .section-title::after { content: ''; position: absolute; bottom: -8px; right: 0; width: 50%; height: 3px; background: var(--primary); border-radius: 3px; }
         .section-link { color: var(--primary); cursor: pointer; font-size: 14px; }
-
+        
         /* الأقسام الهلالية */
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .category-item { text-align: center; cursor: pointer; transition: var(--transition); }
         .category-item:hover { transform: translateY(-5px); }
         .category-icon { font-size: 48px; margin-bottom: 8px; }
         .category-name { font-size: 14px; font-weight: 600; }
-
+        
+        /* المزاد */
+        .auction-section { background: linear-gradient(135deg, #1A0A2E, #2D1B3E); border: 2px solid var(--primary); border-radius: var(--radius-lg); padding: 30px; margin: 40px 0; }
+        .auction-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .auction-title { font-size: 28px; font-weight: bold; color: var(--primary); }
+        .auction-timer { display: flex; gap: 15px; }
+        .timer-box { background: var(--bg-card); padding: 12px 18px; border-radius: var(--radius-sm); text-align: center; min-width: 70px; }
+        .timer-value { font-size: 28px; font-weight: bold; color: var(--primary); }
+        .timer-label { font-size: 11px; color: var(--text-muted); }
+        
         /* شبكة المنتجات */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        .product-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-        }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: var(--transition); cursor: pointer; position: relative; }
         .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--primary); }
-        .product-image {
-            position: relative;
-            padding-top: 100%;
-            overflow: hidden;
-            background: #0F0F1A;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-        }
-        .product-image img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
+        .product-image { position: relative; padding-top: 100%; overflow: hidden; background: #0F0F1A; display: flex; align-items: center; justify-content: center; font-size: 60px; }
+        .product-image img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
         .product-card:hover .product-image img { transform: scale(1.05); }
-        .product-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            z-index: 2;
-        }
+        .product-badge { position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; z-index: 2; }
         .badge-sale { background: var(--danger); color: white; }
         .badge-new { background: var(--success); color: white; }
         .badge-featured { background: var(--primary); color: var(--text-dark); }
-        .product-wishlist {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 2;
-            transition: var(--transition);
-            color: white;
-            font-size: 18px;
-        }
+        .badge-low { background: var(--warning); color: var(--text-dark); }
+        .product-wishlist { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.5); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; transition: var(--transition); color: white; font-size: 18px; }
         .product-wishlist.active { background: var(--danger); }
         .product-info { padding: 18px; }
         .product-category { font-size: 12px; color: var(--primary); margin-bottom: 5px; }
@@ -351,35 +129,17 @@
         .stock-in { color: var(--success); }
         .stock-low { color: var(--warning); }
         .stock-out { color: var(--danger); }
-        .btn-add-cart {
-            width: 100%;
-            padding: 10px;
-            background: var(--primary);
-            border: none;
-            border-radius: 50px;
-            color: var(--text-dark);
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .btn-add-cart { width: 100%; padding: 10px; background: var(--primary); border: none; border-radius: 50px; color: var(--text-dark); font-weight: bold; cursor: pointer; transition: var(--transition); }
         .btn-add-cart:hover { background: var(--primary-light); transform: scale(1.02); }
         .btn-add-cart:disabled { background: var(--text-muted); cursor: not-allowed; }
-
+        
+        /* تحميل المزيد */
+        .load-more-container { text-align: center; margin: 30px 0; }
+        .btn-load-more { padding: 12px 30px; background: transparent; border: 2px solid var(--primary); color: var(--primary); border-radius: 50px; font-weight: bold; cursor: pointer; transition: var(--transition); }
+        .btn-load-more:hover { background: var(--primary); color: var(--text-dark); }
+        
         /* السلة الجانبية */
-        .cart-sidebar {
-            position: fixed;
-            top: 0;
-            left: -400px;
-            width: 380px;
-            height: 100vh;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
-            z-index: 2000;
-            transition: left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow-lg);
-        }
+        .cart-sidebar { position: fixed; top: 0; left: -400px; width: 380px; height: 100vh; background: var(--bg-card); border-right: 1px solid var(--border); z-index: 2000; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
         .cart-sidebar.open { left: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .cart-header h3 { font-size: 20px; color: var(--primary); }
@@ -397,69 +157,24 @@
         .cart-total span:last-child { color: var(--primary); }
         .free-shipping-bar { background: rgba(201,168,76,0.1); height: 6px; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
         .free-shipping-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.3s; }
-
+        
         /* المودالات */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 3000; }
         .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 25px;
-            position: relative;
-        }
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
+        .modal { background: var(--bg-card); border-radius: var(--radius); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 25px; position: relative; }
+        .modal-lg { max-width: 800px; }
+        .modal-close { position: absolute; top: 15px; left: 15px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
         .modal h2 { color: var(--primary); margin-bottom: 20px; text-align: center; }
-
+        
         /* النماذج */
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-light);
-            font-size: 14px;
-            font-family: inherit;
-        }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-light); font-size: 14px; font-family: inherit; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
+        
         /* الأزرار العامة */
-        .btn {
-            display: inline-block;
-            padding: 12px 28px;
-            border-radius: 50px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            text-align: center;
-        }
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; transition: var(--transition); font-family: inherit; text-align: center; }
         .btn-primary { background: var(--primary); color: var(--text-dark); }
         .btn-primary:hover { background: var(--primary-light); transform: translateY(-2px); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
@@ -468,61 +183,16 @@
         .btn-success { background: var(--success); color: white; }
         .btn-block { display: block; width: 100%; }
         .btn-sm { padding: 8px 20px; font-size: 13px; }
-
+        
         /* الإشعارات */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-card);
-            color: var(--text-light);
-            padding: 12px 24px;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            z-index: 4000;
-            font-weight: bold;
-            animation: toastIn 0.3s ease;
-            box-shadow: var(--shadow-lg);
-        }
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateX(-50%) translateY(30px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-card); color: var(--text-light); padding: 12px 24px; border-radius: 50px; border: 1px solid var(--border); z-index: 4000; font-weight: bold; animation: toastIn 0.3s ease; box-shadow: var(--shadow-lg); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(30px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        
         /* الدعم المباشر */
-        .chat-widget {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1500;
-        }
-        .chat-toggle {
-            width: 60px;
-            height: 60px;
-            background: var(--primary);
-            border: none;
-            border-radius: 50%;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: var(--shadow-lg);
-            transition: var(--transition);
-        }
+        .chat-widget { position: fixed; bottom: 30px; right: 30px; z-index: 1500; }
+        .chat-toggle { width: 60px; height: 60px; background: var(--primary); border: none; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: var(--shadow-lg); transition: var(--transition); }
         .chat-toggle:hover { transform: scale(1.1); }
-        .chat-window {
-            position: absolute;
-            bottom: 80px;
-            right: 0;
-            width: 350px;
-            height: 450px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-        }
+        .chat-window { position: absolute; bottom: 80px; right: 0; width: 350px; height: 450px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); display: none; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); }
         .chat-window.open { display: flex; }
         .chat-header { background: var(--primary); color: var(--text-dark); padding: 15px; font-weight: bold; }
         .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -532,21 +202,10 @@
         .chat-input { display: flex; padding: 10px; gap: 10px; border-top: 1px solid var(--border); }
         .chat-input input { flex: 1; padding: 10px; border-radius: 25px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-light); }
         .chat-input button { width: 40px; border-radius: 50%; border: none; background: var(--primary); cursor: pointer; }
-
+        
         /* الفوتر */
-        .footer {
-            background: var(--bg-card);
-            padding: 50px 30px 30px;
-            margin-top: 60px;
-            border-top: 1px solid var(--border);
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .footer { background: var(--bg-card); padding: 50px 30px 30px; margin-top: 60px; border-top: 1px solid var(--border); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
         .footer-col h4 { color: var(--primary); margin-bottom: 15px; }
         .footer-col a { display: block; color: var(--text-muted); text-decoration: none; margin-bottom: 10px; transition: var(--transition); cursor: pointer; }
         .footer-col a:hover { color: var(--primary); }
@@ -554,7 +213,7 @@
         .footer-social a { width: 40px; height: 40px; background: var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 20px; transition: var(--transition); cursor: pointer; }
         .footer-social a:hover { background: var(--primary); transform: translateY(-3px); }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px; }
-
+        
         /* استجابة للجوال */
         @media (max-width: 768px) {
             .hero-slider { height: 400px; margin: 10px 15px 30px; }
@@ -566,6 +225,9 @@
             .products-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .cart-sidebar { width: 320px; }
             .form-row { grid-template-columns: 1fr; }
+            .auction-timer { gap: 8px; }
+            .timer-box { padding: 8px 12px; min-width: 55px; }
+            .timer-value { font-size: 20px; }
             .header-main { padding: 10px 15px; }
             .main-container { padding: 0 15px; }
             .section-title { font-size: 22px; }
@@ -576,18 +238,13 @@
             .category-icon { font-size: 32px; }
             .category-name { font-size: 11px; }
         }
-
         .text-gold { color: var(--primary); }
     </style>
 </head>
 <body>
 
 <div class="loading-screen" id="loadingScreen">
-    <div class="loader">
-        <div class="loader-logo">🦅</div>
-        <div class="loader-spinner"></div>
-        <p class="loader-text">جاري تحميل المتجر...</p>
-    </div>
+    <div class="loader"><div class="loader-logo">🦅</div><div class="loader-spinner"></div><p class="loader-text">جاري تحميل المتجر...</p></div>
 </div>
 
 <audio id="sound-add" preload="auto"><source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg"></audio>
@@ -596,7 +253,6 @@
 
 <header class="glass-header">
     <div class="marquee-container"><div class="marquee">🦅 عرض الصقر: خصم 40% اليوم - الكود RAAD40 🦅 شحن مجاني فوق 500 ريال 🦅 مزاد مباشر الآن 🦅 وصل حديثاً بأفضل الأسعار 🦅 توصيل سريع لجميع مدن المملكة</div></div>
-    
     <div class="header-main">
         <div class="logo"><div class="logo-icon">🦅</div><div><div class="logo-text">الرعدي أونلاين</div><div class="logo-sub">سوق السعودية الأول</div></div></div>
         <div class="search-container"><input type="text" id="searchInput" placeholder="🔍 ابحث عن 50,000 منتج..."></div>
@@ -607,7 +263,6 @@
             <button class="header-btn" id="userBtn" onclick="handleUserClick()">👤 حسابي</button>
         </div>
     </div>
-    
     <div class="action-buttons">
         <button class="action-btn" onclick="openCartSidebar()">🛒 السلة</button>
         <button class="action-btn" onclick="openFavorites()">⭐ المفضلة</button>
@@ -617,7 +272,7 @@
         <button class="action-btn" onclick="startAR()">📱 جرب AR</button>
         <button class="action-btn" onclick="trackOrder()">📦 تتبع طلبك</button>
         <button class="action-btn" onclick="openWhatsApp()">💬 دعم 24/7</button>
-        <button class="action-btn" onclick="window.location.href='/account'">🎁 نقاطي</button>
+        <button class="action-btn" onclick="window.location.href='/account#wallet'">🎁 نقاطي</button>
         <button class="action-btn" onclick="showBranches()">📍 فروعنا</button>
         <button class="action-btn" onclick="openCompare()">⚖️ قارن</button>
         <button class="action-btn" onclick="window.location.href='/blog'">📰 المدونة</button>
@@ -643,10 +298,23 @@
     <div class="section-header"><h2 class="section-title">📂 الأقسام</h2><span class="section-link" onclick="viewAllCategories()">عرض الكل →</span></div>
     <div class="categories-grid" id="categoriesGrid"></div>
 
+    <div class="auction-section" id="auctionSection" style="display: none;">
+        <div class="auction-header">
+            <div class="auction-title">🏆 المزاد الحي – عروض حصرية</div>
+            <div class="auction-timer" id="auctionTimer">
+                <div class="timer-box"><div class="timer-value" id="auctionDays">00</div><div class="timer-label">يوم</div></div>
+                <div class="timer-box"><div class="timer-value" id="auctionHours">00</div><div class="timer-label">ساعة</div></div>
+                <div class="timer-box"><div class="timer-value" id="auctionMinutes">00</div><div class="timer-label">دقيقة</div></div>
+                <div class="timer-box"><div class="timer-value" id="auctionSeconds">00</div><div class="timer-label">ثانية</div></div>
+            </div>
+        </div>
+        <div id="auctionProducts" class="products-grid"></div>
+    </div>
+
     <div class="section-header"><h2 class="section-title">⚡ العروض الخاطفة</h2><span class="section-link" onclick="viewAllFlashSales()">عرض الكل →</span></div>
     <div id="flashSaleProducts" class="products-grid"></div>
 
-    <div class="section-header"><h2 class="section-title">🏷️ أحدث المنتجات</h2><div><select id="sortSelect" onchange="sortProducts(this.value)" style="padding:8px15px;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-light);"><option value="-createdAt">الأحدث</option><option value="price-asc">السعر: من الأقل</option><option value="price-desc">السعر: من الأعلى</option><option value="bestselling">الأكثر مبيعاً</option></select></div></div>
+    <div class="section-header"><h2 class="section-title">🏷️ أحدث المنتجات</h2><div><select id="sortSelect" onchange="sortProducts(this.value)" style="padding:8px 15px;border-radius:50px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-light);"><option value="-createdAt">الأحدث</option><option value="price-asc">السعر: من الأقل</option><option value="price-desc">السعر: من الأعلى</option><option value="bestselling">الأكثر مبيعاً</option><option value="toprated">الأعلى تقييماً</option></select></div></div>
     <div id="productsGrid" class="products-grid"><div style="text-align:center;grid-column:1/-1;padding:60px;"><div class="loader-spinner" style="margin:0 auto;"></div><p style="color:var(--text-muted);">جاري تحميل المنتجات...</p></div></div>
     <div class="load-more-container"><button id="loadMoreBtn" class="btn-load-more" style="display:none;" onclick="loadMoreProducts()">تحميل المزيد ⬇️</button></div>
 </main>
@@ -671,7 +339,11 @@
 <div class="modal-overlay" id="loginModal">
     <div class="modal"><button class="modal-close" onclick="closeModal('loginModal')">✕</button><div style="text-align:center;"><div style="font-size:60px;">🦅</div><h2 style="color:var(--primary);">مرحباً بك</h2><p style="color:var(--text-muted);margin-bottom:25px;">سجل دخولك للمتجر</p></div>
     <div id="loginForm"><div class="form-group"><label>رقم الجوال أو البريد الإلكتروني</label><input type="text" id="loginIdentifier" placeholder="05xxxxxxxx أو example@email.com"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword" placeholder="********"></div><div style="display:flex;justify-content:space-between;margin-bottom:20px;"><label style="display:flex;align-items:center;gap:5px;"><input type="checkbox" id="rememberMe"> تذكرني</label><a href="#" onclick="showForgotPassword()" style="color:var(--primary);">نسيت كلمة المرور؟</a></div><button class="btn btn-primary btn-block" onclick="login()">دخول</button><p style="text-align:center;margin-top:20px;">ليس لديك حساب؟ <a href="#" onclick="showRegister()" style="color:var(--primary);">إنشاء حساب جديد</a></p></div>
-    <div id="registerForm" style="display:none;"><div class="form-group"><label>الاسم الكامل *</label><input type="text" id="regFullName" placeholder="أدخل اسمك الكامل"></div><div class="form-group"><label>رقم الجوال *</label><input type="tel" id="regPhone" placeholder="05XXXXXXXX"></div><div class="form-group"><label>كلمة المرور *</label><input type="password" id="regPassword" placeholder="********"><small style="color:var(--text-muted);">يجب أن تحتوي على 8 خانات على الأقل</small></div><div class="form-group"><label>تأكيد كلمة المرور *</label><input type="password" id="regPasswordConfirm" placeholder="********"></div><div class="form-row"><div class="form-group"><label>الدولة *</label><select id="regCountry"><option value="السعودية">🇸🇦 السعودية</option><option value="الإمارات">🇦🇪 الإمارات</option><option value="الكويت">🇰🇼 الكويت</option><option value="قطر">🇶🇦 قطر</option><option value="عمان">🇴🇲 عمان</option><option value="البحرين">🇧🇭 البحرين</option></select></div><div class="form-group"><label>المدينة *</label><input type="text" id="regCity" placeholder="مثال: الرياض"></div></div><button class="btn btn-primary btn-block" onclick="register()">إنشاء حساب</button><p style="text-align:center;margin-top:20px;">لديك حساب؟ <a href="#" onclick="showLogin()" style="color:var(--primary);">تسجيل الدخول</a></p></div></div>
+    <div id="registerForm" style="display:none;"><div class="form-group"><label>الاسم الكامل *</label><input type="text" id="regFullName" placeholder="أدخل اسمك الكامل"></div><div class="form-group"><label>رقم الجوال *</label><input type="tel" id="regPhone" placeholder="05XXXXXXXX"></div><div class="form-group"><label>كلمة المرور *</label><input type="password" id="regPassword" placeholder="********"><small style="color:var(--text-muted);">يجب أن تحتوي على 8 خانات على الأقل</small></div><div class="form-group"><label>تأكيد كلمة المرور *</label><input type="password" id="regPasswordConfirm" placeholder="********"></div><div class="form-row"><div class="form-group"><label>الدولة *</label><select id="regCountry"><option value="السعودية">🇸🇦 السعودية</option><option value="الإمارات">🇦🇪 الإمارات</option><option value="الكويت">🇰🇼 الكويت</option><option value="قطر">🇶🇦 قطر</option><option value="عمان">🇴🇲 عمان</option><option value="البحرين">🇧🇭 البحرين</option><option value="مصر">🇪🇬 مصر</option><option value="الأردن">🇯🇴 الأردن</option></select></div><div class="form-group"><label>المدينة *</label><input type="text" id="regCity" placeholder="مثال: الرياض"></div></div><button class="btn btn-primary btn-block" onclick="register()">إنشاء حساب</button><p style="text-align:center;margin-top:20px;">لديك حساب؟ <a href="#" onclick="showLogin()" style="color:var(--primary);">تسجيل الدخول</a></p></div></div>
+</div>
+
+<div class="modal-overlay" id="cartModal">
+    <div class="modal modal-lg"><button class="modal-close" onclick="closeModal('cartModal')">✕</button><h2 style="color:var(--primary);">🛒 سلة التسوق</h2><div id="cartModalItems"></div><div id="cartModalSummary"></div><button class="btn btn-primary btn-block" onclick="proceedToCheckout()">إتمام الشراء</button></div>
 </div>
 
 <div class="chat-widget"><button class="chat-toggle" onclick="toggleChat()">💬</button><div class="chat-window" id="chatWindow"><div class="chat-header">💬 الدعم الفني – الرعدي أونلاين<span style="font-size:10px;display:block;">نرد خلال دقيقة</span></div><div class="chat-messages" id="chatMessages"><div class="chat-msg support">👋 مرحباً بك في الرعدي أونلاين! كيف يمكننا مساعدتك؟</div></div><div class="chat-input"><input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()">➡️</button></div></div></div>
@@ -682,12 +354,7 @@
     let currentUser = JSON.parse(localStorage.getItem('user') || 'null');
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    let currentPage = 1;
-    let totalPages = 1;
-    let currentSort = '-createdAt';
-    let currentCategory = '';
-    let currentSearch = '';
-    let sliderIndex = 0;
+    let currentPage = 1, totalPages = 1, currentSort = '-createdAt', currentCategory = '', currentSearch = '', sliderIndex = 0;
 
     function showToast(message, type = 'success') {
         const existingToast = document.querySelector('.toast');
@@ -695,7 +362,7 @@
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.textContent = message;
-        toast.style.background = type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--primary)';
+        toast.style.background = type === 'success' ? '#2ECC71' : type === 'error' ? '#E74C3C' : '#C9A84C';
         toast.style.color = 'white';
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
@@ -781,7 +448,7 @@
 
     function updateCartQuantity(idx, delta) { const newQty = cart[idx].quantity + delta; if (newQty < 1) cart.splice(idx,1); else cart[idx].quantity = newQty; localStorage.setItem('cart',JSON.stringify(cart)); updateCartCount(); loadCart(); }
     function removeFromCart(idx) { cart.splice(idx,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCartCount(); loadCart(); }
-    function checkout() { if (!token) { closeCartSidebar(); openModal('loginModal'); showToast('يرجى تسجيل الدخول أولاً', 'error'); return; } if (cart.length===0) { showToast('السلة فارغة', 'error'); return; } window.location.href = '/checkout'; }
+    function checkout() { if (!token) { closeCartSidebar(); openModal('loginModal'); showToast('يرجى تسجيل الدخول أولاً', 'error'); return; } if (cart.length===0) { showToast('السلة فارغة', 'error'); return; } showToast('جاري معالجة الطلب...'); setTimeout(()=>{ showToast('تم إنشاء الطلب بنجاح! شكراً لتسوقك معنا', 'success'); cart = []; localStorage.setItem('cart',JSON.stringify(cart)); updateCartCount(); closeCartSidebar(); },1500); }
 
     async function loadProducts(page=1, append=false) {
         try {
@@ -801,18 +468,19 @@
 
     function createProductCard(p) {
         const div = document.createElement('div'); div.className = 'product-card'; div.onclick = () => viewProduct(p._id);
-        const img = p.images?.[0]?.url || 'https://placehold.co/400x400/1A1A2E/C9A84C?text=🦅';
+        const img = p.images?.[0] || 'https://placehold.co/400x400/1A1A2E/C9A84C?text=🦅';
         const discount = p.comparePrice ? Math.round((1-p.price/p.comparePrice)*100) : 0;
         let badge = ''; if (discount>0) badge = `<span class="product-badge badge-sale">-${discount}%</span>`;
         else if (p.isFeatured) badge = `<span class="product-badge badge-featured">✨ مميز</span>`;
+        else if (p.stock <=5 && p.stock>0) badge = `<span class="product-badge badge-low">⚡ كمية محدودة</span>`;
         const inWishlist = favorites.includes(p._id);
-        div.innerHTML = `<div class="product-image"><img src="${img}" loading="lazy"><button class="product-wishlist ${inWishlist?'active':''}" onclick="event.stopPropagation(); toggleWishlist('${p._id}')">${inWishlist?'❤️':'🤍'}</button></div><div class="product-info"><div class="product-category">${p.category||'عام'}</div><div class="product-name">${p.name}</div><div class="product-price"><span class="current-price">${p.price.toFixed(2)} ر.س</span>${p.comparePrice?`<span class="old-price">${p.comparePrice.toFixed(2)} ر.س</span>`:''}${discount>0?`<span class="discount">وفر ${discount}%</span>`:''}</div><button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${p._id}','${p.name.replace(/'/g,"\\'")}',${p.price},'${img}')">🛒 أضف إلى السلة</button></div>`;
+        div.innerHTML = `<div class="product-image"><img src="${img}" loading="lazy"><button class="product-wishlist ${inWishlist?'active':''}" onclick="event.stopPropagation(); toggleWishlist('${p._id}')">${inWishlist?'❤️':'🤍'}</button></div><div class="product-info"><div class="product-category">${p.category||'عام'}</div><div class="product-name">${p.name}</div><div class="product-rating"><span class="stars">${'⭐'.repeat(Math.round(p.rating||0))}${'☆'.repeat(5-Math.round(p.rating||0))}</span><span>(${p.ratingCount||0})</span></div><div class="product-price"><span class="current-price">${p.price.toFixed(2)} ر.س</span>${p.comparePrice?`<span class="old-price">${p.comparePrice.toFixed(2)} ر.س</span>`:''}${discount>0?`<span class="discount">وفر ${discount}%</span>`:''}</div><div class="product-stock ${p.stock>0?'stock-in':'stock-out'}">${p.stock>0?`✅ متوفر (${p.stock} قطعة)`:'❌ نفد من المخزون'}</div><button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${p._id}','${p.name.replace(/'/g,"\\'")}',${p.price},'${img}')" ${p.stock===0?'disabled':''}>🛒 أضف إلى السلة</button></div>`;
         return div;
     }
 
     function loadMoreProducts() { loadProducts(currentPage+1, true); }
     function sortProducts(sort) { currentSort = sort; currentPage = 1; loadProducts(); }
-    function filterByCategory(cat) { currentCategory = cat; currentPage = 1; loadProducts(); }
+    function filterByCategory(category) { currentCategory = category; currentPage = 1; loadProducts(); }
     function filterNewProducts() { currentSort = '-createdAt'; currentPage=1; loadProducts(); showToast('عرض أحدث المنتجات','success'); }
     function scrollToProducts() { document.querySelector('.section-header').scrollIntoView({behavior:'smooth'}); }
     function scrollToFlashSale() { document.getElementById('flashSaleProducts').scrollIntoView({behavior:'smooth'}); }
@@ -827,9 +495,22 @@
     }
     function viewAllCategories() { showToast('جميع الأقسام','success'); }
 
+    async function loadAuctions() {
+        try { const res = await fetch(`${API}/products?featured=true&limit=4`); const data = await res.json(); if(data.success && data.data.length) { document.getElementById('auctionSection').style.display = 'block'; const container = document.getElementById('auctionProducts'); container.innerHTML = data.data.map(p=>`<div class="product-card" onclick="viewProduct('${p._id}')"><div class="product-image"><img src="${p.images?.[0]||'https://placehold.co/260x260'}"><span class="product-badge badge-featured">🏆 مزاد</span></div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price"><span class="current-price">${p.price.toFixed(2)} ر.س</span></div><button class="btn-add-cart" onclick="event.stopPropagation(); placeBid('${p._id}')">💎 شارك في المزاد</button></div></div>`).join(''); startAuctionTimer(); } }
+        catch(e) { console.error(e); }
+    }
+
+    function startAuctionTimer() {
+        const endTime = new Date(); endTime.setHours(endTime.getHours()+48);
+        function updateTimer() { const now=new Date(); const diff=endTime-now; if(diff<=0){ document.getElementById('auctionSection').style.display='none'; return; } const days=Math.floor(diff/(1000*60*60*24)); const hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60)); const mins=Math.floor((diff%(1000*60*60))/(1000*60)); const secs=Math.floor((diff%(1000*60))/1000); document.getElementById('auctionDays').textContent=String(days).padStart(2,'0'); document.getElementById('auctionHours').textContent=String(hours).padStart(2,'0'); document.getElementById('auctionMinutes').textContent=String(mins).padStart(2,'0'); document.getElementById('auctionSeconds').textContent=String(secs).padStart(2,'0'); }
+        updateTimer(); setInterval(updateTimer,1000);
+    }
+
+    function placeBid(productId) { if(!token){ openModal('loginModal'); showToast('يرجى تسجيل الدخول للمشاركة في المزاد','error'); return; } showToast('تم تقديم عرضك في المزاد بنجاح!','success'); }
+
     async function loadFlashSales() {
-        try { const res = await fetch(`${API}/products?limit=8`); const data = await res.json(); if(data.success && data.data.length) { document.getElementById('flashSaleProducts').innerHTML = data.data.slice(0,4).map(p=>`<div class="product-card" onclick="viewProduct('${p._id}')"><div class="product-image"><img src="${p.images?.[0]?.url||'https://placehold.co/260x260'}"><span class="product-badge badge-sale">⚡ عرض</span></div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price"><span class="current-price">${p.price.toFixed(2)} ر.س</span></div><button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${p._id}','${p.name.replace(/'/g,"\\'")}',${p.price},'${p.images?.[0]?.url||''}')">🛒 أضف</button></div></div>`).join(''); } }
-        catch(e) { document.getElementById('flashSaleProducts').innerHTML = '<div class="product-card"><div class="product-image">📱</div><div class="product-info"><div class="product-name">ساعة ذكية</div><div class="product-price"><span class="current-price">599 ر.س</span></div><button class="btn-add-cart">🛒 أضف</button></div></div>'; }
+        try { const res = await fetch(`${API}/products?flashSale=true&limit=8`); const data = await res.json(); if(data.success && data.data.length) { document.getElementById('flashSaleProducts').innerHTML = data.data.map(p=>`<div class="product-card" onclick="viewProduct('${p._id}')"><div class="product-image"><img src="${p.images?.[0]||'https://placehold.co/260x260'}"><span class="product-badge badge-sale">⚡ عرض خاطف</span></div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price"><span class="current-price">${p.price.toFixed(2)} ر.س</span>${p.comparePrice?`<span class="old-price">${p.comparePrice.toFixed(2)} ر.س</span>`:''}</div><button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${p._id}','${p.name.replace(/'/g,"\\'")}',${p.price},'${p.images?.[0]||''}')">🛒 أضف إلى السلة</button></div></div>`).join(''); } }
+        catch(e) { console.error(e); }
     }
     function viewAllFlashSales() { showToast('جميع العروض الخاطفة','success'); }
 
@@ -857,7 +538,7 @@
 
     document.addEventListener('DOMContentLoaded',()=>{
         setTimeout(()=>document.getElementById('loadingScreen').classList.add('hidden'),2000);
-        loadCategories(); loadProducts(); loadFlashSales(); initSlider(); updateUserUI(); updateCartCount(); loadCart();
+        loadCategories(); loadProducts(); loadFlashSales(); loadAuctions(); initSlider(); updateUserUI(); updateCartCount(); loadCart();
         if(localStorage.getItem('theme')==='light') document.body.classList.add('light-mode');
         document.addEventListener('click',(e)=>{ const s=document.getElementById('cartSidebar'); if(s && s.classList.contains('open') && !s.contains(e.target) && !e.target.closest('.action-btn') && !e.target.closest('.header-btn')) closeCartSidebar(); });
         console.log('🦅 الرعدي أونلاين – تم تحميل المتجر بنجاح');
