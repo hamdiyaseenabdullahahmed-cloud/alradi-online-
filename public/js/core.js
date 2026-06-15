@@ -2,44 +2,39 @@
    🧠 محرك العمليات الأساسي والربط السحابي لمتجر الرعدي أونلاين الدولي (core.js)
    ========================================================================== */
 
-// --- 🌐 المتغيرات العالمية للمنظومة السحابية ---
 let currentStoreName = "الرعدي أونلاين";
 let currentStoreLogo = "https://i.ibb.co/6NG0byK/falcon-head.png";
 let globalReturnPolicy = "يسمح للعميل الفاضل باستبدال أو استرجاع المنتجات والطلبيات خلال مدة أقصاها 14 يوماً من تاريخ الاستلام الفعلي، شريطة الحفاظ على المنتج في عبوته وحالته الأصلية الفاخرة دون استخدام أو فتح.";
 
-let allProductsArray = []; // المخزن المؤقت للمنتجات المجلوبة سحابياً من MongoDB
-let shoppingCartArray = []; // سلة المشتريات الحالية للعميل
-let appActiveCurrency = "SAR"; // العملة الافتراضية للمتجر (ريال سعودي)
-let currentActiveCategory = "الكل"; // القسم النشط حالياً بالتصفح
-let currentProductGridLayout = 3; // نمط العرض الشبكي الافتراضي (3 منتجات بالصف)
-let activeExtraCouponDiscount = 0; // قيمة الخصم الإضافي من الكوبون
+let allProductsArray = []; 
+let shoppingCartArray = []; 
+let appActiveCurrency = "SAR"; 
+let currentActiveCategory = "الكل"; 
+let currentProductGridLayout = 3; 
+let activeExtraCouponDiscount = 0; 
 
-// بيانات المستخدم الحالي المسجل
 let loggedInUserSession = {
     identity: null,
-    role: "client", // client أو admin
+    role: "client", 
     name: "عميل الرعدي الدولي",
     invoicesHistory: []
 };
 
-// أسعار صرف العملات الدولية الثابتة بالنسبة للريال السعودي (SAR هو الأساس)
 const currencyExchangeRates = {
-    "SAR": 1.0,      // ريال سعودي
-    "YER": 68.0,     // ريال يمني
-    "USD": 0.27,     // دولار أمريكي
-    "AED": 0.98      // درهم إماراتي
+    "SAR": 1.0,      
+    "YER": 68.0,     
+    "USD": 0.27,     
+    "AED": 0.98      
 };
 
-// --- 🚀 دالة تهيئة التطبيق وفحص الجلسات الفورية ---
 function initApp() {
     console.log("🦅 تم تشغيل محرك متجر الرعدي أونلاين المربوط بسحابة MongoDB...");
     loadGlobalStoreSettingsFromStorage();
     applyDynamicStoreIdentity();
-    fetchProductsFromDatabase(); // جلب البيانات من السيرفر السحابي
+    fetchProductsFromDatabase(); 
     generateMockCustomersData();
 }
 
-// --- 🔐 نظام الحماية وبوابة تسجيل الدخول الذكية ---
 function handleAuth(event) {
     event.preventDefault();
     const identityInput = document.getElementById('auth-identity').value.trim();
@@ -47,28 +42,34 @@ function handleAuth(event) {
     const loginErrorBox = document.getElementById('login-error-msg');
     const loginCard = document.querySelector('.auth-card');
 
-    // 👑 التحقق من حساب المدير الافتراضي والشامل
+    // 👑 دخول المدير
     if (identityInput === "alradi@gmail.com" && passwordInput === "admin123") {
         loggedInUserSession.identity = identityInput;
         loggedInUserSession.role = "admin";
         loggedInUserSession.name = "المدير العام للمتجر";
         
+        // 🎵 تشغيل نغمة ترحيبية فخمة جاهزة من الإنترنت
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-84.wav').play();
+
         loginErrorBox.style.display = "none";
         document.getElementById('login-screen').style.display = "none";
         document.getElementById('main-store-app').style.display = "block";
-        document.getElementById('admin-shortcut-btn').style.display = "flex"; // إظهار زر لوحة التحكم للمدير
+        document.getElementById('admin-shortcut-btn').style.display = "flex"; 
         
         document.getElementById('admin-display-email').innerText = identityInput;
         refreshAdminDashboardAnalytics();
         return;
     }
 
-    // 👤 التحقق من دخول العميل (أبو يزن / الرعدي)
+    // 👤 دخول العميل (أبو يزن / الرعدي)
     if (identityInput.length >= 4 && passwordInput.length >= 4) {
         loggedInUserSession.identity = identityInput;
         loggedInUserSession.role = "client";
         loggedInUserSession.name = identityInput.split('@')[0];
         
+        // 🎵 تشغيل نغمة ترحيبية فخمة جاهزة من الإنترنت
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-84.wav').play();
+
         loginErrorBox.style.display = "none";
         document.getElementById('login-screen').style.display = "none";
         document.getElementById('main-store-app').style.display = "block";
@@ -85,7 +86,6 @@ function handleAuth(event) {
     setTimeout(() => { loginCard.classList.remove('shake-animation'); }, 400);
 }
 
-// دالة إظهار وإخفاء كلمات المرور
 function togglePasswordVisibility(inputId) {
     const passwordField = document.getElementById(inputId);
     const eyeIcon = document.getElementById('eye-icon');
@@ -100,14 +100,11 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
-// --- 📦 دالة جلب المنتجات الحية مباشرة من سحابة MongoDB ---
 async function fetchProductsFromDatabase() {
     try {
-        // استدعاء الممر السحابي في السيرفر لجلب مصفوفة المنتجات الفاخرة
         const response = await fetch('/api/products');
         allProductsArray = await response.json();
 
-        // إذا كانت السحابة فارغة تماماً عند التشغيل الأول، نضخ منتجاً ترحيبياً تلقائياً لكي لا يظهر الموقع فارغاً
         if (allProductsArray.length === 0) {
             allProductsArray = [
                 {
@@ -124,15 +121,13 @@ async function fetchProductsFromDatabase() {
             ];
         }
 
-        // إرسال البيانات المجلوبة فوراً لمحركات الرسوميات والعرض
         renderProductsCatalogView();
         renderCategoriesCrescentNavigation();
     } catch (err) {
-        console.error("❌ فشل جلب المنتجات السحابية من الخادم، تم التحويل للمخزن الاحتياطي المحلي:", err);
+        console.error("❌ فشل جلب المنتجات السحابية:", err);
     }
 }
 
-// --- 📊 العمليات الحسابية التلقائية والذكية لنسب الخصم ---
 function autoCalculateDiscountPercentage() {
     const priceNew = parseFloat(document.getElementById('prod-price-new').value);
     const priceOld = parseFloat(document.getElementById('prod-price-old').value);
@@ -146,7 +141,6 @@ function autoCalculateDiscountPercentage() {
     }
 }
 
-// --- 🪙 دالة تحويل العملات الدولية المعتمدة واللحظية ---
 function formatPriceWithActiveCurrency(priceInSAR) {
     const convertedPrice = priceInSAR * currencyExchangeRates[appActiveCurrency];
     return `${convertedPrice.toFixed(2)} ${appActiveCurrency}`;
@@ -154,11 +148,10 @@ function formatPriceWithActiveCurrency(priceInSAR) {
 
 function updateCurrencyAndPrices() {
     appActiveCurrency = document.getElementById('global-currency').value;
-    renderProductsCatalogView(); // إعادة تحديث الأسعار على الشاشة فوراً
-    updateCartPanelTotalsUI(); // تحديث أرقام السلة الجانبية
+    renderProductsCatalogView(); 
+    updateCartPanelTotalsUI(); 
 }
 
-// --- 💾 حفظ وإدارة إعدادات الهوية وسيطرة المدير السحابية ---
 function saveGlobalStoreSettings() {
     const nameInput = document.getElementById('settings-store-name-input').value.trim();
     const logoInput = document.getElementById('settings-store-logo-input').value.trim();
@@ -199,14 +192,11 @@ function applyDynamicStoreIdentity() {
     document.getElementById('invoice-legal-text-content').innerText = globalReturnPolicy;
 }
 
-// --- 📑 إدارة أرشيف الفواتير وإرسالها حية للسحابة MongoDB ---
 async function saveInvoiceToClientArchive(invoiceObj) {
-    // 1. حفظ محلي سريع في جهاز العميل لضمان سرعة التصفح
     let clientArchive = JSON.parse(localStorage.getItem(`archive_${loggedInUserSession.identity}`)) || [];
     clientArchive.push(invoiceObj);
     localStorage.setItem(`archive_${loggedInUserSession.identity}`, JSON.stringify(clientArchive));
     
-    // 2. إرسال الفاتورة بالكامل عبر الـ API ليتم توثيقها وحفظها للأبد داخل سحابة MongoDB
     try {
         await fetch('/api/invoices', {
             method: 'POST',
@@ -221,7 +211,7 @@ async function saveInvoiceToClientArchive(invoiceObj) {
                 paymentType: document.getElementById('checkout-payment-method').value,
                 currencyType: appActiveCurrency,
                 items: invoiceObj.items,
-                subtotal: invoiceObj.amountInSAR, // المعالجة الأساسية بالريال
+                subtotal: invoiceObj.amountInSAR, 
                 discount: invoiceObj.amountInSAR * activeExtraCouponDiscount,
                 grandTotal: invoiceObj.amountInSAR - (invoiceObj.amountInSAR * activeExtraCouponDiscount)
             })
@@ -238,7 +228,6 @@ function loadClientInvoicesFromStorage() {
     rebuildClientInvoicesTableUI();
 }
 
-// دالة تفريغ محاكاة بيانات مستهلكين للوحة تحكم المدير
 let mockCustomersArray = [];
 function generateMockCustomersData() {
     mockCustomersArray = [
