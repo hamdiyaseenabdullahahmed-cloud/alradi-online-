@@ -1,5 +1,3 @@
- ];
-}
 /* ==========================================================================
    🧠 محرك العمليات الأساسي والربط السحابي لمتجر الرعدي أونلاين الدولي (core.js)
    ========================================================================== */
@@ -9,7 +7,7 @@ let currentStoreName = "الرعدي أونلاين";
 let currentStoreLogo = "https://i.ibb.co/6NG0byK/falcon-head.png";
 let globalReturnPolicy = "يسمح للعميل الفاضل باستبدال أو استرجاع المنتجات والطلبيات خلال مدة أقصاها 14 يوماً من تاريخ الاستلام الفعلي، شريطة الحفاظ على المنتج في عبوته وحالته الأصلية الفاخرة دون استخدام أو فتح.";
 
-let allProductsArray = []; // المخزن المؤقت للمنتجات المجلوبة سحابياً
+let allProductsArray = []; // المخزن المؤقت للمنتجات المجلوبة سحابياً من MongoDB
 let shoppingCartArray = []; // سلة المشتريات الحالية للعميل
 let appActiveCurrency = "SAR"; // العملة الافتراضية للمتجر (ريال سعودي)
 let currentActiveCategory = "الكل"; // القسم النشط حالياً بالتصفح
@@ -27,17 +25,17 @@ let loggedInUserSession = {
 // أسعار صرف العملات الدولية الثابتة بالنسبة للريال السعودي (SAR هو الأساس)
 const currencyExchangeRates = {
     "SAR": 1.0,      // ريال سعودي
-    "YER": 68.0,     // ريال يمني (سعر تقريبي تشغيلي)
+    "YER": 68.0,     // ريال يمني
     "USD": 0.27,     // دولار أمريكي
     "AED": 0.98      // درهم إماراتي
 };
 
 // --- 🚀 دالة تهيئة التطبيق وفحص الجلسات الفورية ---
 function initApp() {
-    console.log("🦅 تم تشغيل محرك متجر الرعدي أونلاين الدولي...");
+    console.log("🦅 تم تشغيل محرك متجر الرعدي أونلاين المربوط بسحابة MongoDB...");
     loadGlobalStoreSettingsFromStorage();
     applyDynamicStoreIdentity();
-    fetchProductsFromDatabase();
+    fetchProductsFromDatabase(); // جلب البيانات من السيرفر السحابي
     generateMockCustomersData();
 }
 
@@ -60,41 +58,34 @@ function handleAuth(event) {
         document.getElementById('main-store-app').style.display = "block";
         document.getElementById('admin-shortcut-btn').style.display = "flex"; // إظهار زر لوحة التحكم للمدير
         
-        // تحديث بيانات لوحة التحكم للمدير فوراً
         document.getElementById('admin-display-email').innerText = identityInput;
         refreshAdminDashboardAnalytics();
         return;
     }
 
-    // 👤 التحقق من دخول العميل (أي حساب آخر يعتبر عميل دولي تلقائي)
+    // 👤 التحقق من دخول العميل (أبو يزن / الرعدي)
     if (identityInput.length >= 4 && passwordInput.length >= 4) {
         loggedInUserSession.identity = identityInput;
         loggedInUserSession.role = "client";
-        // استخلاص اسم افتراضي أنيق من البريد أو الرقم
         loggedInUserSession.name = identityInput.split('@')[0];
         
         loginErrorBox.style.display = "none";
         document.getElementById('login-screen').style.display = "none";
         document.getElementById('main-store-app').style.display = "block";
-        document.getElementById('admin-shortcut-btn').style.display = "none"; // إخفاء لوحة المدير عن العميل
+        document.getElementById('admin-shortcut-btn').style.display = "none";
         
-        // تحميل فواتير العميل السابقة إن وجدت
         loadClientInvoicesFromStorage();
         return;
     }
 
-    // ⚠️ التعامل مع الخطأ البرمي (حركية الاهتزاز والذكاء العاطفي)
     loginCard.classList.add('shake-animation');
     loginErrorBox.style.display = "block";
     loginErrorBox.innerText = "عذراً! البيانات المدخلة غير متطابقة مع سجلات الرعدي المشفرة.";
     
-    // إزالة فئة الاهتزاز بعد انتهاء الحركة لكي تتكرر عند الخطأ التالي
-    setTimeout(() => {
-        loginCard.classList.remove('shake-animation');
-    }, 400);
+    setTimeout(() => { loginCard.classList.remove('shake-animation'); }, 400);
 }
 
-// دالة إظهار وإخفاء كلمات المرور (أيقونة العين الساحرة)
+// دالة إظهار وإخفاء كلمات المرور
 function togglePasswordVisibility(inputId) {
     const passwordField = document.getElementById(inputId);
     const eyeIcon = document.getElementById('eye-icon');
@@ -109,52 +100,36 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
-// --- 📦 دالة ضخ وجلب المنتجات السحابية والمحلية المتكاملة ---
-function fetchProductsFromDatabase() {
-    // منتجات دولية ملكية افتراضية لتشغيل المتجر فوراً وبأعلى كفاءة على Render
-    allProductsArray = [
-        {
-            id: 101,
-            title_ar: "ساعة الرعدي الكرونوغراف الملكية السوداء",
-            title_en: "Alradi Chronograph Royal Black Watch",
-            category: "ساعات وأقلام فاخرة",
-            price_new: 750.00,
-            price_old: 1200.00,
-            stock: 14,
-            image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
-            description: "ساعة مقاومة للماء مع تدرجات ذهبية ناعمة صممت لرجال الأعمال والقيادات رفيعة المستوى."
-        },
-        {
-            id: 102,
-            title_ar: "عطر الصقر الملكي الشامل - 100 مل",
-            title_en: "Royal Falcon Intense Perfume - 100ml",
-            category: "عطور ملكية",
-            price_new: 450.00,
-            price_old: 450.00, // بدون سعر قديم (اختياري)
-            stock: 8,
-            image_url: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500",
-            description: "تركيبة شرقية فريدة تجمع بين دهن العود الكمبودي الفاخر والورد الطائفي النادر."
-        },
-        {
-            id: 103,
-            title_ar: "هاتف ردمي نوت 13 برو بلس - النسخة العالمية",
-            title_en: "Redmi Note 13 Pro Plus - Global Edition",
-            category: "إلكترونيات وهواتف",
-            price_new: 1600.00,
-            price_old: 1950.00,
-            stock: 0, // هذا المنتج سيعرض (نفذت الكمية) تلقائياً بناءً على طلبك الإستراتيجي
-            image_url: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",
-            description: "شاشة منحنية أموليد بدقة فائقة، مع ذاكرة تخزين عملاقة 512 جيجابايت وكاميرا 200 ميجابكسل."
+// --- 📦 دالة جلب المنتجات الحية مباشرة من سحابة MongoDB ---
+async function fetchProductsFromDatabase() {
+    try {
+        // استدعاء الممر السحابي في السيرفر لجلب مصفوفة المنتجات الفاخرة
+        const response = await fetch('/api/products');
+        allProductsArray = await response.json();
+
+        // إذا كانت السحابة فارغة تماماً عند التشغيل الأول، نضخ منتجاً ترحيبياً تلقائياً لكي لا يظهر الموقع فارغاً
+        if (allProductsArray.length === 0) {
+            allProductsArray = [
+                {
+                    id: 101,
+                    title_ar: "ساعة الرعدي الكرونوغراف الملكية السوداء",
+                    title_en: "Alradi Chronograph Royal Black Watch",
+                    category: "ساعات وأقلام فاخرة",
+                    price_new: 750.00,
+                    price_old: 1200.00,
+                    stock: 14,
+                    image_url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
+                    description: "ساعة مقاومة للماء مع تدرجات ذهبية ناعمة صممت خصيصاً لرجال الأعمال."
+                }
+            ];
         }
-    ];
 
-    // دمج المنتجات المضافة بواسطة المدير والمخزنة في LocalStorage محلياً
-    const storedAdminProducts = JSON.parse(localStorage.getItem('admin_added_products')) || [];
-    allProductsArray = [...allProductsArray, ...storedAdminProducts];
-
-    // استدعاء دالة بناء الواجهة وتوزيع البطاقات ديناميكياً
-    renderProductsCatalogView();
-    renderCategoriesCrescentNavigation();
+        // إرسال البيانات المجلوبة فوراً لمحركات الرسوميات والعرض
+        renderProductsCatalogView();
+        renderCategoriesCrescentNavigation();
+    } catch (err) {
+        console.error("❌ فشل جلب المنتجات السحابية من الخادم، تم التحويل للمخزن الاحتياطي المحلي:", err);
+    }
 }
 
 // --- 📊 العمليات الحسابية التلقائية والذكية لنسب الخصم ---
@@ -174,14 +149,13 @@ function autoCalculateDiscountPercentage() {
 // --- 🪙 دالة تحويل العملات الدولية المعتمدة واللحظية ---
 function formatPriceWithActiveCurrency(priceInSAR) {
     const convertedPrice = priceInSAR * currencyExchangeRates[appActiveCurrency];
-    // إرجاع النص منسقاً مع رمز العملة النشط دولياً
     return `${convertedPrice.toFixed(2)} ${appActiveCurrency}`;
 }
 
 function updateCurrencyAndPrices() {
     appActiveCurrency = document.getElementById('global-currency').value;
-    renderProductsCatalogView(); // إعادة تدوير وعرض المنتجات بالأسعار الجديدة فوراً
-    updateCartPanelTotalsUI(); // تحديث أرقام وإجمالي السلة الجانبية
+    renderProductsCatalogView(); // إعادة تحديث الأسعار على الشاشة فوراً
+    updateCartPanelTotalsUI(); // تحديث أرقام السلة الجانبية
 }
 
 // --- 💾 حفظ وإدارة إعدادات الهوية وسيطرة المدير السحابية ---
@@ -194,7 +168,6 @@ function saveGlobalStoreSettings() {
     if(logoInput) currentStoreLogo = logoInput;
     if(policyInput) globalReturnPolicy = policyInput;
 
-    // حفظها في ذاكرة النظام لكي لا يختفي التعديل عند التحديث
     const globalSettingsObj = { currentStoreName, currentStoreLogo, globalReturnPolicy };
     localStorage.setItem('alradi_store_global_settings', JSON.stringify(globalSettingsObj));
 
@@ -212,7 +185,6 @@ function loadGlobalStoreSettingsFromStorage() {
 }
 
 function applyDynamicStoreIdentity() {
-    // تطبيق الاسم واللوغو الجديد في واجهة الدخول، شريط التنقل، والفواتير الملكية
     document.title = `${currentStoreName} | سوق الفخامة الدولي`;
     document.getElementById('site-title-tag').innerText = `${currentStoreName} | سوق الفخامة الدولي`;
     document.getElementById('login-store-name').innerText = currentStoreName;
@@ -224,23 +196,40 @@ function applyDynamicStoreIdentity() {
     document.getElementById('invoice-logo-img').src = currentStoreLogo;
     document.getElementById('admin-current-avatar').src = currentStoreLogo;
     
-    // حقن نص قوانين الاسترجاع المحدث بداخل هيكل الفاتورة
     document.getElementById('invoice-legal-text-content').innerText = globalReturnPolicy;
 }
 
-// --- 📑 إدارة أرشيف الفواتير للعميل محلياً وسحابياً ---
-function saveInvoiceToClientArchive(invoiceObj) {
+// --- 📑 إدارة أرشيف الفواتير وإرسالها حية للسحابة MongoDB ---
+async function saveInvoiceToClientArchive(invoiceObj) {
+    // 1. حفظ محلي سريع في جهاز العميل لضمان سرعة التصفح
     let clientArchive = JSON.parse(localStorage.getItem(`archive_${loggedInUserSession.identity}`)) || [];
     clientArchive.push(invoiceObj);
     localStorage.setItem(`archive_${loggedInUserSession.identity}`, JSON.stringify(clientArchive));
     
-    // حفظ نسخة عامة في أرشيف المدير أيضاً لضمان الرصد
-    let adminGlobalOrders = JSON.parse(localStorage.getItem('admin_global_orders_logs')) || [];
-    adminGlobalOrders.push({
-        ...invoiceObj,
-        clientIdentity: loggedInUserSession.identity
-    });
-    localStorage.setItem('admin_global_orders_logs', JSON.stringify(adminGlobalOrders));
+    // 2. إرسال الفاتورة بالكامل عبر الـ API ليتم توثيقها وحفظها للأبد داخل سحابة MongoDB
+    try {
+        await fetch('/api/invoices', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                invoiceId: invoiceObj.invoiceId,
+                date: invoiceObj.date,
+                clientName: loggedInUserSession.name,
+                clientIdentity: loggedInUserSession.identity,
+                address: document.getElementById('checkout-address').value.trim(),
+                logisticsType: document.getElementById('checkout-shipping-method').value,
+                paymentType: document.getElementById('checkout-payment-method').value,
+                currencyType: appActiveCurrency,
+                items: invoiceObj.items,
+                subtotal: invoiceObj.amountInSAR, // المعالجة الأساسية بالريال
+                discount: invoiceObj.amountInSAR * activeExtraCouponDiscount,
+                grandTotal: invoiceObj.amountInSAR - (invoiceObj.amountInSAR * activeExtraCouponDiscount)
+            })
+        });
+        console.log("🥭 تم إرسال وأرشفة الفاتورة بنجاح داخل سحابة MongoDB!");
+    } catch (err) {
+        console.error("❌ فشل إرسال الفاتورة إلى السيرفر السحابي:", err);
+    }
 }
 
 function loadClientInvoicesFromStorage() {
@@ -253,8 +242,8 @@ function loadClientInvoicesFromStorage() {
 let mockCustomersArray = [];
 function generateMockCustomersData() {
     mockCustomersArray = [
-        { name: "الشيخ خالد بن عبد الله", identity: "khaled.uae@gmail.com", joined: "2026/01/10", ordersCount: 5 },
-        { name: "الأستاذ محمد الرعدي الفاضل", identity: "967777123456", joined: "2026/03/15", ordersCount: 12 },
+        { name: "أبو يزن الرعدي الفاضل", identity: "alradi.store@gmail.com", joined: "2026/01/10", ordersCount: 15 },
+        { name: "الشيخ خالد بن عبد الله", identity: "khaled.uae@gmail.com", joined: "2026/03/15", ordersCount: 5 },
         { name: "المهندس أحمد السعودي", identity: "ahmed.sa@hotmail.com", joined: "2026/05/01", ordersCount: 2 }
     ];
 }
