@@ -5,23 +5,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const cors = require('cors'); // مضاف لضمان حماية واستقرار الاتصالات الخارجية
+require('dotenv').config();
+
 const app = express();
 
-// تفعيل قراءة البيانات بصيغة JSON القادمة من المتجر
+// تفعيل قراءات وتأمين البيانات بصيغ JSON و CORS القادمة من المتجر
+app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+// البورت المخصص للتشغيل على سيرفر Render الدولي
+const PORT = process.env.PORT || 10000;
 
-// 🌐 رابط الاتصال المباشر بسحابتك (MongoDB)
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://root:admin123@cluster0.mongodb.net/alradi_db?retryWrites=true&w=majority";
+// 🌐 رابط الاتصال المباشر والجديد بسحابة المانجو للرعدي أونلاين
+const MONGO_URI = process.env.MONGODB_URI || 
+                  process.env.MONGO_URI || 
+                  "mongodb+srv://alradimostafayaseen_db_user:alradi1995@cluster0.njjwehg.mongodb.net/alradi_db?appName=Cluster0";
 
 mongoose.connect(MONGO_URI)
-.then(() => console.log("🥭 تم تأمين الاتصال بنجاح بسحابة MongoDB العالمية!"))
+.then(() => console.log("🦅 تم تأمين الاتصال بنجاح بسحابة MongoDB العالمية لمتجر الرعدي أونلاين!"))
 .catch(err => console.error("❌ خطأ في الاتصال بالسحابة:", err));
 
 // --- 📊 بناء الهياكل البرمجية (Schemas & Models) داخل MongoDB ---
 
-// 1. هيكل المنتجات
+// 1. هيكل المنتجات[span_2](start_span)[span_2](end_span)
 const ProductSchema = new mongoose.Schema({
     id: Number,
     title_ar: String,
@@ -35,7 +42,7 @@ const ProductSchema = new mongoose.Schema({
 });
 const Product = mongoose.model('Product', ProductSchema);
 
-// 2. هيكل فواتير المبيعات
+// 2. هيكل فواتير المبيعات[span_3](start_span)[span_3](end_span)
 const InvoiceSchema = new mongoose.Schema({
     invoiceId: String,
     date: String,
@@ -55,7 +62,7 @@ const Invoice = mongoose.model('Invoice', InvoiceSchema);
 
 // --- 🔌 ممرات العمليات (API Routes) لربط الـ Frontend بالسحابة ---
 
-// ممر [1]: جلب جميع المنتجات من MongoDB للكتالوج
+// ممر [1]: جلب جميع المنتجات من MongoDB للكتالوج[span_4](start_span)[span_4](end_span)
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find({});
@@ -65,7 +72,7 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// ممر [2]: إضافة منتج جديد من لوحة المدير وحفظه في السحابة
+// mمر [2]: إضافة منتج جديد من لوحة المدير وحفظه في السحابة[span_5](start_span)[span_5](end_span)
 app.post('/api/products', async (req, res) => {
     try {
         const newProduct = new Product(req.body);
@@ -76,7 +83,7 @@ app.post('/api/products', async (req, res) => {
     }
 });
 
-// ممر [3]: حذف منتج نهائياً من السحابة بواسطة المعرف (ID)
+// ممر [3]: حذف منتج نهائياً من السحابة بواسطة المعرف (ID)[span_6](start_span)[span_6](end_span)
 app.delete('/api/products/:id', async (req, res) => {
     try {
         await Product.deleteOne({ id: req.params.id });
@@ -86,7 +93,7 @@ app.delete('/api/products/:id', async (req, res) => {
     }
 });
 
-// ممر [4]: حفظ فاتورة مشتريات جديدة للعميل (أبو يزن / الرعدي)
+// ممر [4]: حفظ فاتورة مشتريات جديدة للعميل[span_7](start_span)[span_7](end_span)
 app.post('/api/invoices', async (req, res) => {
     try {
         const newInvoice = new Invoice(req.body);
@@ -98,10 +105,10 @@ app.post('/api/invoices', async (req, res) => {
 });
 
 
-// توجيه السيرفر لقراءة ملفات الواجهة الأمامية بداخل مجلد public
+// توجيه السيرفر لقراءة ملفات الواجهة الأمامية (تأكد أن ملفات السيرفر خارج مجلد public)[span_8](start_span)[span_8](end_span)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// مسار افتراضي لتشغيل واجهة المتجر الرئيسية
+// مسار افتراضي لتشغيل واجهة المتجر الرئيسية[span_9](start_span)[span_9](end_span)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
