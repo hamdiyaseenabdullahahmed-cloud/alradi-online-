@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سوق الرعدي أونلاين - بوابة الدخول الفخمة</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>متجر الرعدي اون لاين | بوابتك الفاخرة</title>
+    <!-- استدعاء خط القاهرة والأيقونات الاحترافية -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-dark: #0d0f12;
-            --card-dark: #14181f;
+            --bg-dark-blue: #0b1a30;
+            --card-blue: #0f2442;
             --gold-primary: #caa135;
             --gold-hover: #b08a27;
             --text-light: #ffffff;
             --text-muted: #a0aec0;
-            --input-bg: #1c232e;
-            --border-color: #2d3748;
+            --input-border: #1e3a5f;
         }
 
         * {
@@ -26,343 +24,297 @@
             margin: 0;
             padding: 0;
             font-family: 'Cairo', sans-serif;
-            transition: all 0.3s ease;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-dark-blue);
             color: var(--text-light);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
             overflow-x: hidden;
-        }
-
-        /* حاوية الكرت الرئيسي */
-        .auth-container {
-            background-color: var(--card-dark);
-            border: 1px solid rgba(202, 161, 53, 0.2);
-            border-radius: 15px;
-            padding: 35px 25px;
-            width: 100%;
-            max-width: 430px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(202, 161, 53, 0.05);
-            text-align: center;
             position: relative;
         }
 
-        /* تصميم شعار الصقر الفخم */
-        .logo-area {
-            margin-bottom: 25px;
+        /* الزخرفة الإسلامية الخلفية الشفافة */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
+            opacity: 0.04;
+            pointer-events: none;
+            top: 0; left: 0;
         }
 
-        .logo-icon {
+        /* شريط اختيار العملة العلوي */
+        .top-currency-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--input-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .top-currency-bar select {
+            background: transparent;
+            color: var(--text-light);
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .auth-card {
+            text-align: center;
+        }
+
+        .brand-logo {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 20px auto;
+            background: linear-gradient(135deg, #1e3a5f, #0b1a30);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--gold-primary);
+            box-shadow: 0 0 25px rgba(202, 161, 53, 0.25);
+        }
+
+        .brand-logo i {
             font-size: 50px;
             color: var(--gold-primary);
-            filter: drop-shadow(0 0 8px rgba(202, 161, 53, 0.4));
-            margin-bottom: 10px;
         }
 
-        h1 {
-            font-size: 26px;
+        .brand-title {
+            font-size: 28px;
             font-weight: 700;
-            color: var(--text-light);
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-        }
-
-        .subtitle {
-            font-size: 14px;
             color: var(--gold-primary);
-            margin-bottom: 30px;
-            font-weight: 300;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
 
-        /* مجموعات الإدخال والنموذج */
-        .form-group {
-            margin-bottom: 20px;
-            text-align: right;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
+        .brand-subtitle {
+            font-size: 15px;
             color: var(--text-muted);
-            margin-bottom: 8px;
-            padding-right: 5px;
+            margin-bottom: 35px;
         }
 
+        /* حقول الإدخال */
         .input-wrapper {
             position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gold-primary);
-            font-size: 16px;
+            margin-bottom: 20px;
         }
 
         .input-wrapper input {
             width: 100%;
-            padding: 14px 45px 14px 15px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            padding: 15px 45px 15px 15px;
+            background: rgba(15, 36, 66, 0.7);
+            border: 1px solid var(--input-border);
+            border-radius: 25px;
             color: var(--text-light);
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
+            transition: all 0.3s ease;
+            text-align: right;
         }
 
         .input-wrapper input:focus {
             border-color: var(--gold-primary);
-            box-shadow: 0 0 10px rgba(202, 161, 53, 0.15);
+            box-shadow: 0 0 10px rgba(202, 161, 53, 0.2);
         }
 
-        /* زر الرؤية لكلمة المرور */
-        .toggle-password {
+        .input-wrapper i {
             position: absolute;
-            left: 15px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
-            cursor: pointer;
+            color: var(--gold-primary);
+            font-size: 16px;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 10px;
             font-size: 14px;
         }
 
-        .toggle-password:hover {
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .forgot-pass-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-pass-link:hover {
             color: var(--gold-primary);
         }
 
-        /* أزرار الفخامة */
-        .btn-gold {
+        /* الأزرار الفخمة */
+        .btn-gold-solid {
             width: 100%;
             padding: 14px;
-            background-color: var(--gold-primary);
-            color: #000000;
+            background: linear-gradient(90deg, var(--gold-hover), var(--gold-primary));
             border: none;
-            border-radius: 8px;
+            border-radius: 25px;
+            color: #050d1a;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(202, 161, 53, 0.3);
+            margin-bottom: 15px;
         }
 
-        .btn-gold:hover {
-            background-color: var(--gold-hover);
-            box-shadow: 0 5px 15px rgba(202, 161, 53, 0.3);
-            transform: translateY(-1px);
+        .btn-gold-solid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(202, 161, 53, 0.4);
         }
 
-        /* روابط التبديل السفلى */
-        .switch-form-text {
-            margin-top: 25px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .switch-link {
-            color: var(--gold-primary);
-            text-decoration: none;
+        .btn-outline-gold {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1.5px solid var(--gold-primary);
+            border-radius: 25px;
+            color: var(--text-light);
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-right: 5px;
+            transition: all 0.3s ease;
         }
 
-        .switch-link:hover {
-            text-decoration: underline;
-            color: var(--gold-hover);
+        .btn-outline-gold:hover {
+            background: rgba(202, 161, 53, 0.1);
         }
 
-        /* إخفاء الشاشات برمجياً بالتناوب */
-        .hidden-form {
+        .hidden-pane {
             display: none !important;
-        }
-
-        /* تنبيهات النظام */
-        .alert-box {
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 1px solid #dc3545;
-            color: #ff6b6b;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            display: none;
-            text-align: right;
         }
     </style>
 </head>
 <body>
 
-    <div class="auth-container">
-        
-        <div class="logo-area">
-            <div class="logo-icon">
-                <i class="fa-solid fa-crow"></i> </div>
-            <h1>الرعدي أونلاين</h1>
-            <div class="subtitle" id="dynamic-subtitle">بوابتك لعالم التسوق الدولي الفاخر</div>
-        </div>
-
-        <div class="alert-box" id="alertLog"></div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label>البريد الإلكتروني أو رقم الهاتف</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="text" id="loginUser" placeholder="9665xxxxxxxx أو example@gmail.com" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>كلمة المرور</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="loginPass" placeholder="••••••••" required>
-                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassVisibility('loginPass', this)"></i>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-gold">
-                <span>دخول إلى عالم الفخامة</span>
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-
-            <p class="switch-form-text">
-                ليس لديك حساب؟ 
-                <span class="switch-link" onclick="showRegisterForm()">أنشئ حساباً جديداً الآن</span>
-            </p>
-        </form>
-
-        <form id="registerForm" class="hidden-form">
-            <div class="form-group">
-                <label>الاسم الكامل</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-user"></i>
-                    <input type="text" id="regName" placeholder="اكتب اسمك الثلاثي" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>رقم الهاتف (مع رمز الدولة)</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-phone"></i>
-                    <input type="tel" id="regPhone" placeholder="9665xxxxxxxx" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>البريد الإلكتروني (اختياري)</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" id="regEmail" placeholder="example@gmail.com">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>كلمة المرور الجديدة</label>
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="regPass" placeholder="اختر كلمة مرور قوية" required>
-                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassVisibility('regPass', this)"></i>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-gold">
-                <span>إنشاء الحساب والانطلاق</span>
-                <i class="fa-solid fa-user-plus"></i>
-            </button>
-
-            <p class="switch-form-text">
-                لديك حساب بالفعل؟ 
-                <span class="switch-link" onclick="showLoginForm()">تسجيل الدخول</span>
-            </p>
-        </form>
-
+    <div class="top-currency-bar">
+        <i class="fa-solid fa-money-bill-wave" style="color: var(--gold-primary);"></i>
+        <select id="currency-select">
+            <option value="SAR">الريال السعودي (ر.س)</option>
+            <option value="YER">الريال اليمني (ر.ي)</option>
+        </select>
     </div>
 
+    <div class="auth-wrapper">
+        <!-- نموذج تسجيل الدخول -->
+        <div class="auth-card" id="login-pane">
+            <div class="brand-logo">
+                <i class="fa-solid fa-dove"></i>
+            </div>
+            <h1 class="brand-title">مَتْجَر الرَّعْدِي اِؤْن لَايِنْ</h1>
+            <p class="brand-subtitle">بوابتك الرقمية لعالم من الفخامة والتميز</p>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="login-user" required placeholder="اسم المستخدم أو رقم الهاتف">
+                </div>
+
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="login-pass" required placeholder="كلمة المرور الشخصية">
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> تذكر بياناتي
+                    </label>
+                    <a href="#" class="forgot-pass-link">هل نسيت كلمة المرور؟</a>
+                </div>
+
+                <button type="submit" class="btn-gold-solid">تسجيل الدخول</button>
+                <button type="button" class="btn-outline-gold" onclick="toggleView('reg')">إنشاء حساب جديد</button>
+            </form>
+        </div>
+
+        <!-- نموذج إنشاء حساب جديد -->
+        <div class="auth-card hidden-pane" id="register-pane">
+            <div class="brand-logo">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h1 class="brand-title">عضوية جديدة</h1>
+            <p class="brand-subtitle">انضم إلى عملاء متجر الرعدي المميزين</p>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input type="text" id="reg-name" required placeholder="الاسم الكامل للعميل">
+                </div>
+
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="reg-phone" required placeholder="رقم الهاتف (مع رمز الدولة)">
+                </div>
+
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="reg-pass" required placeholder="تعيين كلمة مرور قوية">
+                </div>
+
+                <button type="submit" class="btn-gold-solid">تأكيد الحساب والانطلاق</button>
+                <button type="button" class="btn-outline-gold" onclick="toggleView('login')">العودة لتسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- استدعاء ملفات الـ JS التابعة لك من مجلداتك الموضحة بالصور -->
+    <script src="js/core.js"></script>
+    <script src="js/ui.js"></script>
     <script>
-        // إظهار وإخفاء كلمة المرور عند النقر على العين
-        function togglePassVisibility(id, icon) {
-            const input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove("fa-eye");
-                icon.classList.add("fa-eye-slash");
+        function toggleView(pane) {
+            if(pane === 'reg') {
+                document.getElementById('login-pane').classList.add('hidden-pane');
+                document.getElementById('register-pane').classList.remove('hidden-pane');
             } else {
-                input.type = "password";
-                icon.classList.remove("fa-eye-slash");
-                icon.classList.add("fa-eye");
+                document.getElementById('register-pane').classList.add('hidden-pane');
+                document.getElementById('login-pane').classList.remove('hidden-pane');
             }
         }
 
-        // التبديل إلى شاشة إنشاء الحساب
-        function showRegisterForm() {
-            document.getElementById("loginForm").classList.add("hidden-form");
-            document.getElementById("registerForm").classList.remove("hidden-form");
-            document.getElementById("dynamic-subtitle").innerText = "انضم إلينا لتبدأ رحلة التسوق الفاخرة";
-            document.getElementById("alertLog").style.display = "none";
-        }
-
-        // التبديل إلى شاشة تسجيل الدخول
-        function showLoginForm() {
-            document.getElementById("registerForm").classList.add("hidden-form");
-            document.getElementById("loginForm").classList.remove("hidden-form");
-            document.getElementById("dynamic-subtitle").innerText = "بوابتك لعالم التسوق الدولي الفاخر";
-            document.getElementById("alertLog").style.display = "none";
-        }
-
-        // معالجة الضغط على زر تسجيل الدخول
-        document.getElementById("loginForm").addEventListener("submit", function(e) {
+        function handleLogin(e) {
             e.preventDefault();
-            const user = document.getElementById("loginUser").value;
-            const pass = document.getElementById("loginPass").value;
-            const alertBox = document.getElementById("alertLog");
+            alert("جارٍ تشغيل محرك الخلفية وسيرفر رندر للتحقق ودخول متجر الرعدي!");
+        }
 
-            // محاكاة برمجية دفاعية ذكية للدخول المؤقت حتى تجهيز الـ Database بالكامل
-            if(user && pass) {
-                alertBox.style.backgroundColor = "rgba(40, 167, 69, 0.1)";
-                alertBox.style.borderColor = "#28a745";
-                alertBox.style.color = "#2ecc71";
-                alertBox.innerText = "⏳ جاري التحقق والدخول لعالم الفخامة...";
-                alertBox.style.display = "block";
-                
-                setTimeout(() => {
-                    // تحويل المستخدم لصفحة المتجر الرئيسية (يمكنك تبديلها لأي مسار لاحقاً)
-                    window.location.href = "/api/health"; 
-                }, 1500);
-            }
-        });
-
-        // معالجة الضغط على زر إنشاء حساب جديد
-        document.getElementById("registerForm").addEventListener("submit", function(e) {
+        function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById("regName").value;
-            const phone = document.getElementById("regPhone").value;
-            const alertBox = document.getElementById("alertLog");
-
-            if(name && phone) {
-                alertBox.style.backgroundColor = "rgba(40, 167, 69, 0.1)";
-                alertBox.style.borderColor = "#28a745";
-                alertBox.style.color = "#2ecc71";
-                alertBox.innerText = `🟢 أهلاً بك يا ${name}، تم إنشاء حسابك بنجاح! جاري تحويلك...`;
-                alertBox.style.display = "block";
-
-                setTimeout(() => {
-                    showLoginForm();
-                }, 2000);
-            }
-        });
+            alert("تم إرسال طلب تسجيل العميل الجديد بنجاح!");
+            toggleView('login');
+        }
     </script>
 </body>
 </html>
