@@ -1,0 +1,157 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# بطاقة المنتج الموحدة                            %>
+<%# ============================================= %>
+
+<div class="product-card animate-fadeIn">
+    
+    <%# صورة المنتج %>
+    <div class="product-image-container">
+        <a href="/products/<%= product.slug || product._id %>">
+            <img src="<%= product.images && product.images.length > 0 ? product.images[0].url : '/images/default-product.png' %>" 
+                 alt="<%= product.name %>"
+                 loading="lazy"
+                 onerror="this.src='/images/default-product.png'">
+        </a>
+        
+        <%# الأوسمة %>
+        <div class="product-badges">
+            <% if (product.isOnSale) { %>
+                <span class="badge badge-sale">
+                    <i class="fas fa-tag"></i> 
+                    <%= currentLanguage === 'en' ? 'Sale' : 'تخفيض' %>
+                </span>
+            <% } %>
+            <% if (product.isNewArrival) { %>
+                <span class="badge badge-new">
+                    <i class="fas fa-bolt"></i> 
+                    <%= currentLanguage === 'en' ? 'New' : 'جديد' %>
+                </span>
+            <% } %>
+            <% if (product.isFeatured) { %>
+                <span class="badge badge-featured">
+                    <i class="fas fa-star"></i> 
+                    <%= currentLanguage === 'en' ? 'Featured' : 'مميز' %>
+                </span>
+            <% } %>
+            <% if (product.stockStatus === 'out_of_stock') { %>
+                <span class="badge badge-out-of-stock">
+                    <i class="fas fa-times-circle"></i> 
+                    <%= currentLanguage === 'en' ? 'Sold Out' : 'نفد' %>
+                </span>
+            <% } %>
+        </div>
+        
+        <%# أزرار الإجراءات السريعة %>
+        <div class="product-actions">
+            <button class="action-btn wishlist-btn" 
+                    data-product-id="<%= product._id %>"
+                    onclick="toggleWishlist('<%= product._id %>')"
+                    title="<%= currentLanguage === 'en' ? 'Add to Wishlist' : 'أضف للمفضلة' %>">
+                <i class="far fa-heart"></i>
+            </button>
+            <button class="action-btn quick-view-btn" 
+                    data-product-id="<%= product._id %>"
+                    onclick="quickView('<%= product._id %>')"
+                    title="<%= currentLanguage === 'en' ? 'Quick View' : 'نظرة سريعة' %>">
+                <i class="fas fa-eye"></i>
+            </button>
+            <% if (product.stockStatus !== 'out_of_stock') { %>
+                <button class="action-btn add-to-cart-quick-btn" 
+                        data-product-id="<%= product._id %>"
+                        onclick="addToCart('<%= product._id %>', 1, {})"
+                        title="<%= currentLanguage === 'en' ? 'Add to Cart' : 'أضف للسلة' %>">
+                    <i class="fas fa-shopping-cart"></i>
+                </button>
+            <% } %>
+        </div>
+    </div>
+    
+    <%# معلومات المنتج %>
+    <div class="product-info">
+        <%# القسم %>
+        <% if (product.category && product.category.name) { %>
+            <span class="product-category">
+                <i class="fas fa-folder"></i> 
+                <%= currentLanguage === 'en' ? (product.category.nameEn || product.category.name) : product.category.name %>
+            </span>
+        <% } %>
+        
+        <%# اسم المنتج %>
+        <h3 class="product-name">
+            <a href="/products/<%= product.slug || product._id %>">
+                <%= currentLanguage === 'en' ? (product.nameEn || product.name) : product.name %>
+            </a>
+        </h3>
+        
+        <%# التقييم %>
+        <% if (product.rating && product.rating.average > 0) { %>
+            <div class="product-rating">
+                <div class="stars">
+                    <% for (var i = 1; i <= 5; i++) { %>
+                        <% if (i <= Math.floor(product.rating.average)) { %>
+                            <i class="fas fa-star"></i>
+                        <% } else if (i - 0.5 <= product.rating.average) { %>
+                            <i class="fas fa-star-half-alt"></i>
+                        <% } else { %>
+                            <i class="far fa-star"></i>
+                        <% } %>
+                    <% } %>
+                </div>
+                <span class="rating-count">(<%= product.rating.count || 0 %>)</span>
+            </div>
+        <% } %>
+        
+        <%# السعر %>
+        <div class="product-price-container">
+            <% if (product.isOnSale && product.comparePrice) { %>
+                <span class="current-price">
+                    <%= product.price %> <%= typeof currencySymbol !== 'undefined' ? currencySymbol : 'ر.س' %>
+                </span>
+                <span class="old-price">
+                    <%= product.comparePrice %> <%= typeof currencySymbol !== 'undefined' ? currencySymbol : 'ر.س' %>
+                </span>
+                <span class="discount-percentage">
+                    -<%= Math.round((1 - product.price / product.comparePrice) * 100) %>%
+                </span>
+            <% } else { %>
+                <span class="current-price">
+                    <%= product.price %> <%= typeof currencySymbol !== 'undefined' ? currencySymbol : 'ر.س' %>
+                </span>
+            <% } %>
+        </div>
+        
+        <%# حالة المخزون %>
+        <div class="stock-status <%= product.stockStatus === 'out_of_stock' ? 'out-of-stock' : (product.stockStatus === 'low_stock' ? 'low-stock' : 'in-stock') %>">
+            <% if (product.stockStatus === 'in_stock') { %>
+                <i class="fas fa-check-circle"></i> 
+                <%= currentLanguage === 'en' ? 'In Stock' : 'متوفر' %>
+                <% if (product.stock && product.stock > 0) { %>
+                    : <%= product.stock %>
+                <% } %>
+            <% } else if (product.stockStatus === 'low_stock') { %>
+                <i class="fas fa-exclamation-circle"></i> 
+                <%= currentLanguage === 'en' ? 'Low Stock' : 'الكمية محدودة' %>
+                : <%= product.stock %>
+            <% } else { %>
+                <i class="fas fa-times-circle"></i> 
+                <%= currentLanguage === 'en' ? 'Out of Stock' : 'نفد' %>
+            <% } %>
+        </div>
+        
+        <%# زر الإضافة للسلة %>
+        <% if (product.stockStatus !== 'out_of_stock') { %>
+            <button class="add-to-cart-btn" 
+                    data-product-id="<%= product._id %>"
+                    onclick="addToCart('<%= product._id %>', 1, {})">
+                <i class="fas fa-shopping-cart"></i>
+                <%= currentLanguage === 'en' ? 'Add to Cart' : 'أضف إلى السلة' %>
+            </button>
+        <% } else { %>
+            <button class="add-to-cart-btn" disabled style="background: #999; cursor: not-allowed;">
+                <i class="fas fa-times-circle"></i>
+                <%= currentLanguage === 'en' ? 'Out of Stock' : 'نفد من المخزون' %>
+            </button>
+        <% } %>
+    </div>
+</div>
