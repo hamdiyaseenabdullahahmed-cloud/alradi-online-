@@ -1,0 +1,430 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة تفاصيل المنتج                              %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# Breadcrumb %>
+    <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">
+        <a href="/" style="color: var(--text-muted);">الرئيسية</a>
+        <span style="margin: 0 8px;">/</span>
+        <a href="/products" style="color: var(--text-muted);">المنتجات</a>
+        <span style="margin: 0 8px;">/</span>
+        <% if (productFull && productFull.category) { %>
+            <a href="/products?category=<%= productFull.category._id %>" style="color: var(--text-muted);"><%= productFull.category.name %></a>
+            <span style="margin: 0 8px;">/</span>
+        <% } %>
+        <span style="color: var(--secondary-color); font-weight: bold;"><%= product.name %></span>
+    </nav>
+    
+    <div class="product-detail">
+        
+        <%# ============================================= %>
+        <%# معرض الصور                                      %>
+        <%# ============================================= %>
+        <div class="product-gallery">
+            <img src="<%= product.mainImage || '/images/default-product.png' %>" 
+                 alt="<%= product.name %>" 
+                 class="main-image" 
+                 id="mainImage"
+                 onerror="this.src='/images/default-product.png'">
+            
+            <% if (productFull && productFull.images && productFull.images.length > 1) { %>
+                <div class="thumbnail-list">
+                    <% productFull.images.forEach(function(img, index) { %>
+                        <img src="<%= img.url %>" 
+                             alt="<%= img.alt || product.name %>"
+                             class="thumbnail <%= index === 0 ? 'active' : '' %>"
+                             onclick="document.getElementById('mainImage').src='<%= img.url %>'; 
+                                      document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                                      this.classList.add('active');"
+                             onerror="this.src='/images/default-product.png'">
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+        
+        <%# ============================================= %>
+        <%# معلومات المنتج                                   %>
+        <%# ============================================= %>
+        <div class="product-detail-info">
+            
+            <%# اسم المنتج %>
+            <h1><%= product.name %></h1>
+            <% if (productFull && productFull.nameEn) { %>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 10px;"><%= productFull.nameEn %></p>
+            <% } %>
+            
+            <%# التقييم %>
+            <% if (product.rating && product.rating.count > 0) { %>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <div class="stars" style="font-size: 16px;">
+                        <% for (var i = 1; i <= 5; i++) { %>
+                            <i class="fas fa-star<%= i > Math.floor(product.rating.average) ? (i - 0.5 <= product.rating.average ? '-half-alt' : '') : '' %>" 
+                               style="color: <%= i <= product.rating.average ? 'var(--gold-color)' : '#ddd' %>;"></i>
+                        <% } %>
+                    </div>
+                    <span style="font-weight: bold;"><%= product.rating.average %></span>
+                    <span style="color: var(--text-muted);">(<%= product.rating.count %> تقييم)</span>
+                    <span style="color: var(--text-muted);">|</span>
+                    <span style="color: var(--text-muted);"><%= productFull ? productFull.sales || 0 : 0 %> مبيعاً</span>
+                </div>
+            <% } %>
+            
+            <%# السعر %>
+            <div class="product-detail-price">
+                <% if (product.isOnSale && product.comparePrice) { %>
+                    <span class="current-price"><%= product.finalPrice || product.price %> <%= currencySymbol %></span>
+                    <span class="old-price"><%= product.comparePrice %> <%= currencySymbol %></span>
+                    <span class="discount-percentage" style="font-size: 16px; padding: 5px 12px;">
+                        -<%= product.discountPercentage || Math.round((1 - product.price / product.comparePrice) * 100) %>%
+                    </span>
+                <% } else { %>
+                    <span class="current-price" style="font-size: 32px;"><%= product.price %> <%= currencySymbol %></span>
+                <% } %>
+            </div>
+            
+            <%# وصف مختصر %>
+            <div style="margin-bottom: 20px; color: var(--text-light); line-height: 1.8;">
+                <p><%= productFull ? productFull.description.substring(0, 200) + '...' : '' %></p>
+            </div>
+            
+            <%# ============================================= %>
+            <%# خيارات المنتج (ألوان، مقاسات)                    %>
+            <%# ============================================= %>
+            <form id="addToCartForm">
+                <input type="hidden" name="productId" value="<%= productFull ? productFull._id : '' %>">
+                
+                <% if (productFull && productFull.options && productFull.options.length > 0) { %>
+                    <% productFull.options.forEach(function(option) { %>
+                        <div class="option-group">
+                            <label class="option-label"><%= option.name %>:</label>
+                            <div class="option-values">
+                                <% if (option.type === 'color') { %>
+                                    <% option.values.forEach(function(val) { %>
+                                        <div class="color-option" 
+                                             style="background: <%= val.colorCode || val.value %>;"
+                                             data-option-group="<%= option.name %>"
+                                             data-option-value="<%= val.value %>"
+                                             title="<%= val.value %>"
+                                             onclick="selectOption(this, '<%= option.name %>', '<%= val.value %>')"></div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <% option.values.forEach(function(val) { %>
+                                        <button type="button" 
+                                                class="option-value"
+                                                data-option-group="<%= option.name %>"
+                                                data-option-value="<%= val.value %>"
+                                                onclick="selectOption(this, '<%= option.name %>', '<%= val.value %>')">
+                                            <%= val.value %>
+                                            <% if (val.additionalPrice > 0) { %>
+                                                (+<%= val.additionalPrice %> <%= currencySymbol %>)
+                                            <% } %>
+                                        </button>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+                
+                <%# ============================================= %>
+                <%# الكمية                                         %>
+                <%# ============================================= %>
+                <div style="margin-bottom: 20px;">
+                    <label class="option-label"><%= currentLanguage === 'en' ? 'Quantity' : 'الكمية' %>:</label>
+                    <div class="quantity-selector">
+                        <button type="button" class="quantity-btn minus" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" class="quantity-input" id="quantityInput" value="1" min="1" 
+                               max="<%= productFull && productFull.maxOrderQuantity ? productFull.maxOrderQuantity : 10 %>" 
+                               readonly>
+                        <button type="button" class="quantity-btn plus" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+                
+                <%# ============================================= %>
+                <%# حالة المخزون                                    %>
+                <%# ============================================= %>
+                <div style="margin-bottom: 20px;">
+                    <% if (product.stockStatus === 'in_stock') { %>
+                        <span style="color: var(--success-color); font-weight: bold;">
+                            <i class="fas fa-check-circle"></i> متوفر
+                            <% if (productFull && productFull.stock > 0) { %>
+                                : <%= productFull.stock %> قطعة
+                            <% } %>
+                        </span>
+                    <% } else if (product.stockStatus === 'low_stock') { %>
+                        <span style="color: var(--warning-color); font-weight: bold;">
+                            <i class="fas fa-exclamation-circle"></i> الكمية محدودة: <%= productFull ? productFull.stock : 0 %> قطعة
+                        </span>
+                    <% } else { %>
+                        <span style="color: var(--danger-color); font-weight: bold;">
+                            <i class="fas fa-times-circle"></i> نفد من المخزون
+                        </span>
+                    <% } %>
+                </div>
+                
+                <%# ============================================= %>
+                <%# أزرار الشراء                                    %>
+                <%# ============================================= %>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <% if (product.stockStatus !== 'out_of_stock') { %>
+                        <button type="button" class="btn btn-primary btn-lg" onclick="handleAddToCart()" style="flex: 1;">
+                            <i class="fas fa-shopping-cart"></i>
+                            <%= currentLanguage === 'en' ? 'Add to Cart' : 'أضف إلى السلة' %>
+                        </button>
+                        <button type="button" class="btn btn-gold btn-lg" onclick="handleBuyNow()" style="flex: 1;">
+                            <i class="fas fa-bolt"></i>
+                            <%= currentLanguage === 'en' ? 'Buy Now' : 'اشتري الآن' %>
+                        </button>
+                    <% } else { %>
+                        <button class="btn btn-lg" disabled style="flex: 1; background: #999; color: white; cursor: not-allowed;">
+                            <i class="fas fa-times-circle"></i> نفد من المخزون
+                        </button>
+                    <% } %>
+                    
+                    <button type="button" class="btn btn-outline btn-lg" onclick="toggleWishlist('<%= productFull ? productFull._id : '' %>')">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <%# ============================================= %>
+            <%# معلومات إضافية                                  %>
+            <%# ============================================= %>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong><i class="fas fa-truck"></i> الشحن:</strong>
+                        <span style="color: var(--success-color);">
+                            <%= productFull && productFull.freeShipping ? 'شحن مجاني' : 'يحدد عند الدفع' %>
+                        </span>
+                    </div>
+                    <div>
+                        <strong><i class="fas fa-undo-alt"></i> الإرجاع:</strong>
+                        <span>استبدال خلال 3 أيام</span>
+                    </div>
+                    <div>
+                        <strong><i class="fas fa-shield-alt"></i> الضمان:</strong>
+                        <span>ضمان الجودة</span>
+                    </div>
+                    <% if (productFull && productFull.sku) { %>
+                        <div>
+                            <strong><i class="fas fa-barcode"></i> SKU:</strong>
+                            <span><%= productFull.sku %></span>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <%# مشاركة %>
+            <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-weight: bold;">مشاركة:</span>
+                <a href="https://wa.me/?text=<%= encodeURIComponent(product.name + ' - ' + product.price + ' ' + currencySymbol) %>" 
+                   target="_blank" class="social-link" style="background: #25D366;" title="واتساب">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(product.name) %>" 
+                   target="_blank" class="social-link" style="background: #1DA1F2;" title="تويتر">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://' + (typeof host !== 'undefined' ? host : '') + '/products/' + (product.slug || productFull._id)) %>" 
+                   target="_blank" class="social-link" style="background: #4267B2;" title="فيسبوك">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <%# ============================================= %>
+    <%# الوصف الكامل + المواصفات                         %>
+    <%# ============================================= %>
+    <div style="margin-top: 40px; background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <div style="display: flex; gap: 0; border-bottom: 2px solid var(--border-color); margin-bottom: 25px;">
+            <button class="tab-btn active" onclick="switchTab('description', this)" style="padding: 12px 25px; background: none; border: none; border-bottom: 3px solid var(--secondary-color); font-weight: bold; font-size: 15px; cursor: pointer; color: var(--secondary-color);">
+                <i class="fas fa-align-right"></i> الوصف
+            </button>
+            <button class="tab-btn" onclick="switchTab('specifications', this)" style="padding: 12px 25px; background: none; border: none; border-bottom: 3px solid transparent; font-weight: bold; font-size: 15px; cursor: pointer; color: var(--text-muted);">
+                <i class="fas fa-list"></i> المواصفات
+            </button>
+            <button class="tab-btn" onclick="switchTab('reviews', this)" style="padding: 12px 25px; background: none; border: none; border-bottom: 3px solid transparent; font-weight: bold; font-size: 15px; cursor: pointer; color: var(--text-muted);">
+                <i class="fas fa-star"></i> التقييمات (<%= reviews ? reviews.length : 0 %>)
+            </button>
+        </div>
+        
+        <div id="tab-description" class="tab-content">
+            <div style="line-height: 2; color: var(--text-light);">
+                <%- productFull ? productFull.description.replace(/\n/g, '<br>') : '' %>
+            </div>
+        </div>
+        
+        <div id="tab-specifications" class="tab-content" style="display: none;">
+            <% if (productFull && productFull.specifications && productFull.specifications.length > 0) { %>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <% productFull.specifications.forEach(function(spec) { %>
+                        <tr style="border-bottom: 1px solid var(--border-light);">
+                            <td style="padding: 12px; font-weight: bold; width: 30%; background: var(--bg-color);"><%= spec.name %></td>
+                            <td style="padding: 12px;"><%= spec.value %></td>
+                        </tr>
+                    <% }); %>
+                </table>
+            <% } else { %>
+                <p style="color: var(--text-muted); text-align: center; padding: 30px;">لا توجد مواصفات مضافة لهذا المنتج</p>
+            <% } %>
+        </div>
+        
+        <div id="tab-reviews" class="tab-content" style="display: none;">
+            <% if (reviews && reviews.length > 0) { %>
+                <% reviews.forEach(function(review) { %>
+                    <div style="padding: 20px; border-bottom: 1px solid var(--border-light);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong><%= review.name %></strong>
+                            <div class="stars" style="font-size: 13px;">
+                                <% for (var i = 1; i <= 5; i++) { %>
+                                    <i class="fas fa-star" style="color: <%= i <= review.rating ? 'var(--gold-color)' : '#ddd' %>;"></i>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% if (review.title) { %>
+                            <h4 style="margin-bottom: 8px;"><%= review.title %></h4>
+                        <% } %>
+                        <p style="color: var(--text-light);"><%= review.comment %></p>
+                        <small style="color: var(--text-muted);"><%= new Date(review.createdAt).toLocaleDateString('ar-SA') %></small>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p style="color: var(--text-muted); text-align: center; padding: 30px;">لا توجد تقييمات بعد. كن أول من يقيم هذا المنتج!</p>
+            <% } %>
+            
+            <% if (user) { %>
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                    <h4>أضف تقييمك</h4>
+                    <form action="/products/<%= productFull ? productFull._id : '' %>/review" method="POST">
+                        <div class="form-group">
+                            <label>تقييمك:</label>
+                            <div style="display: flex; gap: 5px; font-size: 24px; cursor: pointer;" id="starRating">
+                                <% for (var i = 1; i <= 5; i++) { %>
+                                    <i class="far fa-star" data-rating="<%= i %>" onclick="setRating(<%= i %>)"></i>
+                                <% } %>
+                            </div>
+                            <input type="hidden" name="rating" id="ratingInput" value="5">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="title" class="form-control" placeholder="عنوان التقييم (اختياري)">
+                        </div>
+                        <div class="form-group">
+                            <textarea name="comment" class="form-control" placeholder="اكتب تقييمك هنا..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> إرسال التقييم
+                        </button>
+                    </form>
+                </div>
+            <% } else { %>
+                <p style="text-align: center; margin-top: 20px;">
+                    <a href="/auth/login">سجل دخولك</a> لتتمكن من إضافة تقييم
+                </p>
+            <% } %>
+        </div>
+    </div>
+    
+    <%# ============================================= %>
+    <%# منتجات ذات صلة                                   %>
+    <%# ============================================= %>
+    <% if (relatedProducts && relatedProducts.length > 0) { %>
+        <section class="section" style="margin-top: 40px;">
+            <div class="section-header">
+                <h2 class="section-title">منتجات ذات صلة</h2>
+            </div>
+            <div class="products-grid cols-4">
+                <% relatedProducts.forEach(function(relProduct) { %>
+                    <%- include('../partials/product-card', { product: relProduct, currencySymbol: currencySymbol }) %>
+                <% }); %>
+            </div>
+        </section>
+    <% } %>
+</div>
+
+<script>
+let selectedQuantity = 1;
+let selectedOptions = {};
+
+function changeQuantity(delta) {
+    const input = document.getElementById('quantityInput');
+    let value = parseInt(input.value) + delta;
+    const max = parseInt(input.max) || 10;
+    if (value >= 1 && value <= max) {
+        input.value = value;
+        selectedQuantity = value;
+    }
+}
+
+function selectOption(element, group, value) {
+    const parent = element.parentElement;
+    parent.querySelectorAll('.option-value, .color-option').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    
+    if (!selectedOptions[group]) selectedOptions[group] = [];
+    selectedOptions[group] = [value];
+}
+
+function handleAddToCart() {
+    const productId = '<%= productFull ? productFull._id : '' %>';
+    addToCart(productId, selectedQuantity, selectedOptions);
+}
+
+function handleBuyNow() {
+    handleAddToCart();
+    setTimeout(() => { window.location.href = '/cart/checkout'; }, 500);
+}
+
+function switchTab(tabName, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('active');
+        el.style.borderBottomColor = 'transparent';
+        el.style.color = 'var(--text-muted)';
+    });
+    
+    document.getElementById('tab-' + tabName).style.display = 'block';
+    btn.classList.add('active');
+    btn.style.borderBottomColor = 'var(--secondary-color)';
+    btn.style.color = 'var(--secondary-color)';
+}
+
+function setRating(rating) {
+    document.getElementById('ratingInput').value = rating;
+    const stars = document.querySelectorAll('#starRating i');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.className = 'fas fa-star';
+        } else {
+            star.className = 'far fa-star';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('#starRating i');
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.rating);
+            stars.forEach((s, i) => {
+                s.className = i < rating ? 'fas fa-star' : 'far fa-star';
+            });
+        });
+    });
+    document.getElementById('starRating').addEventListener('mouseleave', function() {
+        const currentRating = parseInt(document.getElementById('ratingInput').value);
+        stars.forEach((s, i) => {
+            s.className = i < currentRating ? 'fas fa-star' : 'far fa-star';
+        });
+    });
+    setRating(5);
+});
+</script>
+
+<%- include('../partials/footer') %>
