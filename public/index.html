@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر الرعدي اون لاين | بوابتك الفاخرة</title>
-    <!-- استدعاء خط القاهرة والأيقونات الاحترافية -->
+    <title>الرعدي أونلاين | المنصة المتكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -17,303 +16,627 @@
             --text-light: #ffffff;
             --text-muted: #a0aec0;
             --input-border: #1e3a5f;
+            --danger: #e53e3e;
+            --success: #38a169;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-dark-blue); color: var(--text-light); min-height: 100vh; overflow-x: hidden; position: relative; }
+        body::before { content: ""; position: absolute; width: 100%; height: 100%; background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'); opacity: 0.03; pointer-events: none; top: 0; left: 0; z-index: 1; }
 
-        body {
-            background-color: var(--bg-dark-blue);
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
+        .hidden { display: none !important; }
 
-        /* الزخرفة الإسلامية الخلفية الشفافة */
-        body::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
-            opacity: 0.04;
-            pointer-events: none;
-            top: 0; left: 0;
-        }
+        /* --- 1) شاشة الدخول الملكية --- */
+        .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; position: relative; z-index: 10; }
+        .auth-card { width: 100%; max-width: 440px; text-align: center; background: rgba(15, 36, 66, 0.4); padding: 30px; border-radius: 20px; border: 1px solid var(--input-border); }
+        .brand-logo { width: 100px; height: 100px; margin: 0 auto 20px; background: linear-gradient(135deg, #1e3a5f, #0b1a30); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--gold-primary); box-shadow: 0 0 20px rgba(202, 161, 53, 0.3); }
+        .brand-logo i { font-size: 45px; color: var(--gold-primary); }
+        .brand-title { font-size: 26px; font-weight: 700; color: var(--gold-primary); margin-bottom: 5px; }
+        .brand-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
+        .input-wrapper { position: relative; margin-bottom: 20px; }
+        .input-wrapper input, .input-wrapper select { width: 100%; padding: 14px 45px 14px 15px; background: rgba(15, 36, 66, 0.8); border: 1px solid var(--input-border); border-radius: 25px; color: var(--text-light); font-size: 14px; outline: none; text-align: right; }
+        .input-wrapper input:focus { border-color: var(--gold-primary); }
+        .input-wrapper i { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--gold-primary); }
+        .btn-gold { width: 100%; padding: 14px; background: linear-gradient(90deg, var(--gold-hover), var(--gold-primary)); border: none; border-radius: 25px; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(202, 161, 53, 0.3); margin-bottom: 12px; }
+        .btn-gold:hover { transform: translateY(-2px); }
+        .btn-outline { width: 100%; padding: 14px; background: transparent; border: 1.5px solid var(--gold-primary); border-radius: 25px; color: var(--text-light); font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-outline:hover { background: rgba(202, 161, 53, 0.1); }
 
-        /* شريط اختيار العملة العلوي */
-        .top-currency-bar {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 15px;
-            border-radius: 5px;
-            border: 1px solid var(--input-border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 20;
-        }
+        /* --- 2) الهيكل الرئيسي للمتجر الفخم --- */
+        .app-layout { display: flex; min-height: 100vh; position: relative; z-index: 10; }
+        
+        /* القائمة الجانبية اليمنى */
+        .sidebar { width: 260px; background: var(--card-blue); border-left: 1px solid var(--input-border); display: flex; flex-direction: column; padding: 20px; }
+        .sidebar-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--input-border); margin-bottom: 20px; }
+        .sidebar-header h2 { color: var(--gold-primary); font-size: 20px; }
+        .menu-list { list-style: none; }
+        .menu-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; transition: 0.3s; color: var(--text-muted); }
+        .menu-item:hover, .menu-item.active { background: rgba(202, 161, 53, 0.1); color: var(--text-light); border-right: 4px solid var(--gold-primary); }
 
-        .top-currency-bar select {
-            background: transparent;
-            color: var(--text-light);
-            border: none;
-            outline: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
+        /* المحتوى الرئيسي */
+        .main-content { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 30px; }
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; background: var(--card-blue); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--input-border); }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .cart-trigger { position: relative; cursor: pointer; font-size: 20px; color: var(--gold-primary); }
+        .cart-count { position: absolute; top: -10px; left: -10px; background: var(--danger); color: #fff; font-size: 11px; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
 
-        .auth-wrapper {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            z-index: 10;
-        }
+        /* السلايدر وقسم العروض */
+        .promo-slider { background: linear-gradient(135deg, #1e3a5f, #0f2442); border-radius: 15px; padding: 40px; border: 1px solid var(--gold-primary); position: relative; overflow: hidden; }
+        .promo-slider h1 { color: var(--gold-primary); font-size: 32px; margin-bottom: 10px; }
+        .flash-deal-box { background: rgba(229, 62, 62, 0.1); border: 1px solid var(--danger); padding: 15px; border-radius: 10px; display: flex; align-items: center; gap: 20px; margin-top: 15px; }
+        .countdown { display: flex; gap: 10px; font-weight: 700; font-size: 18px; color: var(--gold-primary); }
 
-        .auth-card {
-            text-align: center;
-        }
+        /* شبكة المنتجات */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .product-card { background: var(--card-blue); border-radius: 15px; border: 1px solid var(--input-border); overflow: hidden; transition: 0.3s; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); border-color: var(--gold-primary); }
+        .product-img { width: 100%; height: 180px; background: #132a4a; display: flex; justify-content: center; align-items: center; font-size: 40px; color: var(--input-border); }
+        .product-info { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .product-meta { display: flex; justify-content: space-between; align-items: center; }
+        .product-price { color: var(--gold-primary); font-weight: 700; font-size: 16px; }
+        .btn-add-cart { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 13px; }
+        .btn-add-cart:hover { background: var(--gold-primary); color: #000; }
 
-        .brand-logo {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 20px auto;
-            background: linear-gradient(135deg, #1e3a5f, #0b1a30);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid var(--gold-primary);
-            box-shadow: 0 0 25px rgba(202, 161, 53, 0.25);
-        }
+        /* --- 3) لوحة تحكم المدير العظمى --- */
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--card-blue); padding: 20px; border-radius: 15px; border: 1px solid var(--input-border); text-align: center; }
+        .stat-card h3 { color: var(--text-muted); font-size: 14px; margin-bottom: 10px; }
+        .stat-card p { font-size: 28px; font-weight: 700; color: var(--gold-primary); }
+        .admin-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media(max-width: 768px) { .admin-sections { grid-template-columns: 1fr; } .app-layout { flex-direction: column; } .sidebar { width: 100%; } }
+        .panel-box { background: var(--card-blue); padding: 25px; border-radius: 15px; border: 1px solid var(--input-border); }
+        .panel-box h2 { color: var(--gold-primary); margin-bottom: 20px; font-size: 18px; border-bottom: 1px solid var(--input-border); padding-bottom: 10px; }
+        .admin-form-group { margin-bottom: 15px; }
+        .admin-form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-muted); }
+        .admin-form-group input, .admin-form-group select { width: 100%; padding: 10px; background: #132a4a; border: 1px solid var(--input-border); border-radius: 8px; color: #fff; outline: none; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--input-border); }
+        th { color: var(--gold-primary); }
 
-        .brand-logo i {
-            font-size: 50px;
-            color: var(--gold-primary);
-        }
-
-        .brand-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--gold-primary);
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
-
-        .brand-subtitle {
-            font-size: 15px;
-            color: var(--text-muted);
-            margin-bottom: 35px;
-        }
-
-        /* حقول الإدخال */
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 15px 45px 15px 15px;
-            background: rgba(15, 36, 66, 0.7);
-            border: 1px solid var(--input-border);
-            border-radius: 25px;
-            color: var(--text-light);
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-            text-align: right;
-        }
-
-        .input-wrapper input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 10px rgba(202, 161, 53, 0.2);
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gold-primary);
-            font-size: 16px;
-        }
-
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 0 10px;
-            font-size: 14px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .forgot-pass-link {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .forgot-pass-link:hover {
-            color: var(--gold-primary);
-        }
-
-        /* الأزرار الفخمة */
-        .btn-gold-solid {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(90deg, var(--gold-hover), var(--gold-primary));
-            border: none;
-            border-radius: 25px;
-            color: #050d1a;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(202, 161, 53, 0.3);
-            margin-bottom: 15px;
-        }
-
-        .btn-gold-solid:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(202, 161, 53, 0.4);
-        }
-
-        .btn-outline-gold {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            border: 1.5px solid var(--gold-primary);
-            border-radius: 25px;
-            color: var(--text-light);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-outline-gold:hover {
-            background: rgba(202, 161, 53, 0.1);
-        }
-
-        .hidden-pane {
-            display: none !important;
-        }
+        /* --- 4) نافذة السلة والفاتورة المودال --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; padding: 20px; }
+        .modal-content { background: var(--card-blue); border: 1px solid var(--gold-primary); border-radius: 20px; width: 100%; max-width: 550px; padding: 25px; max-height: 90vh; overflow-y: auto; }
+        .invoice-box { background: #fff; color: #000; padding: 25px; border-radius: 10px; font-family: 'Cairo', sans-serif; margin-top: 15px; line-height: 1.6; }
+        .invoice-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; }
+        .invoice-title { font-size: 22px; font-weight: 700; color: #0b1a30; }
+        .invoice-details { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 15px; color: #333; }
+        .invoice-table { width: 100%; margin-bottom: 15px; text-align: right; }
+        .invoice-table th { color: #000; border-bottom: 2px solid #000; }
+        .invoice-table td { border-bottom: 1px solid #ccc; padding: 8px 4px; }
+        .invoice-total-row { font-size: 16px; font-weight: 700; text-align: left; padding-top: 10px; }
+        .invoice-policy { background: #f7f7f7; padding: 10px; border-radius: 5px; border-right: 4px solid var(--gold-primary); font-size: 11px; font-weight: 600; color: #444; margin-top: 15px; text-align: justify; }
     </style>
 </head>
 <body>
 
-    <div class="top-currency-bar">
-        <i class="fa-solid fa-money-bill-wave" style="color: var(--gold-primary);"></i>
-        <select id="currency-select">
-            <option value="SAR">الريال السعودي (ر.س)</option>
-            <option value="YER">الريال اليمني (ر.ي)</option>
-        </select>
-    </div>
-
-    <div class="auth-wrapper">
-        <!-- نموذج تسجيل الدخول -->
+    <!-- ==================== أولاً: شاشة الدخول والتسجيل الملكية ==================== -->
+    <div class="auth-container" id="auth-screen">
         <div class="auth-card" id="login-pane">
-            <div class="brand-logo">
-                <i class="fa-solid fa-dove"></i>
-            </div>
+            <div class="brand-logo"><i class="fa-solid fa-feather-pointed"></i></div>
             <h1 class="brand-title">مَتْجَر الرَّعْدِي اِؤْن لَايِنْ</h1>
-            <p class="brand-subtitle">بوابتك الرقمية لعالم من الفخامة والتميز</p>
-
-            <form id="loginForm" onsubmit="handleLogin(event)">
+            <p class="brand-subtitle">سوق اليمن الرقمي الفاخر لبيع البرمجيات والمنتجات</p>
+            
+            <form onsubmit="loginAction(event)">
                 <div class="input-wrapper">
                     <i class="fa-solid fa-user"></i>
-                    <input type="text" id="login-user" required placeholder="اسم المستخدم أو رقم الهاتف">
+                    <input type="text" id="login-username" placeholder="رقم الهاتف أو اسم المستخدم (المدير: admin)" required>
                 </div>
-
                 <div class="input-wrapper">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="login-pass" required placeholder="كلمة المرور الشخصية">
+                    <input type="password" id="login-password" placeholder="كلمة المرور (المدير: adminpassword)" required>
                 </div>
-
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox"> تذكر بياناتي
-                    </label>
-                    <a href="#" class="forgot-pass-link">هل نسيت كلمة المرور؟</a>
-                </div>
-
-                <button type="submit" class="btn-gold-solid">تسجيل الدخول</button>
-                <button type="button" class="btn-outline-gold" onclick="toggleView('reg')">إنشاء حساب جديد</button>
+                <button type="submit" class="btn-gold">تسجيل الدخول الآمن</button>
+                <button type="button" class="btn-outline" onclick="toggleAuth('reg')">إنشاء عضوية جديدة</button>
             </form>
         </div>
 
-        <!-- نموذج إنشاء حساب جديد -->
-        <div class="auth-card hidden-pane" id="register-pane">
-            <div class="brand-logo">
-                <i class="fa-solid fa-user-plus"></i>
-            </div>
+        <div class="auth-card hidden" id="register-pane">
+            <div class="brand-logo"><i class="fa-solid fa-user-plus"></i></div>
             <h1 class="brand-title">عضوية جديدة</h1>
-            <p class="brand-subtitle">انضم إلى عملاء متجر الرعدي المميزين</p>
-
-            <form id="registerForm" onsubmit="handleRegister(event)">
+            <p class="brand-subtitle">سجل بياناتك للانضمام إلى منصتنا الفاخرة</p>
+            
+            <form onsubmit="registerAction(event)">
                 <div class="input-wrapper">
                     <i class="fa-solid fa-id-card"></i>
-                    <input type="text" id="reg-name" required placeholder="الاسم الكامل للعميل">
+                    <input type="text" id="reg-name" placeholder="الاسم الكامل للعميل" required>
                 </div>
-
                 <div class="input-wrapper">
                     <i class="fa-solid fa-phone"></i>
-                    <input type="tel" id="reg-phone" required placeholder="رقم الهاتف (مع رمز الدولة)">
+                    <input type="tel" id="reg-phone" placeholder="رقم الهاتف الخلوي" required>
                 </div>
-
                 <div class="input-wrapper">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="reg-pass" required placeholder="تعيين كلمة مرور قوية">
+                    <input type="password" id="reg-password" placeholder="كلمة المرور الخاصة بك" required>
                 </div>
-
-                <button type="submit" class="btn-gold-solid">تأكيد الحساب والانطلاق</button>
-                <button type="button" class="btn-outline-gold" onclick="toggleView('login')">العودة لتسجيل الدخول</button>
+                <button type="submit" class="btn-gold">تأكيد الحساب والانطلاق</button>
+                <button type="button" class="btn-outline" onclick="toggleAuth('login')">العودة لتسجيل الدخول</button>
             </form>
         </div>
     </div>
 
-    <!-- استدعاء ملفات الـ JS التابعة لك من مجلداتك الموضحة بالصور -->
-    <script src="js/core.js"></script>
-    <script src="js/ui.js"></script>
+
+    <!-- ==================== ثانياً: الهيكل الرئيسي للتطبيق والمنصة ==================== -->
+    <div class="app-layout hidden" id="app-screen">
+        
+        <!-- الشريط الجانبي الفخم للأقسام -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>الرعدي أونلاين</h2>
+                <span style="font-size: 11px; color: var(--gold-primary);" id="user-badge">عميل مميز</span>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item active" id="menu-store" onclick="switchView('store')">
+                    <i class="fa-solid fa-shop"></i> تصفح المتجر
+                </li>
+                <li class="menu-item hidden" id="menu-admin" onclick="switchView('admin')">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> لوحة التحكم للمدير
+                </li>
+                <li class="menu-item" style="margin-top: auto; color: var(--danger);" onclick="logoutAction()">
+                    <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+                </li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى المعروض -->
+        <main class="main-content">
+            
+            <!-- الهيدر العلوي وسلة المشتريات -->
+            <header class="top-navbar">
+                <div class="user-profile">
+                    <i class="fa-solid fa-circle-user" style="font-size: 24px; color: var(--gold-primary);"></i>
+                    <span id="welcome-text">مرحباً بك</span>
+                </div>
+                <div class="cart-trigger" onclick="openCartModal()">
+                    <i class="fa-solid fa-bag-shopping"></i> السلة الرقمية
+                    <div class="cart-count" id="cart-counter">0</div>
+                </div>
+            </header>
+
+            <!-- واجهة تصفح المتجر للعميل -->
+            <div id="view-store" class="view-section">
+                <div class="promo-slider">
+                    <h1>عروض الصيف الكبرى</h1>
+                    <p>أفضل المنتجات والأجهزة الإلكترونية بأسعار تنافسية وحصرية بالريال السعودي</p>
+                    <div class="flash-deal-box">
+                        <span style="font-weight: bold;"><i class="fa-solid fa-bolt"></i> ينتهي العرض الخاطف خلال:</span>
+                        <div class="countdown" id="timer">02:59:59</div>
+                    </div>
+                </div>
+                <h2 style="color: var(--gold-primary); margin: 30px 0 20px 0; font-size: 22px;">المنتجات المتاحة بالمخزن</h2>
+                <div class="products-grid" id="products-container">
+                    <!-- المنتجات تحقن هنا تلقائياً -->
+                </div>
+            </div>
+
+            <!-- واجهة لوحة تحكم المدير العظمى -->
+            <div id="view-admin" class="view-section hidden">
+                <h2 style="color: var(--gold-primary); margin-bottom: 25px;">لوحة تحكم الإدارة الحية</h2>
+                <div class="admin-grid">
+                    <div class="stat-card"><h3>إجمالي الأرباح الحالية</h3><p id="stat-sales">0 ر.س</p></div>
+                    <div class="stat-card"><h3>عدد الفواتير الصادرة</h3><p id="stat-orders">0</p></div>
+                    <div class="stat-card"><h3>إجمالي أنواع المنتجات</h3><p id="stat-products">0</p></div>
+                </div>
+
+                <div class="admin-sections">
+                    <div class="panel-box">
+                        <h2>إضافة منتج جديد للمخزون</h2>
+                        <form onsubmit="addProductAction(event)">
+                            <div class="admin-form-group">
+                                <label>اسم المنتج الفخم</label>
+                                <input type="text" id="adm-pname" required placeholder="مثال: لابتوب ديل ذكي">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>السعر بالريال السعودي (ر.س)</label>
+                                <input type="number" id="adm-pprice" required placeholder="مثال: 2500">
+                            </div>
+                            <div class="admin-form-group">
+                                <label>القسم</label>
+                                <select id="adm-pcategory">
+                                    <option value="electronics">إلكترونيات</option>
+                                    <option value="appliances">أجهزة منزلية</option>
+                                    <option value="general">عام</option>
+                                </select>
+                            </div>
+                            <div class="admin-form-group">
+                                <label>الكمية المتاحة بالمخزن</label>
+                                <input type="number" id="adm-pstock" required placeholder="مثال: 20">
+                            </div>
+                            <button type="submit" class="btn-gold" style="padding: 10px; font-size: 14px; margin-top: 10px;">ضخ المنتج في المخازن</button>
+                        </form>
+                    </div>
+
+                    <div class="panel-box">
+                        <h2>قائمة التحكم وحذف المنتجات</h2>
+                        <div class="table-wrapper">
+                            <table>
+                               <thead>
+                                   <tr>
+                                       <th>المنتج</th>
+                                       <th>السعر</th>
+                                       <th>المخزون</th>
+                                       <th>إجراء</th>
+                                   </tr>
+                               </thead>
+                               <tbody id="admin-table-body">
+                                   <!-- تحقن صفوف المنتجات هنا للتعديل والحذف -->
+                               </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <!-- ==================== ثالثاً: نافذة السلة والفاتورة المودال المكتملة ==================== -->
+    <div class="modal hidden" id="cart-modal">
+        <div class="modal-content">
+            <h2 style="color: var(--gold-primary); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <span>السلة وفاتورتك الفاخرة</span>
+                <i class="fa-solid fa-circle-xmark" style="cursor: pointer; color: var(--danger);" onclick="closeCartModal()"></i>
+            </h2>
+            
+            <div id="cart-items-list" style="margin-bottom: 20px;">
+                <!-- عناصر السلة -->
+            </div>
+
+            <button class="btn-gold" id="btn-checkout" onclick="checkoutAction()">تأكيد الشراء وإصدار الفاتورة الفورية</button>
+
+            <!-- صندوق الفاتورة المعد للطباعة الفورية بيدك -->
+            <div class="invoice-wrapper-box hidden" id="invoice-section">
+                <div class="invoice-box" id="printable-invoice">
+                    <div class="invoice-header">
+                        <div class="invoice-title">مَتْجَر الرَّعْدِي اِؤْن لَايِنْ</div>
+                        <p style="font-size: 12px; margin-top: 4px;">سوقك الإلكتروني الأول - فاتورة مبيعات رسمية</p>
+                    </div>
+                    <div class="invoice-details">
+                        <div>
+                            <p><strong>رقم الفاتورة:</strong> <span id="inv-id">0000</span></p>
+                            <p><strong>التاريخ:</strong> <span id="inv-date">--/--/----</span></p>
+                        </div>
+                        <div style="text-align: left;">
+                            <p><strong>العميل:</strong> <span id="inv-customer">--</span></p>
+                            <p><strong>الهاتف:</strong> <span id="inv-phone">--</span></p>
+                        </div>
+                    </div>
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>البيان</th>
+                                <th>الكمية</th>
+                                <th>السعر</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inv-rows">
+                            <!-- صفوف الشراء -->
+                        </tbody>
+                    </table>
+                    <div class="invoice-total-row">
+                        <span>الإجمالي الكلي: </span><span id="inv-total">0</span> ر.س
+                    </div>
+                    <div class="invoice-policy">
+                        <strong>شروط الإرجاع والاستبدال الفقهية والقانونية للرعدي أونلاين:</strong><br>
+                        الاستبدال مسموح خلال 14 يوماً من تاريخ الاستلام بشرط أن يكون المنتج بحالته الأصلية وغلافه السليم ولم يتم استخدامه.
+                    </div>
+                </div>
+                <button class="btn-outline" style="margin-top: 15px; background: #fff; color: #000; border: none;" onclick="printInvoice()">
+                    <i class="fa-solid fa-print"></i> طباعة الفاتورة بملف PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== رابعاً: نظام الجافا سكريبت المطور والمتكامل ربطاً مع السيرفر ==================== -->
     <script>
-        function toggleView(pane) {
-            if(pane === 'reg') {
-                document.getElementById('login-pane').classList.add('hidden-pane');
-                document.getElementById('register-pane').classList.remove('hidden-pane');
+        let currentUser = null;
+        let globalProducts = [];
+        let cart = [];
+
+        // تشغيل العداد التنازلي التلقائي بشكل فخم
+        let hour = 2, min = 59, sec = 59;
+        setInterval(() => {
+            sec--;
+            if (sec < 0) { sec = 59; min--; }
+            if (min < 0) { min = 59; hour--; }
+            if (hour < 0) { hour = 2; min = 59; sec = 59; }
+            document.getElementById('timer').innerText = 
+                `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        function toggleAuth(view) {
+            if(view === 'reg') {
+                document.getElementById('login-pane').classList.add('hidden');
+                document.getElementById('register-pane').classList.remove('hidden');
             } else {
-                document.getElementById('register-pane').classList.add('hidden-pane');
-                document.getElementById('login-pane').classList.remove('hidden-pane');
+                document.getElementById('register-pane').classList.add('hidden');
+                document.getElementById('login-pane').classList.remove('hidden');
             }
         }
 
-        function handleLogin(e) {
+        // تسجيل الدخول والربط مع السيرفر الحي
+        async function loginAction(e) {
             e.preventDefault();
-            alert("جارٍ تشغيل محرك الخلفية وسيرفر رندر للتحقق ودخول متجر الرعدي!");
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                
+                if(data.success) {
+                    currentUser = data.user;
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    document.getElementById('welcome-text').innerText = `مرحباً، ${currentUser.name}`;
+                    
+                    if(currentUser.role === 'admin') {
+                        document.getElementById('menu-admin').classList.remove('hidden');
+                        document.getElementById('user-badge').innerText = "المدير العام والمالك";
+                    } else {
+                        document.getElementById('menu-admin').classList.add('hidden');
+                        document.getElementById('user-badge').innerText = "عميل مميز الفئة الذهبية";
+                    }
+                    loadProducts();
+                } else {
+                    alert(data.message);
+                }
+            } catch(err) {
+                alert("خطأ في الاتصال بالسيرفر المطور!");
+            }
         }
 
-        function handleRegister(e) {
+        // إنشاء العضوية الجديدة في السيرفر ومونجو
+        async function registerAction(e) {
             e.preventDefault();
-            alert("تم إرسال طلب تسجيل العميل الجديد بنجاح!");
-            toggleView('login');
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, password })
+                });
+                const data = await response.json();
+                alert(data.message);
+                if(data.success) toggleAuth('login');
+            } catch(err) {
+                alert("فشل إرسال طلب العضوية للسيرفر!");
+            }
+        }
+
+        function logoutAction() {
+            currentUser = null;
+            cart = [];
+            updateCartUI();
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('invoice-section').classList.add('hidden');
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.menu-item').forEach(li => li.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+            
+            if(view === 'store') {
+                document.getElementById('menu-store').classList.add('active');
+                document.getElementById('view-store').classList.remove('hidden');
+                loadProducts();
+            } else if(view === 'admin') {
+                document.getElementById('menu-admin').classList.add('active');
+                document.getElementById('view-admin').classList.remove('hidden');
+                loadAdminDashboard();
+            }
+        }
+
+        // جلب وضخ المنتجات الحية
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                globalProducts = await response.json();
+                
+                const container = document.getElementById('products-container');
+                container.innerHTML = '';
+                
+                globalProducts.forEach(prod => {
+                    container.innerHTML += `
+                        <div class="product-card">
+                            <div class="product-img"><i class="fa-solid fa-box-open"></i></div>
+                            <div class="product-info">
+                                <div class="product-title">${prod.name}</div>
+                                <div class="product-meta">
+                                    <div class="product-price">${prod.price_sar} ر.س</div>
+                                    <button class="btn-add-cart" onclick="addToCart(${prod.id})">إضافة للسلة</button>
+                                </div>
+                                <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">المخزون المتوفر: ${prod.stock} قطع</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(err) {
+                console.log("خطأ في قراءة المنتجات");
+            }
+        }
+
+        // إدارة عمليات السلة الحية والعدادات
+        function addToCart(id) {
+            const product = globalProducts.find(p => p.id === id);
+            if(product.stock <= 0) {
+                alert("نفذت الكمية من المخازن تماماً!");
+                return;
+            }
+            const exist = cart.find(item => item.id === id);
+            if(exist) {
+                exist.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, i) => sum + i.quantity, 0);
+            document.getElementById('cart-counter').innerText = count;
+        }
+
+        function openCartModal() {
+            document.getElementById('cart-modal').classList.remove('hidden');
+            const listContainer = document.getElementById('cart-items-list');
+            listContainer.innerHTML = '';
+            
+            if(cart.length === 0) {
+                listContainer.innerHTML = '<p style="color:var(--text-muted); text-align:center;">السلة فارغة حالياً.</p>';
+                document.getElementById('btn-checkout').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('btn-checkout').style.display = 'block';
+            cart.forEach(item => {
+                listContainer.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid var(--input-border); padding-bottom:8px;">
+                        <span>${item.name} (×${item.quantity})</span>
+                        <span style="color:var(--gold-primary);">${item.price_sar * item.quantity} ر.س</span>
+                    </div>
+                `;
+            });
+        }
+
+        function closeCartModal() {
+            document.getElementById('cart-modal').classList.add('hidden');
+        }
+
+        // إتمام الشراء، قفل المخزون وعرض وتجهيز الفاتورة للطباعة الفورية
+        async function checkoutAction() {
+            const total = cart.reduce((sum, i) => sum + (i.price_sar * i.quantity), 0);
+            const orderPayload = {
+                customerName: currentUser.name,
+                customerPhone: currentUser.username,
+                cartItems: cart,
+                totalAmount: total
+            };
+
+            try {
+                const response = await fetch('/api/orders/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                });
+                const data = await response.json();
+                
+                if(data.success) {
+                    // ملء الفاتورة
+                    document.getElementById('inv-id').innerText = data.order.orderId;
+                    document.getElementById('inv-date').innerText = data.order.date;
+                    document.getElementById('inv-customer').innerText = data.order.customerName;
+                    document.getElementById('inv-phone').innerText = data.order.customerPhone;
+                    
+                    const tbody = document.getElementById('inv-rows');
+                    tbody.innerHTML = '';
+                    cart.forEach(item => {
+                        tbody.innerHTML += `<tr><td>${item.name}</td><td>${item.quantity}</td><td>${item.price_sar * item.quantity}</td></tr>`;
+                    });
+                    
+                    document.getElementById('inv-total').innerText = total;
+                    document.getElementById('invoice-section').classList.remove('hidden');
+                    document.getElementById('btn-checkout').style.display = 'none';
+                    
+                    // تصفير السلة
+                    cart = [];
+                    updateCartUI();
+                    alert("تم تأكيد الطلبية وإصدار الفاتورة الفاخرة بنجاح!");
+                }
+            } catch(err) {
+                alert("خطأ أثناء إرسال الفاتورة ومعالجة المخزون!");
+            }
+        }
+
+        // طباعة الفاتورة كملف PDF بيدك فوراً من المتصفح
+        function printInvoice() {
+            const printContent = document.getElementById('printable-invoice').innerHTML;
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            window.location.reload(); // إعادة التحميل لتهيئة الواجهة
+        }
+
+        // لوحة تحكم المدير وحذف وإضافة البضاعة
+        async function loadAdminDashboard() {
+            try {
+                const response = await fetch('/api/admin/dashboard');
+                const data = await response.json();
+                
+                document.getElementById('stat-sales').innerText = `${data.totalSales} ر.س`;
+                document.getElementById('stat-orders').innerText = data.ordersCount;
+                document.getElementById('stat-products').innerText = data.productsCount;
+                
+                const tableBody = document.getElementById('admin-table-body');
+                tableBody.innerHTML = '';
+                
+                // إعادة تحميل المنتجات في جدول الإدارة
+                const prodRes = await fetch('/api/products');
+                const prods = await prodRes.json();
+                
+                prods.forEach(p => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${p.name}</td>
+                            <td>${p.price_sar} ر.س</td>
+                            <td>${p.stock}</td>
+                            <td><i class="fa-solid fa-trash" style="color:var(--danger); cursor:pointer;" onclick="deleteProduct(${p.id})"></i></td>
+                        </tr>
+                    `;
+                });
+            } catch(err) {
+                console.log("خطأ في جلب بيانات الإدارة الكبرى");
+            }
+        }
+
+        async function addProductAction(e) {
+            e.preventDefault();
+            const name = document.getElementById('adm-pname').value;
+            const price_sar = document.getElementById('adm-pprice').value;
+            const category = document.getElementById('adm-pcategory').value;
+            const stock = document.getElementById('adm-pstock').value;
+
+            try {
+                const response = await fetch('/api/products/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, price_sar, category, stock })
+                });
+                const data = await response.json();
+                alert(data.message);
+                loadAdminDashboard();
+                // مسح الحقول بعد الإضافة
+                document.getElementById('adm-pname').value = '';
+                document.getElementById('adm-pprice').value = '';
+                document.getElementById('adm-pstock').value = '';
+            } catch(err) {
+                alert("فشل إضافة المنتج!");
+            }
+        }
+
+        async function deleteProduct(id) {
+            if(!confirm("هل أنت متأكد تماماً من حذف هذا المنتج البرمجي من متجر الرعدي؟")) return;
+            try {
+                const response = await fetch(`/api/products/delete/${id}`, { method: 'DELETE' });
+                const data = await response.json();
+                alert(data.message);
+                loadAdminDashboard();
+            } catch(err) {
+                alert("خطأ في حذف المنتج!");
+            }
         }
     </script>
 </body>
