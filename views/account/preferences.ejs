@@ -1,0 +1,219 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة الإعدادات والتفضيلات                       %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# عنوان الصفحة %>
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-cog" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            <%= currentLanguage === 'en' ? 'Settings & Preferences' : 'الإعدادات والتفضيلات' %>
+        </h1>
+        <p style="color: var(--text-muted);">
+            <%= currentLanguage === 'en' ? 'Customize your account settings' : 'خصص إعدادات حسابك حسب رغبتك' %>
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 30px;">
+        
+        <%# القائمة الجانبية %>
+        <aside>
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+                    <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                         alt="<%= user.name %>"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-color); margin-bottom: 10px;"
+                         onerror="this.src='/images/default-avatar.png'">
+                    <h4 style="font-weight: 700; margin-bottom: 3px;"><%= user.name %></h4>
+                </div>
+                <nav>
+                    <a href="/account" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-th-large"></i> لوحة التحكم
+                    </a>
+                    <a href="/account/profile" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-user"></i> الملف الشخصي
+                    </a>
+                    <a href="/account/preferences" class="account-nav-link active" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: white; background: var(--secondary-color); font-weight: bold; font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-cog"></i> الإعدادات
+                    </a>
+                    <a href="/auth/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--danger-color); font-size: 14px; text-decoration: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <%# المحتوى الرئيسي %>
+        <main>
+            
+            <%# ============================================= %>
+            <%# إعدادات اللغة والعملة                             %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-globe" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    <%= currentLanguage === 'en' ? 'Language & Currency' : 'اللغة والعملة' %>
+                </h3>
+                
+                <form action="/account/preferences" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">اللغة</label>
+                            <select name="language" class="form-control">
+                                <option value="ar" <%= user.preferences && user.preferences.language === 'ar' ? 'selected' : '' %>>العربية</option>
+                                <option value="en" <%= user.preferences && user.preferences.language === 'en' ? 'selected' : '' %>>English</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">العملة</label>
+                            <select name="currency" class="form-control">
+                                <option value="SAR" <%= user.preferences && user.preferences.currency === 'SAR' ? 'selected' : '' %>>ريال سعودي (ر.س)</option>
+                                <option value="USD" <%= user.preferences && user.preferences.currency === 'USD' ? 'selected' : '' %>>دولار ($)</option>
+                                <option value="AED" <%= user.preferences && user.preferences.currency === 'AED' ? 'selected' : '' %>>درهم إماراتي</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                        <i class="fas fa-save"></i> حفظ التفضيلات
+                    </button>
+                </form>
+            </div>
+            
+            <%# ============================================= %>
+            <%# إعدادات الإشعارات                                %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-bell" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    <%= currentLanguage === 'en' ? 'Notifications' : 'الإشعارات' %>
+                </h3>
+                
+                <form action="/account/preferences" method="POST">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--bg-color); border-radius: 10px; cursor: pointer;">
+                            <div>
+                                <strong>إشعارات البريد الإلكتروني</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 3px 0 0 0;">استقبل تحديثات الطلبات والعروض عبر البريد</p>
+                            </div>
+                            <div style="position: relative; width: 50px; height: 28px;">
+                                <input type="checkbox" name="emailNotifications" style="display: none;" 
+                                       <%= user.preferences && user.preferences.emailNotifications !== false ? 'checked' : '' %>>
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--bg-color); border-radius: 10px; cursor: pointer;">
+                            <div>
+                                <strong>إشعارات SMS</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 3px 0 0 0;">استقبل تنبيهات مهمة عبر رسائل الجوال</p>
+                            </div>
+                            <div style="position: relative; width: 50px; height: 28px;">
+                                <input type="checkbox" name="smsNotifications" style="display: none;" 
+                                       <%= user.preferences && user.preferences.smsNotifications === true ? 'checked' : '' %>>
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--bg-color); border-radius: 10px; cursor: pointer;">
+                            <div>
+                                <strong>الوضع الليلي</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin: 3px 0 0 0;">تفعيل المظهر الداكن للمتجر</p>
+                            </div>
+                            <div style="position: relative; width: 50px; height: 28px;">
+                                <input type="checkbox" name="darkMode" style="display: none;" 
+                                       <%= user.preferences && user.preferences.darkMode === true ? 'checked' : '' %>>
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                        <i class="fas fa-save"></i> حفظ الإعدادات
+                    </button>
+                </form>
+            </div>
+            
+            <%# ============================================= %>
+            <%# قسم الخطر: حذف الحساب                             %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 2px solid var(--danger-color);">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: var(--danger-color);">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <%= currentLanguage === 'en' ? 'Danger Zone' : 'منطقة الخطر' %>
+                </h3>
+                <p style="color: var(--text-light); margin-bottom: 20px; font-size: 14px;">
+                    <%= currentLanguage === 'en' ? 'Once you delete your account, there is no going back. Please be certain.' : 'بمجرد حذف حسابك، لا يمكن التراجع عن هذا الإجراء. يرجى التأكد من قرارك.' %>
+                </p>
+                <ul style="color: var(--danger-color); font-size: 13px; margin-bottom: 20px; padding-right: 18px;">
+                    <li>سيتم حذف جميع بياناتك الشخصية</li>
+                    <li>ستفقد جميع نقاط الولاء المتراكمة</li>
+                    <li>لن تتمكن من استعادة سجل الطلبات</li>
+                    <li>سيتم إلغاء أي طلبات معلقة</li>
+                </ul>
+                <a href="/account/delete-account" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> 
+                    <%= currentLanguage === 'en' ? 'Delete My Account' : 'حذف حسابي' %>
+                </a>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+.account-nav-link:hover {
+    background: rgba(233, 69, 96, 0.05);
+    color: var(--secondary-color);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--border-color);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.toggle-switch:before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+input:checked + .toggle-switch {
+    background: var(--success-color);
+}
+input:checked + .toggle-switch:before {
+    left: 25px;
+}
+</style>
+
+<script>
+// تفعيل Toggle Switch
+document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    // تحديث الحالة عند النقر على الـ label
+    checkbox.parentElement.addEventListener('click', function(e) {
+        checkbox.checked = !checkbox.checked;
+    });
+});
+</script>
+
+<%- include('../partials/footer') %>
