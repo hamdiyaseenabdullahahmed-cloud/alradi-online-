@@ -1,0 +1,199 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة المفضلة                                   %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# عنوان الصفحة %>
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-heart" style="color: var(--danger-color); margin-left: 10px;"></i>
+            <%= currentLanguage === 'en' ? 'My Wishlist' : 'المفضلة' %>
+        </h1>
+        <p style="color: var(--text-muted);">
+            <%= currentLanguage === 'en' ? 'Products you have saved for later' : 'المنتجات التي قمت بحفظها للمتابعة لاحقاً' %>
+            <% if (products && products.length > 0) { %>
+                (<%= products.length %> <%= currentLanguage === 'en' ? 'products' : 'منتجات' %>)
+            <% } %>
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 30px;">
+        
+        <%# القائمة الجانبية %>
+        <aside>
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+                    <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                         alt="<%= user.name %>"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-color); margin-bottom: 10px;"
+                         onerror="this.src='/images/default-avatar.png'">
+                    <h4 style="font-weight: 700; margin-bottom: 3px;"><%= user.name %></h4>
+                </div>
+                <nav>
+                    <a href="/account" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-th-large"></i> لوحة التحكم
+                    </a>
+                    <a href="/account/profile" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-user"></i> الملف الشخصي
+                    </a>
+                    <a href="/account/orders" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-shopping-bag"></i> طلباتي
+                    </a>
+                    <a href="/account/wishlist" class="account-nav-link active" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: white; background: var(--secondary-color); font-weight: bold; font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-heart"></i> المفضلة
+                    </a>
+                    <a href="/auth/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--danger-color); font-size: 14px; text-decoration: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <%# المحتوى الرئيسي %>
+        <main>
+            <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                
+                <% if (products && products.length > 0) { %>
+                    
+                    <%# شبكة المنتجات %>
+                    <div class="products-grid cols-3">
+                        <% products.forEach(function(product) { %>
+                            <div class="product-card" style="position: relative;">
+                                
+                                <%# زر الإزالة %>
+                                <button onclick="toggleWishlist('<%= product._id %>'); setTimeout(() => location.reload(), 500);" 
+                                        style="position: absolute; top: 10px; right: 10px; z-index: 10; width: 32px; height: 32px; border-radius: 50%; background: var(--danger-color); color: white; border: none; cursor: pointer; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                
+                                <%# صورة المنتج %>
+                                <div class="product-image-container">
+                                    <a href="/products/<%= product.slug || product._id %>">
+                                        <img src="<%= product.images && product.images.length > 0 ? product.images[0].url : '/images/default-product.png' %>" 
+                                             alt="<%= product.name %>"
+                                             loading="lazy"
+                                             onerror="this.src='/images/default-product.png'">
+                                    </a>
+                                    
+                                    <% if (product.isOnSale) { %>
+                                        <div class="product-badges">
+                                            <span class="badge badge-sale">تخفيض</span>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                
+                                <%# معلومات المنتج %>
+                                <div class="product-info">
+                                    <h3 class="product-name">
+                                        <a href="/products/<%= product.slug || product._id %>"><%= product.name %></a>
+                                    </h3>
+                                    
+                                    <%# التقييم %>
+                                    <% if (product.rating && product.rating.average > 0) { %>
+                                        <div class="product-rating">
+                                            <div class="stars" style="font-size: 12px;">
+                                                <% for (var i = 1; i <= 5; i++) { %>
+                                                    <i class="fas fa-star<%= i <= Math.floor(product.rating.average) ? '' : '-half-alt' %>" 
+                                                       style="color: <%= i <= product.rating.average ? 'var(--gold-color)' : '#ddd' %>;"></i>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <%# السعر %>
+                                    <div class="product-price-container">
+                                        <span class="current-price"><%= product.price %> <%= currencySymbol %></span>
+                                        <% if (product.comparePrice) { %>
+                                            <span class="old-price"><%= product.comparePrice %> <%= currencySymbol %></span>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <%# حالة المخزون %>
+                                    <div class="stock-status <%= product.stockStatus === 'in_stock' ? 'in-stock' : 'out-of-stock' %>">
+                                        <% if (product.stockStatus === 'in_stock') { %>
+                                            <i class="fas fa-check-circle"></i> متوفر
+                                        <% } else if (product.stockStatus === 'low_stock') { %>
+                                            <i class="fas fa-exclamation-circle"></i> كمية محدودة
+                                        <% } else { %>
+                                            <i class="fas fa-times-circle"></i> نفد من المخزون
+                                        <% } %>
+                                    </div>
+                                    
+                                    <%# زر الإضافة للسلة %>
+                                    <% if (product.stockStatus !== 'out_of_stock') { %>
+                                        <button class="add-to-cart-btn" onclick="addToCart('<%= product._id %>', 1, {})">
+                                            <i class="fas fa-shopping-cart"></i> أضف إلى السلة
+                                        </button>
+                                    <% } else { %>
+                                        <button class="add-to-cart-btn" disabled style="background: #999; cursor: not-allowed;">
+                                            <i class="fas fa-times-circle"></i> نفد من المخزون
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                    
+                    <%# أزرار أسفل الصفحة %>
+                    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <a href="/products" class="btn btn-outline btn-lg" style="margin-left: 10px;">
+                            <i class="fas fa-shopping-bag"></i> تصفح المنتجات
+                        </a>
+                        <button onclick="addAllToCart()" class="btn btn-primary btn-lg">
+                            <i class="fas fa-cart-plus"></i> أضف الكل للسلة
+                        </button>
+                    </div>
+                    
+                <% } else { %>
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 80px; color: var(--text-muted); margin-bottom: 15px;">
+                            <i class="far fa-heart"></i>
+                        </div>
+                        <h3 style="font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">
+                            <%= currentLanguage === 'en' ? 'Your wishlist is empty' : 'المفضلة فارغة' %>
+                        </h3>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">
+                            <%= currentLanguage === 'en' ? 'Save your favorite products by clicking the heart icon' : 'احفظ منتجاتك المفضلة بالضغط على أيقونة القلب ♡' %>
+                        </p>
+                        <a href="/products" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-bag"></i> تصفح المنتجات
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+function addAllToCart() {
+    <% if (products && products.length > 0) { %>
+        const products = <%- JSON.stringify(products.map(p => p._id)) %>;
+        let added = 0;
+        
+        products.forEach((productId, index) => {
+            setTimeout(() => {
+                addToCart(productId, 1, {}).then(result => {
+                    if (result && result.success) added++;
+                    if (index === products.length - 1) {
+                        showToast(`تمت إضافة ${added} منتج إلى السلة`, 'success');
+                    }
+                });
+            }, index * 200);
+        });
+    <% } %>
+}
+</script>
+
+<style>
+.account-nav-link:hover {
+    background: rgba(233, 69, 96, 0.05);
+    color: var(--secondary-color);
+}
+</style>
+
+<%- include('../partials/footer') %>
