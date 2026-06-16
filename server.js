@@ -21,13 +21,15 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
-// ربط قاعدة البيانات
+// ربط قاعدة البيانات السحابية (MongoDB Atlas)
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/alradiStore');
-        console.log('✅ تم الاتصال بقاعدة البيانات');
+        // نعتمد على الرابط الموجود في متغيرات البيئة (Environment Variables) في Render
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log('✅ تم الاتصال بقاعدة البيانات السحابية بنجاح');
     } catch (err) {
-        console.error('❌ فشل الاتصال:', err.message);
+        console.error('❌ فشل الاتصال بقاعدة البيانات، تأكد من الرابط في إعدادات Render:', err.message);
+        process.exit(1);
     }
 };
 
@@ -59,6 +61,10 @@ app.get('*', (req, res) => {
 // بدء التشغيل
 const PORT = process.env.PORT || 3000;
 (async () => {
+    // التأكد من وجود المجلدات قبل التشغيل
+    const dirs = ['public', 'uploads', 'public/invoices'];
+    dirs.forEach(d => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
     await connectDB();
     server.listen(PORT, () => {
         console.log('╔══════════════════════════════════════════╗');
