@@ -1,0 +1,146 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة تسجيل الدخول - البوابة الموحدة             %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div style="max-width: 480px; margin: 40px auto;">
+        
+        <%# ============================================= %>
+        <%# شعار المتجر في الأعلى                            %>
+        <%# ============================================= %>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="<%= store.storeLogo || '/images/default-logo.png' %>" 
+                 alt="شعار المتجر" 
+                 style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold-color); margin-bottom: 15px; box-shadow: 0 0 25px rgba(255,215,0,0.5); object-fit: cover;">
+            <h2 style="font-size: 28px; font-weight: 900; color: var(--primary-color); margin-bottom: 5px;">
+                <%= currentLanguage === 'en' ? 'Welcome Back' : 'أهلاً بعودتك' %>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 15px;">
+                <%= currentLanguage === 'en' ? 'Login to your account at Al-Radi Online Store' : 'سجل دخولك إلى متجر الرعدي أون لاين' %>
+            </p>
+        </div>
+        
+        <%# ============================================= %>
+        <%# نموذج تسجيل الدخول                               %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 25px rgba(0,0,0,0.1);">
+            <form action="/auth/login" method="POST">
+                
+                <%# حقل البريد الإلكتروني أو اسم المستخدم %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user-circle" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Email or Username' : 'البريد الإلكتروني أو اسم المستخدم' %>
+                    </label>
+                    <input type="text" 
+                           name="login" 
+                           class="form-control" 
+                           placeholder="<%= currentLanguage === 'en' ? 'Enter your email or username' : 'أدخل بريدك الإلكتروني أو اسم المستخدم' %>" 
+                           value="<%= typeof oldLogin !== 'undefined' ? oldLogin : '' %>"
+                           required 
+                           autofocus
+                           autocomplete="username">
+                </div>
+                
+                <%# حقل كلمة المرور %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Password' : 'كلمة المرور' %>
+                    </label>
+                    <div style="position: relative;">
+                        <input type="password" 
+                               name="password" 
+                               class="form-control" 
+                               id="loginPassword"
+                               placeholder="<%= currentLanguage === 'en' ? 'Enter your password' : 'أدخل كلمة المرور' %>" 
+                               required
+                               autocomplete="current-password">
+                        <button type="button" 
+                                onclick="togglePasswordVisibility('loginPassword', this)" 
+                                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px;"
+                                aria-label="إظهار كلمة المرور">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <%# تذكرني + نسيت كلمة المرور %>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <label style="font-size: 13px; cursor: pointer; color: var(--text-light); display: flex; align-items: center;">
+                        <input type="checkbox" name="remember" style="margin-left: 5px; accent-color: var(--secondary-color);"> 
+                        <%= currentLanguage === 'en' ? 'Remember me' : 'تذكرني' %>
+                    </label>
+                    <a href="/auth/forgot-password" style="font-size: 13px; color: var(--secondary-color); font-weight: bold; text-decoration: none;">
+                        <i class="fas fa-question-circle"></i> 
+                        <%= currentLanguage === 'en' ? 'Forgot Password?' : 'نسيت كلمة المرور؟' %>
+                    </a>
+                </div>
+                
+                <%# زر تسجيل الدخول %>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> 
+                    <%= currentLanguage === 'en' ? 'Login' : 'تسجيل الدخول' %>
+                </button>
+                
+                <%# رابط إنشاء حساب %>
+                <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 0;">
+                        <%= currentLanguage === 'en' ? 'Don\'t have an account?' : 'ليس لديك حساب؟' %>
+                        <a href="/auth/register" style="color: var(--secondary-color); font-weight: bold; text-decoration: none;">
+                            <i class="fas fa-user-plus"></i> 
+                            <%= currentLanguage === 'en' ? 'Create New Account' : 'إنشاء حساب جديد' %>
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+        
+        <%# ============================================= %>
+        <%# معلومات المدير الافتراضية (للتطوير)               %>
+        <%# ============================================= %>
+        <div style="margin-top: 25px; padding: 15px; background: var(--info-bg); border-radius: 12px; font-size: 13px; color: var(--info-color); text-align: center; border-right: 4px solid var(--info-color);">
+            <p style="margin: 0; font-weight: bold;">
+                <i class="fas fa-shield-alt"></i> 
+                <%= currentLanguage === 'en' ? 'Admin Default Credentials' : 'بيانات المدير الافتراضية' %>
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">
+                📧 <%= currentLanguage === 'en' ? 'Email' : 'البريد' %>: <strong>alradi@gmil.com</strong>
+                &nbsp;|&nbsp;
+                🔑 <%= currentLanguage === 'en' ? 'Password' : 'كلمة المرور' %>: <strong>admin123</strong>
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 11px; opacity: 0.8;">
+                ⚠️ <%= currentLanguage === 'en' ? 'Please change these credentials after first login from the admin panel security settings' : 'يرجى تغيير هذه البيانات بعد الدخول الأول من إعدادات الأمان في لوحة التحكم' %>
+            </p>
+        </div>
+        
+        <%# ============================================= %>
+        <%# روابط سريعة                                    %>
+        <%# ============================================= %>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/" style="font-size: 14px; color: var(--text-muted); text-decoration: none;">
+                <i class="fas fa-arrow-right"></i> 
+                <%= currentLanguage === 'en' ? 'Back to Home' : 'العودة للرئيسية' %>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+</script>
+
+<%- include('../partials/footer') %>
