@@ -1,0 +1,140 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة التحقق من رمز OTP                          %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div style="max-width: 450px; margin: 40px auto;">
+        
+        <%# ============================================= %>
+        <%# أيقونة الأمان                                   %>
+        <%# ============================================= %>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="display: inline-block; width: 90px; height: 90px; background: linear-gradient(135deg, var(--info-color), #138496); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 5px 20px rgba(23,162,184,0.3);">
+                <i class="fas fa-shield-alt" style="font-size: 40px; color: white;"></i>
+            </div>
+            <h2 style="font-size: 26px; font-weight: 900; color: var(--primary-color); margin-bottom: 5px;">
+                <%= currentLanguage === 'en' ? 'Verification Code' : 'رمز التحقق' %>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 14px; padding: 0 20px;">
+                <%= currentLanguage === 'en' ? 'Enter the 6-digit code sent to your email' : 'أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني' %>
+            </p>
+            <% if (typeof email !== 'undefined' && email) { %>
+                <p style="margin-top: 8px;">
+                    <span style="background: var(--info-bg); color: var(--info-color); padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+                        <i class="fas fa-envelope"></i> <%= email %>
+                    </span>
+                </p>
+            <% } %>
+        </div>
+        
+        <%# ============================================= %>
+        <%# نموذج إدخال رمز التحقق                          %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 25px rgba(0,0,0,0.1);">
+            <form action="/auth/verify-otp" method="POST">
+                
+                <%# حقل رمز التحقق %>
+                <div class="form-group" style="text-align: center;">
+                    <label class="form-label" style="text-align: center; display: block;">
+                        <i class="fas fa-key" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Enter Code' : 'أدخل الرمز' %>
+                    </label>
+                    <input type="text" 
+                           name="otp" 
+                           class="form-control" 
+                           placeholder="000000" 
+                           maxlength="6" 
+                           minlength="6" 
+                           pattern="[0-9]{6}" 
+                           style="text-align: center; font-size: 28px; letter-spacing: 12px; font-weight: 900; font-family: 'Courier New', monospace; direction: ltr;"
+                           required 
+                           autofocus
+                           autocomplete="one-time-code"
+                           inputmode="numeric">
+                    <small style="color: var(--text-muted); display: block; margin-top: 8px;">
+                        <i class="fas fa-clock"></i> 
+                        <%= currentLanguage === 'en' ? 'Code expires in 10 minutes' : 'الرمز صالح لمدة 10 دقائق' %>
+                    </small>
+                </div>
+                
+                <%# زر التحقق %>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-check-circle"></i> 
+                    <%= currentLanguage === 'en' ? 'Verify Code' : 'تحقق من الرمز' %>
+                </button>
+                
+                <%# لم يصلك الرمز؟ %>
+                <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">
+                        <i class="fas fa-question-circle"></i> 
+                        <%= currentLanguage === 'en' ? 'Didn\'t receive the code?' : 'لم يصلك الرمز؟' %>
+                    </p>
+                    <a href="/auth/forgot-password" style="color: var(--secondary-color); font-weight: bold; text-decoration: none; font-size: 14px;">
+                        <i class="fas fa-redo"></i> 
+                        <%= currentLanguage === 'en' ? 'Resend Code' : 'إعادة إرسال الرمز' %>
+                    </a>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> 
+                        <%= currentLanguage === 'en' ? 'Also check your spam/junk folder' : 'تأكد أيضاً من صندوق البريد المزعج (Spam)' %>
+                    </p>
+                </div>
+            </form>
+        </div>
+        
+        <%# ============================================= %>
+        <%# إرشادات إضافية                                  %>
+        <%# ============================================= %>
+        <div style="margin-top: 20px; padding: 15px; background: var(--warning-bg); border-radius: 12px; font-size: 13px; color: #856404; border-right: 4px solid var(--warning-color);">
+            <p style="margin: 0; font-weight: bold;">
+                <i class="fas fa-lightbulb"></i> 
+                <%= currentLanguage === 'en' ? 'Tips' : 'إرشادات' %>
+            </p>
+            <ul style="margin: 8px 0 0 0; padding-right: 20px; font-size: 12px; line-height: 1.8;">
+                <li><%= currentLanguage === 'en' ? 'The code is 6 digits only' : 'الرمز مكون من 6 أرقام فقط' %></li>
+                <li><%= currentLanguage === 'en' ? 'The code expires after 10 minutes for security' : 'ينتهي الرمز بعد 10 دقائق لأسباب أمنية' %></li>
+                <li><%= currentLanguage === 'en' ? 'If you requested multiple codes, use the latest one' : 'إذا طلبت عدة رموز، استخدم آخر رمز تم إرساله' %></li>
+                <li><%= currentLanguage === 'en' ? 'Make sure you entered the correct email address' : 'تأكد من إدخال البريد الإلكتروني الصحيح' %></li>
+            </ul>
+        </div>
+        
+        <%# روابط سفلية %>
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="/auth/login" style="font-size: 14px; color: var(--text-muted); text-decoration: none;">
+                <i class="fas fa-arrow-right"></i> 
+                <%= currentLanguage === 'en' ? 'Back to Login' : 'العودة لتسجيل الدخول' %>
+            </a>
+            &nbsp;|&nbsp;
+            <a href="/" style="font-size: 14px; color: var(--text-muted); text-decoration: none;">
+                <%= currentLanguage === 'en' ? 'Home' : 'الرئيسية' %>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// تركيز تلقائي على حقل الرمز وتقييد الإدخال بالأرقام فقط
+document.addEventListener('DOMContentLoaded', function() {
+    const otpInput = document.querySelector('input[name="otp"]');
+    if (otpInput) {
+        otpInput.focus();
+        
+        // منع إدخال غير الأرقام
+        otpInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+        });
+        
+        // لصق الرمز
+        otpInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const numbers = pastedText.replace(/[^0-9]/g, '').slice(0, 6);
+            this.value = numbers;
+        });
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>
