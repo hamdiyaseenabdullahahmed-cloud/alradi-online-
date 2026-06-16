@@ -1,0 +1,238 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة الملف الشخصي                              %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# عنوان الصفحة %>
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-user-edit" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            <%= currentLanguage === 'en' ? 'My Profile' : 'الملف الشخصي' %>
+        </h1>
+        <p style="color: var(--text-muted);">
+            <%= currentLanguage === 'en' ? 'Manage your personal information' : 'إدارة معلوماتك الشخصية' %>
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 30px;">
+        
+        <%# القائمة الجانبية %>
+        <aside>
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+                    <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                         alt="<%= user.name %>"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-color); margin-bottom: 10px;"
+                         onerror="this.src='/images/default-avatar.png'">
+                    <h4 style="font-weight: 700; margin-bottom: 3px;"><%= user.name %></h4>
+                    <span style="font-size: 12px; color: var(--text-muted);">@<%= user.username %></span>
+                </div>
+                <nav>
+                    <a href="/account" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-th-large"></i> لوحة التحكم
+                    </a>
+                    <a href="/account/profile" class="account-nav-link active" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: white; background: var(--secondary-color); font-weight: bold; font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-user"></i> الملف الشخصي
+                    </a>
+                    <a href="/account/orders" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-shopping-bag"></i> طلباتي
+                    </a>
+                    <a href="/account/wishlist" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-heart"></i> المفضلة
+                    </a>
+                    <a href="/auth/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--danger-color); font-size: 14px; text-decoration: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <%# المحتوى الرئيسي %>
+        <main>
+            
+            <%# ============================================= %>
+            <%# نموذج تعديل الملف الشخصي                        %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-user-circle" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    <%= currentLanguage === 'en' ? 'Personal Information' : 'المعلومات الشخصية' %>
+                </h3>
+                
+                <form action="/account/profile" method="POST" enctype="multipart/form-data">
+                    
+                    <%# الصورة الشخصية %>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                             alt="الصورة الشخصية" 
+                             id="profilePreview"
+                             style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-color); margin-bottom: 10px;"
+                             onerror="this.src='/images/default-avatar.png'">
+                        <br>
+                        <label style="cursor: pointer; color: var(--secondary-color); font-weight: bold; font-size: 13px;">
+                            <i class="fas fa-camera"></i> تغيير الصورة
+                            <input type="file" name="profileImage" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                        </label>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">الاسم الكامل *</label>
+                            <input type="text" name="name" class="form-control" value="<%= user.name %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">اسم المستخدم</label>
+                            <input type="text" class="form-control" value="<%= user.username %>" disabled style="background: var(--bg-color);">
+                            <small style="color: var(--text-muted);">لا يمكن تغيير اسم المستخدم مباشرة. يتطلب تحقق OTP.</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="text" class="form-control" value="<%= user.email %>" disabled style="background: var(--bg-color);">
+                            <small style="color: var(--text-muted);">لتغيير البريد، استخدم زر التعديل أدناه.</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="tel" name="phone" class="form-control" value="<%= user.phone || '' %>" placeholder="05xxxxxxxx">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">هاتف بديل</label>
+                            <input type="tel" name="alternativePhone" class="form-control" value="<%= user.alternativePhone || '' %>" placeholder="اختياري">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                        <i class="fas fa-save"></i> حفظ التغييرات
+                    </button>
+                </form>
+            </div>
+            
+            <%# ============================================= %>
+            <%# نموذج تعديل العنوان                              %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-map-marker-alt" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    <%= currentLanguage === 'en' ? 'Address' : 'العنوان' %>
+                </h3>
+                
+                <form action="/account/profile" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label class="form-label">الشارع</label>
+                            <input type="text" name="street" class="form-control" value="<%= user.address ? user.address.street : '' %>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">المدينة</label>
+                            <input type="text" name="city" class="form-control" value="<%= user.address ? user.address.city : '' %>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">المنطقة</label>
+                            <input type="text" name="state" class="form-control" value="<%= user.address ? user.address.state : '' %>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الرمز البريدي</label>
+                            <input type="text" name="zipCode" class="form-control" value="<%= user.address ? user.address.zipCode : '' %>">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label">الدولة</label>
+                            <input type="text" name="country" class="form-control" value="<%= user.address ? user.address.country : 'المملكة العربية السعودية' %>">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                        <i class="fas fa-save"></i> حفظ العنوان
+                    </button>
+                </form>
+            </div>
+            
+            <%# ============================================= %>
+            <%# تعديل البيانات الحساسة (تتطلب OTP)               %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-shield-alt" style="color: var(--warning-color); margin-left: 8px;"></i>
+                    <%= currentLanguage === 'en' ? 'Sensitive Data (Requires OTP)' : 'تعديل البيانات الحساسة (يتطلب تحقق)' %>
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <a href="/account/change-password" class="btn btn-outline" style="justify-content: center;">
+                        <i class="fas fa-lock"></i> تغيير كلمة المرور
+                    </a>
+                    <button class="btn btn-outline" onclick="sendOTP()" style="justify-content: center;">
+                        <i class="fas fa-envelope"></i> تغيير البريد الإلكتروني
+                    </button>
+                    <button class="btn btn-outline" onclick="sendOTP()" style="justify-content: center;">
+                        <i class="fas fa-user-tag"></i> تغيير اسم المستخدم
+                    </button>
+                    <a href="/account/delete-account" class="btn btn-outline" style="justify-content: center; color: var(--danger-color); border-color: var(--danger-color);">
+                        <i class="fas fa-trash-alt"></i> حذف الحساب
+                    </a>
+                </div>
+                
+                <div id="otpSection" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <p style="font-weight: bold; margin-bottom: 15px;">أدخل رمز التحقق المرسل إلى بريدك أو هاتفك:</p>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="otpInput" class="form-control" placeholder="000000" maxlength="6" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
+                        <button class="btn btn-primary" onclick="verifyOTP()">تحقق</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function sendOTP() {
+    fetch('/auth/send-otp', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('تم إرسال رمز التحقق', 'success');
+                document.getElementById('otpSection').style.display = 'block';
+            } else {
+                showToast(data.message || 'حدث خطأ', 'error');
+            }
+        });
+}
+
+function verifyOTP() {
+    const otp = document.getElementById('otpInput').value;
+    fetch('/auth/verify-otp-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otp })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('تم التحقق بنجاح', 'success');
+            document.getElementById('otpSection').style.display = 'none';
+        } else {
+            showToast(data.message || 'رمز غير صحيح', 'error');
+        }
+    });
+}
+</script>
+
+<style>
+.account-nav-link:hover {
+    background: rgba(233, 69, 96, 0.05);
+    color: var(--secondary-color);
+}
+</style>
+
+<%- include('../partials/footer') %>
