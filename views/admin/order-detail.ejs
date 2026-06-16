@@ -1,0 +1,136 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - تفاصيل الطلب                 %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">
+        <a href="/admin/dashboard" style="color: var(--text-muted);">لوحة التحكم</a>
+        <span style="margin: 0 8px;">/</span>
+        <a href="/admin/orders" style="color: var(--text-muted);">الطلبات</a>
+        <span style="margin: 0 8px;">/</span>
+        <span style="color: var(--secondary-color); font-weight: bold;">#<%= order.orderNumber %></span>
+    </nav>
+    
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+        <div>
+            <h1 style="font-size: 26px; font-weight: 800; color: var(--primary-color);">الطلب #<%= order.orderNumber %></h1>
+            <p style="color: var(--text-muted);">
+                <i class="fas fa-calendar"></i> <%= new Date(order.createdAt).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                | فاتورة: <%= order.invoiceNumber %>
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="/cart/invoice/<%= order._id %>" class="btn btn-outline" target="_blank"><i class="fas fa-print"></i> طباعة</a>
+            <a href="/admin/orders" class="btn btn-outline"><i class="fas fa-arrow-right"></i> العودة</a>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+        
+        <%# معلومات الطلب %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color);">
+                <i class="fas fa-info-circle" style="color: var(--secondary-color); margin-left: 8px;"></i> معلومات الطلب
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                <div><strong>الرقم:</strong> <%= order.orderNumber %></div>
+                <div><strong>الفاتورة:</strong> <%= order.invoiceNumber %></div>
+                <div><strong>التاريخ:</strong> <%= new Date(order.createdAt).toLocaleDateString('ar-SA') %></div>
+                <div><strong>الشحن:</strong> <%= order.shippingMethod === 'international' ? 'دولي' : 'داخلي' %></div>
+                <div><strong>الدفع:</strong> <%= order.paymentMethod === 'cash_on_delivery' ? 'عند الاستلام' : order.paymentMethod %></div>
+                <div><strong>حالة الدفع:</strong> <%= order.paymentStatus === 'paid' ? '✅ مدفوع' : '⏳ معلق' %></div>
+            </div>
+        </div>
+        
+        <%# معلومات العميل %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color);">
+                <i class="fas fa-user" style="color: var(--secondary-color); margin-left: 8px;"></i> معلومات العميل
+            </h3>
+            <p><strong><%= order.customerName %></strong></p>
+            <p>📧 <%= order.customerEmail %></p>
+            <p>📱 <%= order.customerPhone %></p>
+            <p>📍 <%= order.shippingAddress.fullAddress %></p>
+            <div style="margin-top: 10px; display: flex; gap: 8px;">
+                <a href="mailto:<%= order.customerEmail %>" class="btn btn-sm btn-outline"><i class="fas fa-envelope"></i> بريد</a>
+                <a href="https://wa.me/<%= order.customerPhone %>" class="btn btn-sm btn-outline" target="_blank"><i class="fab fa-whatsapp"></i> واتساب</a>
+            </div>
+        </div>
+    </div>
+    
+    <%# تحديث حالة الطلب %>
+    <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color);">
+            <i class="fas fa-sync-alt" style="color: var(--secondary-color); margin-left: 8px;"></i> تحديث حالة الطلب
+        </h3>
+        <form id="updateStatusForm" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <select id="newStatus" class="form-control" style="width: 180px;">
+                <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>قيد المراجعة</option>
+                <option value="confirmed" <%= order.status === 'confirmed' ? 'selected' : '' %>>مؤكد</option>
+                <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>قيد التجهيز</option>
+                <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>تم الشحن</option>
+                <option value="in_transit" <%= order.status === 'in_transit' ? 'selected' : '' %>>في الطريق</option>
+                <option value="out_for_delivery" <%= order.status === 'out_for_delivery' ? 'selected' : '' %>>جاري التوصيل</option>
+                <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>تم التسليم</option>
+                <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>ملغي</option>
+            </select>
+            <input type="text" id="statusNote" class="form-control" placeholder="ملاحظة (اختياري)" style="flex: 1; min-width: 150px;">
+            <button type="button" class="btn btn-primary" onclick="updateStatus()"><i class="fas fa-check"></i> تحديث</button>
+        </form>
+        
+        <%# سجل التغييرات %>
+        <% if (order.statusHistory && order.statusHistory.length > 0) { %>
+            <div style="margin-top: 20px;">
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">سجل التغييرات:</h4>
+                <% order.statusHistory.slice().reverse().forEach(function(entry) { %>
+                    <div style="font-size: 12px; color: var(--text-muted); padding: 5px 0; border-bottom: 1px solid var(--border-light);">
+                        <strong><%= entry.status %></strong> - <%= entry.note %> - <%= new Date(entry.timestamp).toLocaleString('ar-SA') %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+    
+    <%# المنتجات %>
+    <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color);">
+            <i class="fas fa-box" style="color: var(--secondary-color); margin-left: 8px;"></i> المنتجات
+        </h3>
+        <% order.items.forEach(function(item) { %>
+            <div style="display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-light); align-items: center;">
+                <img src="<%= item.image || '/images/default-product.png' %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" onerror="this.src='/images/default-product.png'">
+                <div style="flex: 1;"><strong><%= item.name %></strong><br><small><%= item.quantity %> × <%= item.price %> ر.س</small></div>
+                <span style="font-weight: bold;"><%= item.total %> ر.س</span>
+            </div>
+        <% }); %>
+        <div style="text-align: left; margin-top: 15px; font-size: 20px; font-weight: 800; color: var(--secondary-color);">الإجمالي: <%= order.totalAmount %> ر.س</div>
+    </div>
+</div>
+
+<script>
+function updateStatus() {
+    const status = document.getElementById('newStatus').value;
+    const note = document.getElementById('statusNote').value || 'تم تغيير الحالة من لوحة التحكم';
+    
+    fetch('/admin/orders/update-status/<%= order._id %>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, note })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('تم تحديث حالة الطلب بنجاح', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'حدث خطأ', 'error');
+        }
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>
