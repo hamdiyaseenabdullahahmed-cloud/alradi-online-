@@ -1,0 +1,222 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# ترويسة الموقع                                  %>
+<%# ============================================= %>
+
+<!DOCTYPE html>
+<html dir="<%= currentLanguage === 'en' ? 'ltr' : 'rtl' %>" lang="<%= currentLanguage || 'ar' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="<%= store.storeDescription || 'متجر إلكتروني متكامل للتسوق العالمي' %>">
+    <meta name="keywords" content="متجر, الرعدي, تسوق, إلكتروني, أون لاين">
+    <meta name="author" content="متجر الرعدي أون لاين">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <%# أيقونة الموقع %>
+    <link rel="icon" type="image/png" href="<%= store.storeFavicon || '/images/favicon.png' %>">
+    <link rel="apple-touch-icon" href="<%= store.storeFavicon || '/images/favicon.png' %>">
+    
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : '' %><%= store.storeName || 'متجر الرعدي أون لاين' %></title>
+    
+    <%# الخطوط %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <%# الأيقونات %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <%# التصميم الرئيسي %>
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <%# وضع dark mode %>
+    <script>
+        if (document.cookie.includes('darkMode=true')) {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body class="<%= currentLanguage === 'en' ? 'en' : '' %> <%= req.cookies && req.cookies.darkMode === 'true' ? 'dark-mode' : '' %>">
+
+    <%# ============================================= %>
+    <%# شريط الإعلانات الترويجي العلوي                  %>
+    <%# ============================================= %>
+    <% if (store.showPromoBanner !== false) { %>
+    <div class="promo-banner" id="promoBanner">
+        <span>
+            <i class="fas fa-truck"></i>
+            <%= currentLanguage === 'en' ? (store.promoBannerTextEn || '🚀 Free shipping for orders over 300 SAR | 15% off first order') : (store.promoBannerText || '🚀 شحن مجاني للطلبات فوق 300 ريال | خصم 15% على أول طلب') %>
+        </span>
+        <button class="close-banner" onclick="document.getElementById('promoBanner').style.display='none'" aria-label="إغلاق">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <% } %>
+
+    <%# ============================================= %>
+    <%# الهيدر الرئيسي                                  %>
+    <%# ============================================= %>
+    <header class="main-header" id="mainHeader">
+        <div class="container">
+            <div class="header-content">
+                
+                <%# زر القائمة للموبايل %>
+                <button class="mobile-menu-toggle" aria-label="القائمة">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <%# الشعار %>
+                <div class="logo-container">
+                    <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
+                        <img src="<%= store.storeLogo || '/images/default-logo.png' %>" 
+                             alt="<%= store.storeName %>" 
+                             class="store-logo"
+                             width="55" height="55">
+                        <span class="store-name"><%= store.storeName || 'متجر الرعدي أون لاين' %></span>
+                    </a>
+                </div>
+                
+                <%# شريط البحث %>
+                <div class="search-container">
+                    <form class="search-bar" action="/search" method="GET">
+                        <input type="text" 
+                               name="q" 
+                               placeholder="<%= currentLanguage === 'en' ? 'Search for products...' : 'ابحث عن المنتجات...' %>"
+                               value="<%= typeof query !== 'undefined' ? query : '' %>"
+                               aria-label="البحث">
+                        <button type="submit" aria-label="بحث">
+                            <i class="fas fa-search"></i>
+                            <span class="search-text"><%= currentLanguage === 'en' ? 'Search' : 'بحث' %></span>
+                        </button>
+                    </form>
+                </div>
+                
+                <%# أيقونات الهيدر %>
+                <div class="header-actions">
+                    
+                    <%# تبديل اللغة %>
+                    <a href="/switch-language/<%= currentLanguage === 'ar' ? 'en' : 'ar' %>" 
+                       class="header-icon" 
+                       title="<%= currentLanguage === 'ar' ? 'English' : 'العربية' %>"
+                       id="language-switcher">
+                        <i class="fas fa-language"></i>
+                        <span style="font-size: 10px; font-weight: bold;">
+                            <%= currentLanguage === 'ar' ? 'EN' : 'عربي' %>
+                        </span>
+                    </a>
+                    
+                    <%# الوضع الليلي %>
+                    <button class="header-icon" id="dark-mode-toggle" title="الوضع الليلي">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <%# المفضلة %>
+                    <% if (user) { %>
+                    <a href="/account/wishlist" class="header-icon" title="المفضلة">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                    <% } %>
+                    
+                    <%# سلة التسوق %>
+                    <a href="/cart" class="header-icon cart-icon" title="سلة التسوق">
+                        <i class="fas fa-shopping-cart"></i>
+                        <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+                            <span class="badge-count cart-count-badge"><%= cartCount %></span>
+                        <% } %>
+                    </a>
+                    
+                    <%# حساب المستخدم %>
+                    <% if (user) { %>
+                        <div class="user-menu">
+                            <a href="/account" class="header-icon" title="حسابي">
+                                <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                                     alt="<%= user.name %>"
+                                     style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-color);">
+                            </a>
+                            <div class="user-dropdown" style="display: none;">
+                                <span class="user-name"><%= user.name %></span>
+                                <a href="/account">حسابي</a>
+                                <a href="/account/orders">طلباتي</a>
+                                <a href="/account/wishlist">المفضلة</a>
+                                <% if (user.role === 'admin' || user.role === 'superadmin') { %>
+                                    <a href="/admin/dashboard" style="color: var(--gold-color);">لوحة التحكم</a>
+                                <% } %>
+                                <a href="/auth/logout" style="color: var(--secondary-color);">تسجيل الخروج</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/auth/login" class="login-btn">
+                            <i class="fas fa-user"></i>
+                            <span><%= currentLanguage === 'en' ? 'Login' : 'تسجيل الدخول' %></span>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+            
+            <%# ============================================= %>
+            <%# القائمة الرئيسية                                  %>
+            <%# ============================================= %>
+            <nav class="main-nav" id="mainNav">
+                <ul>
+                    <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">
+                        <i class="fas fa-home"></i> <%= currentLanguage === 'en' ? 'Home' : 'الرئيسية' %>
+                    </a></li>
+                    <li><a href="/products" class="<%= currentPath.startsWith('/products') ? 'active' : '' %>">
+                        <i class="fas fa-th-large"></i> <%= currentLanguage === 'en' ? 'All Products' : 'كل المنتجات' %>
+                    </a></li>
+                    <li><a href="/products?category=electronics">
+                        <i class="fas fa-laptop"></i> <%= currentLanguage === 'en' ? 'Electronics' : 'إلكترونيات' %>
+                    </a></li>
+                    <li><a href="/products?category=clothing">
+                        <i class="fas fa-tshirt"></i> <%= currentLanguage === 'en' ? 'Clothing' : 'ملابس' %>
+                    </a></li>
+                    <li><a href="/products?category=home">
+                        <i class="fas fa-home"></i> <%= currentLanguage === 'en' ? 'Home' : 'منزل' %>
+                    </a></li>
+                    <li><a href="/offers" class="<%= currentPath === '/offers' ? 'active' : '' %>">
+                        <i class="fas fa-tags" style="color: var(--gold-color);"></i> <%= currentLanguage === 'en' ? 'Offers' : 'العروض' %>
+                    </a></li>
+                    <li><a href="/contact">
+                        <i class="fas fa-envelope"></i> <%= currentLanguage === 'en' ? 'Contact Us' : 'اتصل بنا' %>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <%# ============================================= %>
+    <%# المحتوى الرئيسي                                  %>
+    <%# ============================================= %>
+    <main class="main-content">
+        
+        <%# رسائل التنبيه %>
+        <% if (success_msg && success_msg.length > 0) { %>
+            <div class="container">
+                <div class="alert alert-success animate-fadeIn">
+                    <i class="fas fa-check-circle"></i>
+                    <span><%= Array.isArray(success_msg) ? success_msg.join(', ') : success_msg %></span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            </div>
+        <% } %>
+        
+        <% if (error_msg && error_msg.length > 0) { %>
+            <div class="container">
+                <div class="alert alert-danger animate-fadeIn">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span><%= Array.isArray(error_msg) ? error_msg.join(', ') : error_msg %></span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            </div>
+        <% } %>
+        
+        <% if (info_msg && info_msg.length > 0) { %>
+            <div class="container">
+                <div class="alert alert-info animate-fadeIn">
+                    <i class="fas fa-info-circle"></i>
+                    <span><%= Array.isArray(info_msg) ? info_msg.join(', ') : info_msg %></span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            </div>
+        <% } %>
