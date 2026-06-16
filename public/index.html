@@ -3,479 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="site-title-tag">الرعدي أونلاين | سوق الفخامة الدولي</title>
+    <title>سوق الرعدي أونلاين - بوابة الدخول الفخمة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0d0f12;
+            --card-dark: #14181f;
+            --gold-primary: #caa135;
+            --gold-hover: #b08a27;
+            --text-light: #ffffff;
+            --text-muted: #a0aec0;
+            --input-bg: #1c232e;
+            --border-color: #2d3748;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* حاوية الكرت الرئيسي */
+        .auth-container {
+            background-color: var(--card-dark);
+            border: 1px solid rgba(202, 161, 53, 0.2);
+            border-radius: 15px;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 430px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(202, 161, 53, 0.05);
+            text-align: center;
+            position: relative;
+        }
+
+        /* تصميم شعار الصقر الفخم */
+        .logo-area {
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            font-size: 50px;
+            color: var(--gold-primary);
+            filter: drop-shadow(0 0 8px rgba(202, 161, 53, 0.4));
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--gold-primary);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        /* مجموعات الإدخال والنموذج */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            padding-right: 5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-primary);
+            font-size: 16px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px rgba(202, 161, 53, 0.15);
+        }
+
+        /* زر الرؤية لكلمة المرور */
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .toggle-password:hover {
+            color: var(--gold-primary);
+        }
+
+        /* أزرار الفخامة */
+        .btn-gold {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--gold-primary);
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-gold:hover {
+            background-color: var(--gold-hover);
+            box-shadow: 0 5px 15px rgba(202, 161, 53, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* روابط التبديل السفلى */
+        .switch-form-text {
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .switch-link {
+            color: var(--gold-primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .switch-link:hover {
+            text-decoration: underline;
+            color: var(--gold-hover);
+        }
+
+        /* إخفاء الشاشات برمجياً بالتناوب */
+        .hidden-form {
+            display: none !important;
+        }
+
+        /* تنبيهات النظام */
+        .alert-box {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: right;
+        }
+    </style>
 </head>
-<body class="dark-mode" onload="initApp()">
+<body>
 
-    <div id="login-screen" class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <img id="login-logo" src="https://i.ibb.co/6NG0byK/falcon-head.png" alt="شعار الرعدي" class="falcon-logo-img">
-                <h1 id="login-store-name">الرعدي أونلاين</h1>
-                <p class="gold-subtitle">بوابتك لعالم التسوق الدولي الفاخر</p>
-            </div>
-            
-            <form id="authForm" onsubmit="handleAuth(event)">
-                <div class="input-group">
-                    <label><i class="fa-solid fa-envelope-open"></i> البريد الإلكتروني أو رقم الهاتف</label>
-                    <input type="text" id="auth-identity" required placeholder="example@gmail.com أو 9665xxxxxxxx">
-                </div>
-                
-                <div class="input-group">
-                    <label><i class="fa-solid fa-lock"></i> كلمة المرور</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="auth-password" required placeholder="••••••••">
-                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('auth-password')">
-                            <i class="fa-solid fa-eye" id="eye-icon"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-royal-gold">
-                    <span>دخول إلى عالم الفخامة</span> <i class="fa-solid fa-arrow-left-long"></i>
-                </button>
-            </form>
-            <div id="login-error-msg" class="error-shake-message" style="display: none;"></div>
-        </div>
-    </div>
-
-    <div id="main-store-app" style="display: none;">
+    <div class="auth-container">
         
-        <header class="royal-header">
-            <div class="header-right">
-                <button class="icon-btn-head" onclick="toggleClientProfileModal()" title="ملفي الشخصي">
-                    <i class="fa-solid fa-user-gear"></i>
-                </button>
-                <div class="currency-selector-box">
-                    <i class="fa-solid fa-globe"></i>
-                    <select id="global-currency" onchange="updateCurrencyAndPrices()">
-                        <option value="SAR">ر.س (ريال سعودي)</option>
-                        <option value="YER">ر.ي (ريال يمني)</option>
-                        <option value="USD">$ (دولار أمريكي)</option>
-                        <option value="AED">د.إ (درهم إماراتي)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="header-center" onclick="backToHome()">
-                <img id="store-logo-current" src="https://i.ibb.co/6NG0byK/falcon-head.png" alt="شعار المتجر" class="header-falcon-logo">
-                <span id="store-name-current" class="header-title">الرعدي أونلاين</span>
-            </div>
-
-            <div class="header-left">
-                <button class="icon-btn-head" onclick="toggleTheme()" title="تغيير النمط">
-                    <i class="fa-solid fa-moon" id="theme-icon"></i>
-                </button>
-                <button class="icon-btn-head cart-trigger" onclick="toggleCartModal()" title="سلة المشتريات">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span id="cart-badge-count" class="badge-danger">0</span>
-                </button>
-                <button id="admin-shortcut-btn" class="icon-btn-head admin-lock-btn" style="display: none;" onclick="openAdminDashboard()" title="لوحة التحكم">
-                    <i class="fa-solid fa-chart-line"></i>
-                </button>
-            </div>
-        </header>
-
-        <div class="crescent-navigation-container">
-            <div class="crescent-menu-scroller" id="dynamic-categories-list">
-                </div>
-            
-            <div class="view-grid-controller">
-                <span class="control-label">تنسيق العرض:</span>
-                <button class="grid-btn active" onclick="changeProductGrid(1)"><i class="fa-solid fa-list"></i></button>
-                <button class="grid-btn" onclick="changeProductGrid(2)">2</button>
-                <button class="grid-btn" onclick="changeProductGrid(3)">3</button>
-                <button class="grid-btn" onclick="changeProductGrid(4)">4</button>
-                <button class="grid-btn" onclick="changeProductGrid(5)">5</button>
-            </div>
+        <div class="logo-area">
+            <div class="logo-icon">
+                <i class="fa-solid fa-crow"></i> </div>
+            <h1>الرعدي أونلاين</h1>
+            <div class="subtitle" id="dynamic-subtitle">بوابتك لعالم التسوق الدولي الفاخر</div>
         </div>
 
-        <main class="store-main-viewport">
-            <div class="flash-sale-banner" id="flash-sale-zone">
-                <div class="flash-info">
-                    <span class="flash-badge">عرض دولي محدث</span>
-                    <h2 id="flash-product-title">آيفون 17 برو ماكس - النسخة الذهبية الملكية</h2>
-                    <p>احصل عليه الآن بخصم مباشر وحصري عبر بوابتنا السحابية</p>
-                </div>
-                <div class="flash-timer">
-                    <div class="time-block"><span id="timer-hours">02</span><label>ساعة</label></div>
-                    <div class="time-block"><span id="timer-minutes">45</span><label>دقيقة</label></div>
-                    <div class="time-block"><span id="timer-seconds">19</span><label>ثانية</label></div>
+        <div class="alert-box" id="alertLog"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>البريد الإلكتروني أو رقم الهاتف</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="text" id="loginUser" placeholder="9665xxxxxxxx أو example@gmail.com" required>
                 </div>
             </div>
 
-            <div id="products-catalog-grid" class="products-grid-layout grid-cols-3">
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="loginPass" placeholder="••••••••" required>
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassVisibility('loginPass', this)"></i>
                 </div>
-        </main>
+            </div>
+
+            <button type="submit" class="btn-gold">
+                <span>دخول إلى عالم الفخامة</span>
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+
+            <p class="switch-form-text">
+                ليس لديك حساب؟ 
+                <span class="switch-link" onclick="showRegisterForm()">أنشئ حساباً جديداً الآن</span>
+            </p>
+        </form>
+
+        <form id="registerForm" class="hidden-form">
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="regName" placeholder="اكتب اسمك الثلاثي" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>رقم الهاتف (مع رمز الدولة)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="regPhone" placeholder="9665xxxxxxxx" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>البريد الإلكتروني (اختياري)</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="regEmail" placeholder="example@gmail.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>كلمة المرور الجديدة</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="regPass" placeholder="اختر كلمة مرور قوية" required>
+                    <i class="fa-solid fa-eye toggle-password" onclick="togglePassVisibility('regPass', this)"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-gold">
+                <span>إنشاء الحساب والانطلاق</span>
+                <i class="fa-solid fa-user-plus"></i>
+            </button>
+
+            <p class="switch-form-text">
+                لديك حساب بالفعل؟ 
+                <span class="switch-link" onclick="showLoginForm()">تسجيل الدخول</span>
+            </p>
+        </form>
+
     </div>
 
-    <div id="client-profile-modal" class="modal-overlay" style="display: none;">
-        <div class="royal-modal-card">
-            <div class="modal-header">
-                <h2><i class="fa-solid fa-id-card-clip"></i> حساب العميل الدولي</h2>
-                <button class="close-modal-btn" onclick="toggleClientProfileModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="client-info-summary-box">
-                    <p><strong>اسم العميل:</strong> <span id="profile-client-name">جاري التحميل...</span></p>
-                    <p><strong>البريد الإلكتروني/الهاتف:</strong> <span id="profile-client-identity">...</span></p>
-                </div>
-                <hr class="gold-divider">
-                <h3>تغيير كلمة المرور الآمنة</h3>
-                <div class="form-row">
-                    <input type="password" id="client-old-pass" placeholder="كلمة المرور الحالية">
-                    <input type="password" id="client-new-pass" placeholder="كلمة المرور الجديدة">
-                    <button class="btn-action-gold" onclick="updateClientPassword()">حفظ التحديث</button>
-                </div>
-                <hr class="gold-divider">
-                <h3>أرشيف فواتير المشتريات الخاصة بك</h3>
-                <div class="table-responsive-wrapper">
-                    <table class="royal-data-table">
-                        <thead>
-                            <tr>
-                                <th>رقم الفاتورة</th>
-                                <th>التاريخ</th>
-                                <th>المبلغ الإجمالي</th>
-                                <th>الحالة</th>
-                                <th>إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="client-invoices-history-rows">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+        // إظهار وإخفاء كلمة المرور عند النقر على العين
+        function togglePassVisibility(id, icon) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
 
-    <div id="cart-modal-overlay" class="modal-overlay" style="display: none;" onclick="toggleCartModal()">
-        <div class="sliding-cart-panel" onclick="event.stopPropagation()">
-            <div class="cart-panel-header">
-                <h2><i class="fa-solid fa-basket-shopping"></i> حقيبة المشتريات الملكية</h2>
-                <button class="close-panel-btn" onclick="toggleCartModal()">&times;</button>
-            </div>
-            
-            <div class="cart-panel-body" id="cart-items-container">
-                </div>
+        // التبديل إلى شاشة إنشاء الحساب
+        function showRegisterForm() {
+            document.getElementById("loginForm").classList.add("hidden-form");
+            document.getElementById("registerForm").classList.remove("hidden-form");
+            document.getElementById("dynamic-subtitle").innerText = "انضم إلينا لتبدأ رحلة التسوق الفاخرة";
+            document.getElementById("alertLog").style.display = "none";
+        }
 
-            <div class="cart-panel-footer">
-                <div class="coupon-activation-zone">
-                    <input type="text" id="coupon-input-code" placeholder="أدخل كود الخصم الإضافي">
-                    <button onclick="applyExtraCouponCode()">تطبيق</button>
-                </div>
-                <div class="cart-summary-line">
-                    <span>الإجمالي الفرعي:</span>
-                    <span id="cart-subtotal-price">0.00</span>
-                </div>
-                <div class="cart-summary-line discount-line">
-                    <span>الخصم الإضافي:</span>
-                    <span id="cart-discount-value">0.00</span>
-                </div>
-                <div class="cart-summary-line grand-total">
-                    <span>الإجمالي النهائي للطلب:</span>
-                    <span id="cart-grand-total-price" class="gold-total-text">0.00</span>
-                </div>
+        // التبديل إلى شاشة تسجيل الدخول
+        function showLoginForm() {
+            document.getElementById("registerForm").classList.add("hidden-form");
+            document.getElementById("loginForm").classList.remove("hidden-form");
+            document.getElementById("dynamic-subtitle").innerText = "بوابتك لعالم التسوق الدولي الفاخر";
+            document.getElementById("alertLog").style.display = "none";
+        }
 
-                <div class="checkout-shipping-form">
-                    <div class="mini-input">
-                        <input type="text" id="checkout-address" required placeholder="عنوان الشحن بالتفصيل (الدولة - المدينة - الشارع)">
-                    </div>
-                    <div class="mini-input">
-                        <select id="checkout-shipping-method">
-                            <option value="الرعدي إكسبرس الدولي">شحن جوي سريع (الرعدي إكسبرس الدولي)</option>
-                            <option value="الشحن البري القياسي">شحن بري مؤمن</option>
-                        </select>
-                    </div>
-                    <div class="mini-input">
-                        <select id="checkout-payment-method">
-                            <option value="تحويل عبر شركة الكريمي">تحويل مالي (الكريمي / النجم)</option>
-                            <option value="الدفع نقداً عند الاستلام">الدفع نقداً عند الاستلام الدولي (COD)</option>
-                            <option value="البطاقة الائتمانية / فيزا">بطاقة ائتمانية / Visa / MasterCard</option>
-                        </select>
-                    </div>
-                </div>
+        // معالجة الضغط على زر تسجيل الدخول
+        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const user = document.getElementById("loginUser").value;
+            const pass = document.getElementById("loginPass").value;
+            const alertBox = document.getElementById("alertLog");
 
-                <button class="btn-confirm-checkout-order" onclick="processFinalOrderCheckout()">
-                    <i class="fa-solid fa-signature"></i> إتمام الشراء وتوليد الفاتورة الملكية
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="invoice-modal-overlay" class="modal-overlay" style="display: none;">
-        <div class="royal-invoice-box" id="printable-invoice-area">
-            <div class="invoice-watermark">الرعدي أونلاين</div>
-            <div class="invoice-top-bar">
-                <div class="invoice-brand-meta">
-                    <img id="invoice-logo-img" src="https://i.ibb.co/6NG0byK/falcon-head.png" alt="لوغو المتجر" class="invoice-falcon-logo">
-                    <h2 id="invoice-store-title-text">الرعدي أونلاين</h2>
-                    <p>وثيقة مبيعات دولية معتمدة سحابياً</p>
-                </div>
-                <div class="invoice-main-title">
-                    <h1>فاتورة مبيعات</h1>
-                    <p>رقم العملية: <span id="inv-meta-id">#RAD-XXXX</span></p>
-                    <p>التاريخ: <span id="inv-meta-date">2026/06/15</span></p>
-                </div>
-            </div>
-
-            <hr class="gold-decorative-line">
-
-            <div class="invoice-billing-details">
-                <div class="bill-col">
-                    <h3>بيانات المشتري والعميل:</h3>
-                    <p><strong>الاسم الرباعي:</strong> <span id="inv-cust-name">...</span></p>
-                    <p><strong>رقم التواصل/البريد:</strong> <span id="inv-cust-phone">...</span></p>
-                    <p><strong>عنوان التسليم:</strong> <span id="inv-cust-address">...</span></p>
-                </div>
-                <div class="bill-col">
-                    <h3>تفاصيل اللوجستيات والدفع:</h3>
-                    <p><strong>طريقة الشحن المعتمدة:</strong> <span id="inv-logistics-type">...</span></p>
-                    <p><strong>وسيلة تسوية الحساب:</strong> <span id="inv-payment-type">...</span></p>
-                    <p><strong>العملة المعتمدة:</strong> <span id="inv-currency-type">...</span></p>
-                </div>
-            </div>
-
-            <table class="invoice-items-table">
-                <thead>
-                    <tr>
-                        <th>الرقم</th>
-                        <th>بيان المنتج (عربي / انجليزي)</th>
-                        <th>الكمية المطلوبة</th>
-                        <th>سعر الوحدة</th>
-                        <th>الإجمالي الإفرادي</th>
-                    </tr>
-                </thead>
-                <tbody id="invoice-table-rows-injector">
-                    </tbody>
-            </table>
-
-            <div class="invoice-total-summary-card">
-                <p>الإجمالي الصافي: <span id="inv-summary-subtotal">0.00</span></p>
-                <p>معدل الخصومات والتخفيضات: <span id="inv-summary-discount">0.00</span></p>
-                <h2 class="grand-invoice-total">المبلغ الإجمالي المستحق: <span id="inv-summary-grandtotal">0.00</span></h2>
-            </div>
-
-            <div class="invoice-policy-legal-box">
-                <h4 class="policy-title-alert"><i class="fa-solid fa-shield-halved"></i> سياسات وقوانين متجر الرعدي الدولي الشامل:</h4>
-                <div id="invoice-legal-text-content">
-                    يسمح للعميل الفاضل باستبدال أو استرجاع المنتجات والطلبيات خلال مدة أقصاها 14 يوماً من تاريخ الاستلام الفعلي، شريطة الحفاظ على المنتج في عبوته وحالته الأصلية الفاخرة دون استخدام أو فتح.
-                </div>
-            </div>
-
-            <div class="invoice-signature-footer">
-                <div class="qr-code-holder">
-                    <div class="mock-qr-border"><i class="fa-solid fa-qrcode"></i></div>
-                    <p class="qr-tip">امسح الكود لتتبع حالة الشحنة في أرشيف الرعدي السحابي</p>
-                </div>
-                <div class="signature-capture-zone">
-                    <p>توقيع وإقرار إلكتروني من المستلم:</p>
-                    <canvas id="invoice-signature-pad" width="220" height="70"></canvas>
-                    <button class="clear-sig-btn" onclick="clearSignatureCanvas()">إعادة التوقيع</button>
-                </div>
-            </div>
-
-            <div class="invoice-action-buttons-pane no-print">
-                <button class="btn-print-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الفاتورة الفورية (A4)</button>
-                <button class="btn-download-pdf-action" onclick="triggerInvoicePDFDownload()"><i class="fa-solid fa-file-pdf"></i> حفظ كملف PDF سحابي</button>
-                <button class="btn-close-invoice" onclick="closeInvoiceAndResetCart()"><i class="fa-solid fa-circle-check"></i> إنهاء وإغلاق السلة</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="admin-dashboard-panel" class="admin-dashboard-wrapper" style="display: none;">
-        <aside class="admin-sidebar">
-            <div class="admin-profile-head">
-                <img id="admin-current-avatar" src="https://i.ibb.co/6NG0byK/falcon-head.png" alt="المدير" class="admin-avatar">
-                <h3>غرفة قيادة الرعدي</h3>
-                <p id="admin-display-email">alradi@gmail.com</p>
-            </div>
-            <nav class="admin-nav-links">
-                <button class="nav-lnk active" onclick="switchAdminTab('analytics')"><i class="fa-solid fa-chart-pie"></i> الإحصائيات والأرباح</button>
-                <button class="nav-lnk" onclick="switchAdminTab('products-mgmt')"><i class="fa-solid fa-box-archive"></i> إدارة وإضافة المنتجات</button>
-                <button class="nav-lnk" onclick="switchAdminTab('customers-mgmt')"><i class="fa-solid fa-users-gear"></i> إدارة وبحث العملاء</button>
-                <button class="nav-lnk" onclick="switchAdminTab('settings-mgmt')"><i class="fa-solid fa-sliders"></i> إعدادات الهوية والقوانين</button>
-            </nav>
-            <button class="btn-logout-admin" onclick="logoutAdminSystem()"><i class="fa-solid fa-power-off"></i> خروج من لوحة الإدارة</button>
-        </aside>
-
-        <section class="admin-content-viewport">
-            <div id="admin-tab-analytics" class="admin-tab-pane">
-                <div class="tab-header-title">
-                    <h2><i class="fa-solid fa-chart-line"></i> لوحة التحليلات الحية والأرباح المجمعة</h2>
-                </div>
+            // محاكاة برمجية دفاعية ذكية للدخول المؤقت حتى تجهيز الـ Database بالكامل
+            if(user && pass) {
+                alertBox.style.backgroundColor = "rgba(40, 167, 69, 0.1)";
+                alertBox.style.borderColor = "#28a745";
+                alertBox.style.color = "#2ecc71";
+                alertBox.innerText = "⏳ جاري التحقق والدخول لعالم الفخامة...";
+                alertBox.style.display = "block";
                 
-                <div class="analytics-filter-bar">
-                    <label>فحص الأرباح حسب النطاق الزمني:</label>
-                    <input type="date" id="stats-start-date">
-                    <input type="date" id="stats-end-date">
-                    <button class="btn-filter-action" onclick="calculateRevenueByDateRange()">تحديث البيانات</button>
-                </div>
+                setTimeout(() => {
+                    // تحويل المستخدم لصفحة المتجر الرئيسية (يمكنك تبديلها لأي مسار لاحقاً)
+                    window.location.href = "/api/health"; 
+                }, 1500);
+            }
+        });
 
-                <div class="stats-counters-grid">
-                    <div class="counter-card-royal">
-                        <i class="fa-solid fa-money-bill-trend-up"></i>
-                        <div class="info">
-                            <h4 id="stat-daily-revenue">0.00 ر.س</h4>
-                            <p>الأرباح الإجمالية اليومية</p>
-                        </div>
-                    </div>
-                    <div class="counter-card-royal">
-                        <i class="fa-solid fa-users"></i>
-                        <div class="info">
-                            <h4 id="stat-total-customers">0</h4>
-                            <p>إجمالي عدد العملاء الدوليين</p>
-                        </div>
-                    </div>
-                    <div class="counter-card-royal">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <div class="info">
-                            <h4 id="stat-total-orders">0</h4>
-                            <p>عدد طلبيات الشراء المسجلة</p>
-                        </div>
-                    </div>
-                </div>
+        // معالجة الضغط على زر إنشاء حساب جديد
+        document.getElementById("registerForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const name = document.getElementById("regName").value;
+            const phone = document.getElementById("regPhone").value;
+            const alertBox = document.getElementById("alertLog");
 
-                <div class="top-selling-product-hero-card">
-                    <h3><i class="fa-solid fa-crown"></i> المنتج الأكثر مبيعاً حالياً في المتجر</h3>
-                    <div class="hero-product-meta" id="top-product-view-box">
-                        <p class="no-data-text">لا توجد بيانات مبيعات كافية لتحديد المنتج البطل حالياً</p>
-                    </div>
-                </div>
-            </div>
+            if(name && phone) {
+                alertBox.style.backgroundColor = "rgba(40, 167, 69, 0.1)";
+                alertBox.style.borderColor = "#28a745";
+                alertBox.style.color = "#2ecc71";
+                alertBox.innerText = `🟢 أهلاً بك يا ${name}، تم إنشاء حسابك بنجاح! جاري تحويلك...`;
+                alertBox.style.display = "block";
 
-            <div id="admin-tab-products-mgmt" class="admin-tab-pane" style="display: none;">
-                <div class="tab-header-title">
-                    <h2><i class="fa-solid fa-folder-plus"></i> إضافة وإدارة مخزون المنتجات الدولي</h2>
-                </div>
-
-                <form id="admin-product-form" class="royal-admin-form" onsubmit="handleProductSubmission(event)">
-                    <div class="form-grid-inputs">
-                        <div class="field-box">
-                            <label>اسم المنتج (باللغة العربية) *</label>
-                            <input type="text" id="prod-name-ar" required placeholder="مثال: ساعة الرعدي الملكية الفاخرة">
-                        </div>
-                        <div class="field-box">
-                            <label>اسم المنتج (باللغة الإنجليزية) - اختياري</label>
-                            <input type="text" id="prod-name-en" placeholder="Example: Alradi Royal Luxury Watch">
-                        </div>
-                        <div class="field-box">
-                            <label>اختيار القسم الرئيسي للمنتج *</label>
-                            <select id="prod-category-select" required>
-                                <option value="">-- اضغط لاختيار القسم المناسب --</option>
-                                <option value="إلكترونيات وهواتف">إلكترونيات وهواتف ذكية</option>
-                                <option value="عطور ملكية">عطور ملكية وشرقية</option>
-                                <option value="ساعات وأقلام فاخرة">ساعات وأقلام فاخرة</option>
-                                <option value="أزياء وملبوسات">أزياء وملبوسات دولية</option>
-                            </select>
-                        </div>
-                        <div class="field-box">
-                            <label>السعر الجديد الحالي *</label>
-                            <input type="number" id="prod-price-new" step="0.01" required placeholder="السعر المطروح للبيع" oninput="autoCalculateDiscountPercentage()">
-                        </div>
-                        <div class="field-box">
-                            <label>السعر القديم قبل الخصم - اختياري</label>
-                            <input type="number" id="prod-price-old" step="0.01" placeholder="مثال: 500" oninput="autoCalculateDiscountPercentage()">
-                        </div>
-                        <div class="field-box">
-                            <label>نسبة الخصم المحسوبة تلقائياً (%)</label>
-                            <input type="text" id="prod-discount-calculated" readonly placeholder="0%" class="readonly-input">
-                        </div>
-                        <div class="field-box">
-                            <label>تحديد كمية المخزون المتاحة بالقطع *</label>
-                            <input type="number" id="prod-stock-count" required placeholder="إذا تم إدخال 0 سيعرض (نفذت الكمية) تلقائياً">
-                        </div>
-                        <div class="field-box">
-                            <label>مصدر الصورة (رابط جوجل أو اسم الملف المحلي) *</label>
-                            <input type="text" id="prod-image-url" required placeholder="ضع رابط الصورة المباشر أو اسم الملف">
-                        </div>
-                        <div class="field-box full-width">
-                            <label>وصف وشرح تفاصيل المنتج الفنية</label>
-                            <textarea id="prod-description" placeholder="اكتب تفاصيل ومواصفات المنتج الفاخر هنا..."></textarea>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-submit-product-form"><i class="fa-solid fa-square-plus"></i> حقن وضخ المنتج في قاعدة بيانات المتجر</button>
-                </form>
-
-                <hr class="gold-divider">
-                <h3>كتالوج وجدول المنتجات الحالية بالمتجر</h3>
-                <div class="table-responsive-wrapper">
-                    <table class="royal-data-table">
-                        <thead>
-                            <tr>
-                                <th>الصورة</th>
-                                <th>اسم المنتج (عربي)</th>
-                                <th>القسم</th>
-                                <th>السعر الحالي</th>
-                                <th>المخزون</th>
-                                <th>الحالة بالمتجر</th>
-                                <th>إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-products-list-rows">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="admin-tab-customers-mgmt" class="admin-tab-pane" style="display: none;">
-                <div class="tab-header-title">
-                    <h2><i class="fa-solid fa-users-viewfinder"></i> قاعدة بيانات ومحرك بحث المستهلكين الدوليين</h2>
-                </div>
-                
-                <div class="search-customer-bar">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="search-customer-input" placeholder="ابحث عن العميل بالاسم الكامل أو البريد أو رقم التواصل..." oninput="handleLiveCustomerSearch()">
-                </div>
-
-                <div class="table-responsive-wrapper">
-                    <table class="royal-data-table">
-                        <thead>
-                            <tr>
-                                <th>الاسم الكامل للعميل</th>
-                                <th>الهوية / البريد</th>
-                                <th>تاريخ الانضمام</th>
-                                <th>عدد الفواتير المستخرجة</th>
-                                <th>خيارات ومعاينة</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-customers-list-rows">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="admin-tab-settings-mgmt" class="admin-tab-pane" style="display: none;">
-                <div class="tab-header-title">
-                    <h2><i class="fa-solid fa-gears"></i> إعدادات الهوية الملكية وصندوق القوانين السحابية</h2>
-                </div>
-
-                <div class="royal-admin-form">
-                    <div class="form-grid-inputs">
-                        <div class="field-box">
-                            <label>اسم المتجر الدولي المعتمد</label>
-                            <input type="text" id="settings-store-name-input" value="الرعدي أونلاين">
-                        </div>
-                        <div class="field-box">
-                            <label>رابط شعار المتجر (رأس الصقر أو شعار مخصص)</label>
-                            <input type="text" id="settings-store-logo-input" value="https://i.ibb.co/6NG0byK/falcon-head.png">
-                        </div>
-                        <div class="field-box full-width">
-                            <label>نص قوانين الاسترجاع وشروط الفاتورة الملكية الرسمية</label>
-                            <textarea id="settings-legal-policy-input" rows="5">يسمح للعميل الفاضل باستبدال أو استرجاع المنتجات والطلبيات خلال مدة أقصاها 14 يوماً من تاريخ الاستلام الفعلي، شريطة الحفاظ على المنتج في عبوته وحالته الأصلية الفاخرة دون استخدام أو فتح.</textarea>
-                        </div>
-                    </div>
-                    <button class="btn-submit-product-form" onclick="saveGlobalStoreSettings()"><i class="fa-solid fa-floppy-disk"></i> حفظ وتعميم الإعدادات على المنظومة</button>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <script src="js/core.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/admin.js"></script>
-    <script src="js/extra.js"></script>
+                setTimeout(() => {
+                    showLoginForm();
+                }, 2000);
+            }
+        });
+    </script>
 </body>
 </html>
