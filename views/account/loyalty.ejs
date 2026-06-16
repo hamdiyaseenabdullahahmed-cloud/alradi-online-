@@ -1,0 +1,246 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة برنامج الولاء والنقاط                      %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# عنوان الصفحة %>
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-star" style="color: var(--gold-color); margin-left: 10px;"></i>
+            <%= currentLanguage === 'en' ? 'Loyalty Program' : 'برنامج الولاء' %>
+        </h1>
+        <p style="color: var(--text-muted);">
+            <%= currentLanguage === 'en' ? 'Earn points with every purchase and redeem them for discounts' : 'اكسب نقاط مع كل عملية شراء واستبدلها بخصومات' %>
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 30px;">
+        
+        <%# القائمة الجانبية %>
+        <aside>
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+                    <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                         alt="<%= user.name %>"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-color); margin-bottom: 10px;"
+                         onerror="this.src='/images/default-avatar.png'">
+                    <h4 style="font-weight: 700; margin-bottom: 3px;"><%= user.name %></h4>
+                </div>
+                <nav>
+                    <a href="/account" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-th-large"></i> لوحة التحكم
+                    </a>
+                    <a href="/account/profile" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-user"></i> الملف الشخصي
+                    </a>
+                    <a href="/account/orders" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-shopping-bag"></i> طلباتي
+                    </a>
+                    <a href="/account/loyalty" class="account-nav-link active" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: white; background: var(--secondary-color); font-weight: bold; font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-star"></i> نقاط الولاء
+                    </a>
+                    <a href="/auth/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--danger-color); font-size: 14px; text-decoration: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </a>
+                </nav>
+            </div>
+        </aside>
+        
+        <%# المحتوى الرئيسي %>
+        <main>
+            
+            <%# ============================================= %>
+            <%# بطاقة رصيد النقاط                                %>
+            <%# ============================================= %>
+            <div style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); border-radius: 20px; padding: 35px; color: white; margin-bottom: 25px; position: relative; overflow: hidden;">
+                <%# زخرفة خلفية %>
+                <div style="position: absolute; top: -30px; right: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+                
+                <div style="position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <div>
+                        <p style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">رصيد نقاطك الحالي</p>
+                        <div style="font-size: 60px; font-weight: 900; color: var(--gold-color); line-height: 1;">
+                            <%= user.loyaltyPoints || 0 %>
+                        </div>
+                        <p style="font-size: 18px; opacity: 0.9; margin-top: 5px;">نقطة ولاء</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <i class="fas fa-crown" style="font-size: 70px; color: var(--gold-color); opacity: 0.8;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <%# ============================================= %>
+            <%# إحصائيات النقاط                                  %>
+            <%# ============================================= %>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                <div style="background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div style="font-size: 28px; color: var(--success-color); margin-bottom: 5px;">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div style="font-size: 24px; font-weight: 900; color: var(--primary-color);"><%= user.totalPointsEarned || 0 %></div>
+                    <div style="font-size: 13px; color: var(--text-muted);">إجمالي النقاط المكتسبة</div>
+                </div>
+                
+                <div style="background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div style="font-size: 28px; color: var(--danger-color); margin-bottom: 5px;">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div style="font-size: 24px; font-weight: 900; color: var(--primary-color);"><%= user.totalPointsRedeemed || 0 %></div>
+                    <div style="font-size: 13px; color: var(--text-muted);">إجمالي النقاط المستبدلة</div>
+                </div>
+                
+                <div style="background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div style="font-size: 28px; color: var(--info-color); margin-bottom: 5px;">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div style="font-size: 14px; font-weight: 700; color: var(--primary-color);">
+                        <%= storeSettings.pointsPerRiyal || 1 %> نقطة = 1 <%= currencySymbol %>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-muted);">قيمة التحويل</div>
+                </div>
+            </div>
+            
+            <%# ============================================= %>
+            <%# استبدال النقاط                                    %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-gift" style="color: var(--gold-color); margin-left: 8px;"></i>
+                    استبدال النقاط
+                </h3>
+                
+                <% if (user.loyaltyPoints >= (storeSettings.minimumPointsToRedeem || 100)) { %>
+                    <p style="color: var(--text-light); margin-bottom: 20px;">
+                        يمكنك استبدال نقاطك للحصول على خصم على مشترياتك القادمة.
+                        الحد الأدنى للاستبدال: <strong><%= storeSettings.minimumPointsToRedeem || 100 %> نقطة</strong>.
+                    </p>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <input type="number" id="redeemPoints" class="form-control" 
+                               style="width: 150px;" 
+                               min="<%= storeSettings.minimumPointsToRedeem || 100 %>" 
+                               max="<%= user.loyaltyPoints %>" 
+                               value="<%= storeSettings.minimumPointsToRedeem || 100 %>"
+                               placeholder="عدد النقاط">
+                        <button onclick="redeemPoints()" class="btn btn-gold">
+                            <i class="fas fa-exchange-alt"></i> استبدال
+                        </button>
+                    </div>
+                    
+                    <div id="redeemResult" style="margin-top: 15px; display: none;"></div>
+                    
+                    <div style="margin-top: 15px; padding: 12px; background: var(--warning-bg); border-radius: 8px; font-size: 13px; color: #856404; border-right: 4px solid var(--warning-color);">
+                        <i class="fas fa-info-circle"></i> 
+                        النقاط المستبدلة ستتحول إلى رصيد خصم يمكن استخدامه في عملية الشراء القادمة.
+                    </div>
+                <% } else { %>
+                    <div style="text-align: center; padding: 30px;">
+                        <i class="fas fa-star" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
+                        <p style="color: var(--text-muted);">
+                            تحتاج إلى <strong><%= (storeSettings.minimumPointsToRedeem || 100) - (user.loyaltyPoints || 0) %> نقطة</strong> إضافية للوصول إلى الحد الأدنى للاستبدال.
+                        </p>
+                        <a href="/products" class="btn btn-primary btn-sm">تسوق الآن لكسب النقاط</a>
+                    </div>
+                <% } %>
+            </div>
+            
+            <%# ============================================= %>
+            <%# كيفية كسب النقاط                                  %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-question-circle" style="color: var(--info-color); margin-left: 8px;"></i>
+                    كيفية كسب النقاط
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 12px;">
+                        <div style="font-size: 35px; color: var(--secondary-color); margin-bottom: 10px;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h4 style="font-weight: 700; margin-bottom: 5px;">الشراء</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">اربح <%= storeSettings.pointsPerRiyal || 1 %> نقطة لكل <%= currencySymbol %> تنفقه</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 12px;">
+                        <div style="font-size: 35px; color: var(--success-color); margin-bottom: 10px;">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h4 style="font-weight: 700; margin-bottom: 5px;">التسجيل</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">اربح 50 نقطة ترحيبية عند إنشاء حسابك</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 12px;">
+                        <div style="font-size: 35px; color: var(--info-color); margin-bottom: 10px;">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h4 style="font-weight: 700; margin-bottom: 5px;">التقييم</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">اربح 10 نقاط عند تقييم منتج اشتريته</p>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 12px;">
+                        <div style="font-size: 35px; color: var(--gold-color); margin-bottom: 10px;">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <h4 style="font-weight: 700; margin-bottom: 5px;">المشاركة</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">اربح 5 نقاط عند مشاركة منتج مع أصدقائك</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+function redeemPoints() {
+    const points = parseInt(document.getElementById('redeemPoints').value);
+    const minPoints = <%= storeSettings.minimumPointsToRedeem || 100 %>;
+    const maxPoints = <%= user.loyaltyPoints || 0 %>;
+    
+    if (isNaN(points) || points < minPoints) {
+        showToast('الحد الأدنى للاستبدال هو ' + minPoints + ' نقطة', 'warning');
+        return;
+    }
+    
+    if (points > maxPoints) {
+        showToast('ليس لديك نقاط كافية. رصيدك: ' + maxPoints + ' نقطة', 'error');
+        return;
+    }
+    
+    fetch('/account/loyalty/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ points: points })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const resultDiv = document.getElementById('redeemResult');
+        resultDiv.style.display = 'block';
+        
+        if (data.success) {
+            resultDiv.innerHTML = '<div class="alert alert-success">✅ ' + data.message + '</div>';
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger">❌ ' + data.message + '</div>';
+        }
+    })
+    .catch(err => {
+        showToast('حدث خطأ في استبدال النقاط', 'error');
+    });
+}
+</script>
+
+<style>
+.account-nav-link:hover {
+    background: rgba(233, 69, 96, 0.05);
+    color: var(--secondary-color);
+}
+</style>
+
+<%- include('../partials/footer') %>
