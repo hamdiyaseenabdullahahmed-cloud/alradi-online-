@@ -1,0 +1,179 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - إعدادات المتجر               %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-cog" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            إعدادات المتجر
+        </h1>
+        <p style="color: var(--text-muted);">تحكم في جميع إعدادات متجر الرعدي أون لاين</p>
+    </div>
+    
+    <form action="/admin/settings" method="POST" enctype="multipart/form-data">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+            
+            <%# ============================================= %>
+            <%# الهوية الأساسية                                  %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-store" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    هوية المتجر
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">اسم المتجر (عربي)</label>
+                    <input type="text" name="storeName" class="form-control" value="<%= settings.storeName || '' %>" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">اسم المتجر (إنجليزي)</label>
+                    <input type="text" name="storeNameEn" class="form-control" value="<%= settings.storeNameEn || '' %>">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">وصف المتجر</label>
+                    <textarea name="storeDescription" class="form-control" rows="2"><%= settings.storeDescription || '' %></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">شعار المتجر (صورة)</label>
+                    <% if (settings.storeLogo && settings.storeLogo !== '/images/default-logo.png') { %>
+                        <img src="<%= settings.storeLogo %>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; display: block;">
+                    <% } %>
+                    <input type="file" name="storeLogo" class="form-control" accept="image/*">
+                    <small>يفضل صورة مربعة 200×200 بكسل</small>
+                </div>
+            </div>
+            
+            <%# ============================================= %>
+            <%# معلومات الاتصال                                  %>
+            <%# ============================================= %>
+            <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                    <i class="fas fa-address-book" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    معلومات الاتصال
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" name="contactEmail" class="form-control" value="<%= settings.contactEmail || '' %>">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف</label>
+                    <input type="text" name="phoneNumber" class="form-control" value="<%= settings.phoneNumber || '' %>">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رقم الواتساب</label>
+                    <input type="text" name="whatsappNumber" class="form-control" value="<%= settings.whatsappNumber || '' %>">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">العنوان</label>
+                    <input type="text" name="address" class="form-control" value="<%= settings.address || '' %>">
+                </div>
+            </div>
+        </div>
+        
+        <%# ============================================= %>
+        <%# إعدادات الشحن والمالية                           %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                <i class="fas fa-truck" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                إعدادات الشحن والمالية
+            </h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div class="form-group">
+                    <label class="form-label">العملة</label>
+                    <select name="currency" class="form-control">
+                        <option value="SAR" <%= settings.currency === 'SAR' ? 'selected' : '' %>>ريال سعودي (ر.س)</option>
+                        <option value="USD" <%= settings.currency === 'USD' ? 'selected' : '' %>>دولار ($)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رسوم الشحن الداخلي (ر.س)</label>
+                    <input type="number" name="shippingInternal" class="form-control" value="<%= settings.shippingInternal || 25 %>" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رسوم الشحن الدولي (ر.س)</label>
+                    <input type="number" name="shippingInternational" class="form-control" value="<%= settings.shippingInternational || 75 %>" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الحد الأدنى للشحن المجاني (ر.س)</label>
+                    <input type="number" name="freeShippingMin" class="form-control" value="<%= settings.freeShippingMin || 300 %>" min="0">
+                </div>
+            </div>
+        </div>
+        
+        <%# ============================================= %>
+        <%# إعدادات الصوتيات                                  %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                <i class="fas fa-volume-up" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                إعدادات الصوتيات
+            </h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: var(--bg-color); border-radius: 8px;">
+                        <input type="checkbox" name="voiceGreetingEnabled" <%= settings.voiceGreetingEnabled ? 'checked' : '' %>>
+                        <span>تفعيل الصوت الترحيبي</span>
+                    </label>
+                </div>
+                <div>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: var(--bg-color); border-radius: 8px;">
+                        <input type="checkbox" name="voiceInteractionsEnabled" <%= settings.voiceInteractionsEnabled ? 'checked' : '' %>>
+                        <span>تفعيل الأصوات التفاعلية</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <%# ============================================= %>
+        <%# السياسات                                         %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                <i class="fas fa-file-contract" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                السياسات والشروط
+            </h3>
+            
+            <div class="form-group">
+                <label class="form-label">سياسة الاستبدال والاسترجاع</label>
+                <textarea name="returnPolicy" class="form-control" rows="3"><%= settings.returnPolicy || 'يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان. يحق للزبون استبدال السلعة بأخرى خلال 3 أيام فقط من تاريخ الاستلام في حال وجود خلل مصنعي واضح.' %></textarea>
+            </div>
+        </div>
+        
+        <%# ============================================= %>
+        <%# نص حقوق الملكية                                  %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                <i class="fas fa-copyright" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                حقوق الملكية
+            </h3>
+            <div class="form-group">
+                <label class="form-label">نص حقوق الملكية (عربي)</label>
+                <input type="text" name="copyrightText" class="form-control" value="<%= settings.copyrightText || 'جميع الحقوق محفوظة © 2026 لمجموعة متاجر الرعدي أونلاين الفاخرة - تجربة تسوق فائقة وآمنة.' %>">
+            </div>
+        </div>
+        
+        <%# أزرار الحفظ %>
+        <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                <i class="fas fa-save"></i> حفظ جميع الإعدادات
+            </button>
+            <a href="/admin/dashboard" class="btn btn-outline btn-lg">
+                <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
+            </a>
+        </div>
+    </form>
+</div>
+
+<%- include('../partials/footer') %>
