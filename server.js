@@ -3,163 +3,114 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// قاعدة بيانات داخلية مؤقتة (تخزين في الذاكرة الحية للسيرفر)
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// قاعدة البيانات الحية المؤقتة بداخل السيرفر
 let products = [
-    {
-        id: 1,
-        name: "شاشة ذكية 55 بوصة Ultra HD",
-        price_sar: 1499,
-        category: "electronics",
-        stock: 10,
-        img: "https://via.placeholder.com/300?text=TV+55"
-    },
-    {
-        id: 2,
-        name: "مكيف سبليت روتاري فخم",
-        price_sar: 2199,
-        category: "appliances",
-        stock: 5,
-        img: "https://via.placeholder.com/300?text=Air+Conditioner"
-    },
-    {
-        id: 3,
-        name: "خلاط كهربائي متكامل بقوة 1000 واط",
-        price_sar: 250,
-        category: "appliances",
-        stock: 15,
-        img: "https://via.placeholder.com/300?text=Blender"
-    }
+    { id: 1, name: "شاشة ذكية 55 بوصة Ultra HD", price_sar: 1499, category: "electronics", stock: 10 },
+    { id: 2, name: "مكيف سبليت روتاري فخم", price_sar: 2199, category: "appliances", stock: 5 },
+    { id: 3, name: "خلاط كهربائي متكامل 1000 واط", price_sar: 250, category: "appliances", stock: 14 },
+    { id: 4, name: "هاتف آل تي ذكي متطور", price_sar: 400, category: "electronics", stock: 40 }
 ];
 
 let orders = [];
-let users = [
-    { username: "admin", password: "adminpassword", role: "admin" } // حساب مدير افتراضي للدخول للوحة التحكم
-];
+let salesTotal = 0;
 
-// إعدادات قراءة الملفات من المجلد العام public
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+// حساب المدير الافتراضي للدخول المباشر
+const ADMIN_USER = {
+    email: "alradi@gmail.com",
+    password: "adminpassword",
+    name: "أبو يزن الرعدي"
+};
 
-// توجيه الواجهة الرئيسية للموقع
+// مسار تشغيل الواجهة الرئيسية
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ==================== APIs نظام المستخدمين والدخول ====================
-
-// تسجيل حساب جديد للعملاء
-app.post('/api/auth/register', (req, res) => {
-    const { name, phone, password } = req.body;
-    if (!name || !phone || !password) {
-        return res.status(400).json({ success: false, message: "جميع الحقول مطلوبة لتسجيل الحساب!" });
-    }
-    
-    const userExists = users.find(u => u.username === phone);
-    if (userExists) {
-        return res.status(400).json({ success: false, message: "هذا الرقم مسجل مسبقاً في المتجر!" });
-    }
-
-    users.push({ username: phone, name: name, password: password, role: "customer" });
-    res.json({ success: true, message: "تم إنشاء حسابك الفاخر بنجاح في مَتْجَر الرَّعْدِي!" });
-});
-
-// تسجيل الدخول (للعملاء والمدير)
+// [API] تسجيل الدخول والتحقق من رتبة العميل أو المدير
 app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
+    const { email, password } = req.body;
     
-    if (!user) {
-        return res.status(401).json({ success: false, message: "خطأ في اسم المستخدم أو كلمة المرور!" });
+    if (email === ADMIN_USER.email && password === ADMIN_USER.password) {
+        return res.json({ success: true, role: "admin", name: ADMIN_USER.name });
+    }
+    
+    // تسجيل دخول افتراضي للعملاء العاديين لتسهيل التجربة
+    if (email && password && email.includes('@')) {
+        return res.json({ success: true, role: "customer", name: email.split('@')[0] });
     }
 
-    res.json({ 
-        success: true, 
-        message: `مرحباً بك مجدداً في الرعدي أونلاين`,
-        user: { name: user.name || user.username, role: user.role }
-    });
+    res.status(401).json({ success: false, message: "بيانات الدخول غير صحيحة!" });
 });
 
-// ==================== APIs إدارة المنتجات (المتجر واللوحة) ====================
-
-// جلب المنتجات
+// [API] جلب قائمة المنتجات الحية للمتجر وللوحة التحكم
 app.get('/api/products', (req, res) => {
     res.json(products);
 });
 
-// إضافة منتج جديد (من لوحة التحكم للمدير)
+// [API] إضافة منتج جديد من لوحة تحكم المدير
 app.post('/api/products/add', (req, res) => {
-    const { name, price_sar, category, stock, img } = req.body;
-    
+    const { name, price_sar, category, stock } = req.body;
     if (!name || !price_sar || !stock) {
-        return res.status(400).json({ success: false, message: "الاسم، السعر والمخزون حقول إجبارية!" });
+        return res.status(400).json({ success: false, message: "جميع الحقول مطلوبة لإدخال المنتج!" });
     }
 
     const newProduct = {
-        id: products.length + 1,
+        id: Date.now(),
         name,
         price_sar: Number(price_sar),
-        category: category || "general",
-        stock: Number(stock),
-        img: img || "https://via.placeholder.com/300?text=Product"
+        category,
+        stock: Number(stock)
     };
-
     products.push(newProduct);
-    res.json({ success: true, message: "تم إضافة المنتج بنجاح إلى مخزون المتجر!", product: newProduct });
+    res.json({ success: true, message: "تم ضخ المنتج الجديد في المخازن بنجاح!" });
 });
 
-// حذف منتج (من لوحة التحكم للمدير)
+// [API] حذف منتج نهائيًا من النظام
 app.delete('/api/products/delete/:id', (req, res) => {
     const id = Number(req.params.id);
     products = products.filter(p => p.id !== id);
-    res.json({ success: true, message: "تم حذف المنتج بنجاح من النظام!" });
+    res.json({ success: true, message: "تم حذف المنتج وتحديث المخزن الإداري!" });
 });
 
-
-// ==================== APIs الطلبات والفواتير وإحصائيات المدير ====================
-
-// إنشاء طلب شراء جديد وتوليد بيانات الفاتورة الرسمية
+// [API] إنشاء الطلب، خصم المخزون، وحساب الأرباح الحية للوحة
 app.post('/api/orders/create', (req, res) => {
-    const { customerName, customerPhone, cartItems, totalAmount } = req.body;
-
-    if (!cartItems || cartItems.length === 0) {
-        return res.status(400).json({ success: false, message: "السلة فارغة، لا يمكن إتمام الطلب!" });
-    }
-
-    // خصم الكميات من المخزون وتحديث المنتجات
+    const { customerName, cartItems, totalAmount } = req.body;
+    
+    // تحديث كميات المخزون في السيرفر
     cartItems.forEach(item => {
         const product = products.find(p => p.id === item.id);
-        if (product && product.stock >= item.quantity) {
-            product.stock -= item.quantity;
+        if (product) {
+            product.stock = Math.max(0, product.stock - item.quantity);
         }
     });
 
     const newOrder = {
         orderId: "RAD-" + Math.floor(100000 + Math.random() * 900000),
         customerName,
-        customerPhone,
         items: cartItems,
         total: totalAmount,
-        currency: "SAR",
         date: new Date().toLocaleDateString('ar-SA'),
         policy: "الاستبدال مسموح خلال 14 يوماً من تاريخ الاستلام بشرط أن يكون المنتج بحالته الأصلية."
     };
 
     orders.push(newOrder);
-    res.json({ success: true, message: "تم تسجيل طلبك وإصدار الفاتورة الفاخرة!", order: newOrder });
+    salesTotal += Number(totalAmount);
+
+    res.json({ success: true, order: newOrder, salesTotal, ordersCount: orders.length });
 });
 
-// جلب الإحصائيات الحية ولوحة التحكم للمدير
-app.get('/api/admin/dashboard', (req, res) => {
-    const totalSales = orders.reduce((sum, order) => sum + Number(order.total), 0);
+// [API] جلب الإحصائيات الفورية للوحة تحكم المدير
+app.get('/api/admin/stats', (req, res) => {
     res.json({
-        totalSales: totalSales,
+        salesTotal,
         ordersCount: orders.length,
-        productsCount: products.length,
-        recentOrders: orders
+        productsCount: products.length
     });
 });
 
-// تشغيل واستماع السيرفر
 app.listen(PORT, () => {
-    console.log(`سيرفر منصة الرعدي أونلاين المتكامل يعمل بكفاءة على المنفذ: ${PORT}`);
+    console.log(`سيرفر الرعدي أونلاين يعمل بكفاءة عظمى على المنفذ: ${PORT}`);
 });
