@@ -1,0 +1,207 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة حذف الحساب                                 %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div style="max-width: 550px; margin: 30px auto;">
+        
+        <%# ============================================= %>
+        <%# أيقونة التحذير                                  %>
+        <%# ============================================= %>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="display: inline-block; width: 100px; height: 100px; background: linear-gradient(135deg, var(--danger-color), #c82333); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 5px 25px rgba(220,53,69,0.4);">
+                <i class="fas fa-exclamation-triangle" style="font-size: 45px; color: white;"></i>
+            </div>
+            <h2 style="font-size: 28px; font-weight: 900; color: var(--danger-color); margin-bottom: 5px;">
+                <%= currentLanguage === 'en' ? 'Delete Account' : 'حذف الحساب' %>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 15px;">
+                <%= currentLanguage === 'en' ? 'This action cannot be undone' : 'هذا الإجراء لا يمكن التراجع عنه' %>
+            </p>
+        </div>
+        
+        <%# ============================================= %>
+        <%# بطاقة التحذير                                   %>
+        <%# ============================================= %>
+        <div style="background: var(--danger-bg); border: 2px solid var(--danger-color); border-radius: 15px; padding: 25px; margin-bottom: 25px;">
+            <h4 style="color: #721c24; font-weight: 700; margin-bottom: 15px;">
+                <i class="fas fa-list"></i> 
+                <%= currentLanguage === 'en' ? 'What will happen when you delete your account:' : 'ماذا سيحدث عند حذف حسابك:' %>
+            </h4>
+            <ul style="color: #721c24; font-size: 14px; line-height: 2.2; padding-right: 20px;">
+                <li><strong>سيتم تعطيل حسابك</strong> ولن تتمكن من تسجيل الدخول مرة أخرى</li>
+                <li><strong>ستفقد جميع نقاط الولاء</strong> المتراكمة لديك (<%= user.loyaltyPoints || 0 %> نقطة)</li>
+                <li><strong>سيتم إخفاء بياناتك الشخصية</strong> من النظام</li>
+                <li><strong>لن تتمكن من استعادة سجل الطلبات</strong> السابقة</li>
+                <li><strong>سيتم إلغاء أي كوبونات خصم</strong> مرتبطة بحسابك</li>
+                <li><strong>ستفقد قائمة المفضلة</strong> الخاصة بك</li>
+            </ul>
+        </div>
+        
+        <%# ============================================= %>
+        <%# نموذج تأكيد الحذف                                %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); border: 2px solid var(--danger-color);">
+            <form action="/account/delete-account" method="POST" data-validate>
+                
+                <%# معلومات الحساب %>
+                <div style="background: var(--bg-color); border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                    <p style="margin: 0; font-size: 14px; color: var(--text-muted);">
+                        <strong>الحساب:</strong> <%= user.name %> (@<%= user.username %>)
+                        <br><strong>البريد:</strong> <%= user.email %>
+                    </p>
+                </div>
+                
+                <%# كلمة المرور للتأكيد %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock" style="color: var(--danger-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Enter your password to confirm' : 'أدخل كلمة المرور للتأكيد' %> *
+                    </label>
+                    <div style="position: relative;">
+                        <input type="password" 
+                               name="password" 
+                               class="form-control" 
+                               id="deletePassword"
+                               placeholder="<%= currentLanguage === 'en' ? 'Your current password' : 'كلمة المرور الحالية' %>" 
+                               required
+                               autofocus
+                               style="border-color: var(--danger-color);">
+                        <button type="button" 
+                                onclick="togglePasswordVisibility('deletePassword', this)" 
+                                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px;"
+                                aria-label="إظهار كلمة المرور">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <%# كتابة كلمة "حذف" للتأكيد %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-pen" style="color: var(--danger-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Type "DELETE" to confirm' : 'اكتب كلمة "حذف" للتأكيد' %> *
+                    </label>
+                    <input type="text" 
+                           name="confirmText" 
+                           class="form-control" 
+                           placeholder="<%= currentLanguage === 'en' ? 'Type DELETE here' : 'اكتب "حذف" هنا' %>" 
+                           required
+                           style="border-color: var(--danger-color); text-align: center; font-size: 18px; font-weight: bold; letter-spacing: 3px;"
+                           autocomplete="off">
+                    <small style="color: var(--danger-color); display: block; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> 
+                        <%= currentLanguage === 'en' ? 'You must type the word "DELETE" exactly' : 'يجب كتابة كلمة "حذف" بالضبط' %>
+                    </small>
+                </div>
+                
+                <%# تأكيد نهائي %>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: flex-start; cursor: pointer; font-size: 13px; color: var(--text-light);">
+                        <input type="checkbox" required style="margin-left: 8px; margin-top: 3px; accent-color: var(--danger-color);">
+                        <span>
+                            <%= currentLanguage === 'en' ? 'I understand that this action is permanent and cannot be undone. I understand I will lose all my data, loyalty points, and order history.' : 'أفهم أن هذا الإجراء دائم ولا يمكن التراجع عنه. أفهم أنني سأفقد جميع بياناتي ونقاط الولاء وسجل الطلبات.' %>
+                        </span>
+                    </label>
+                </div>
+                
+                <%# أزرار الإجراء %>
+                <div style="display: flex; gap: 12px;">
+                    <a href="/account/preferences" class="btn btn-outline btn-lg" style="flex: 1;">
+                        <i class="fas fa-arrow-right"></i> 
+                        <%= currentLanguage === 'en' ? 'Cancel' : 'إلغاء' %>
+                    </a>
+                    <button type="submit" class="btn btn-danger btn-lg" style="flex: 1;">
+                        <i class="fas fa-trash-alt"></i> 
+                        <%= currentLanguage === 'en' ? 'Delete My Account' : 'حذف حسابي نهائياً' %>
+                    </button>
+                </div>
+                
+                <%# رابط للتواصل مع الدعم %>
+                <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;">
+                        <%= currentLanguage === 'en' ? 'Having second thoughts?' : 'تفكر في التراجع؟' %>
+                        <a href="/contact" style="color: var(--secondary-color); font-weight: bold; text-decoration: none;">
+                            <%= currentLanguage === 'en' ? 'Contact Support' : 'تواصل مع الدعم' %>
+                        </a>
+                        <%= currentLanguage === 'en' ? 'for help' : 'للمساعدة' %>
+                    </p>
+                </div>
+            </form>
+        </div>
+        
+        <%# ============================================= %>
+        <%# بدائل حذف الحساب                                 %>
+        <%# ============================================= %>
+        <div style="margin-top: 25px; padding: 20px; background: var(--info-bg); border-radius: 12px; border-right: 4px solid var(--info-color);">
+            <h4 style="font-weight: 700; color: var(--info-color); margin-bottom: 10px;">
+                <i class="fas fa-lightbulb"></i> 
+                <%= currentLanguage === 'en' ? 'Alternatives to deleting your account' : 'بدائل لحذف الحساب' %>
+            </h4>
+            <ul style="font-size: 13px; color: #0c5460; padding-right: 18px; line-height: 2;">
+                <li>
+                    <a href="/account/preferences" style="color: var(--info-color); font-weight: bold;">تعطيل الإشعارات</a> 
+                    بدلاً من حذف الحساب
+                </li>
+                <li>
+                    <a href="/account/profile" style="color: var(--info-color); font-weight: bold;">تحديث بياناتك</a> 
+                    إذا كانت المعلومات غير صحيحة
+                </li>
+                <li>
+                    <a href="/contact" style="color: var(--info-color); font-weight: bold;">التواصل معنا</a> 
+                    إذا كان هناك مشكلة نستطيع حلها
+                </li>
+            </ul>
+        </div>
+        
+        <%# رابط العودة %>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/account/preferences" style="font-size: 14px; color: var(--text-muted); text-decoration: none;">
+                <i class="fas fa-arrow-right"></i> العودة للإعدادات
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+// التحقق من كتابة كلمة "حذف" بشكل صحيح
+document.querySelector('form').addEventListener('submit', function(e) {
+    const confirmText = document.querySelector('input[name="confirmText"]').value.trim();
+    const expectedText = '<%= currentLanguage === "en" ? "DELETE" : "حذف" %>';
+    
+    if (confirmText !== expectedText) {
+        e.preventDefault();
+        alert('<%= currentLanguage === "en" ? "Please type DELETE to confirm" : "يرجى كتابة كلمة حذف للتأكيد" %>');
+        return false;
+    }
+    
+    const password = document.querySelector('input[name="password"]').value;
+    if (!password) {
+        e.preventDefault();
+        alert('<%= currentLanguage === "en" ? "Please enter your password" : "يرجى إدخال كلمة المرور" %>');
+        return false;
+    }
+    
+    if (!confirm('<%= currentLanguage === "en" ? "Are you absolutely sure you want to delete your account? This cannot be undone!" : "هل أنت متأكد تماماً من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء!" %>')) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>
