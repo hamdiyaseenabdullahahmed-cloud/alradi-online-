@@ -1,15 +1,6 @@
-# حجب مجلد المكتبات المحملة تلقائياً من قبل الخادم لمنع تضخم مستودع GitHub
 node_modules/
-
-# حجب ملفات البيئة المتغيرة والسرية
 .env
-
-# حجب ملفات النظام المؤقتة لأنظمة تشغيل الأجهزة المتنوعة
+*.log
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# حجب ملفات السجلات والأخطاء المؤقتة للـ Node
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+uploads/*
+!uploads/.gitkeep
