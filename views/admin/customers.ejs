@@ -1,0 +1,101 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - إدارة العملاء                %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+                <i class="fas fa-users" style="color: var(--secondary-color); margin-left: 10px;"></i>
+                إدارة العملاء
+            </h1>
+            <p style="color: var(--text-muted);">إجمالي <strong><%= pagination ? pagination.total : 0 %></strong> عميل</p>
+        </div>
+        <a href="/admin/reports?type=customers" class="btn btn-outline"><i class="fas fa-chart-bar"></i> تقرير العملاء</a>
+    </div>
+    
+    <%# شريط البحث %>
+    <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <form action="/admin/customers" method="GET" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+                <input type="text" name="search" class="form-control" placeholder="🔍 بحث بالاسم، البريد، أو اسم المستخدم..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> بحث</button>
+            <a href="/admin/customers" class="btn btn-outline"><i class="fas fa-redo"></i></a>
+        </form>
+    </div>
+    
+    <%# جدول العملاء %>
+    <div style="background: white; border-radius: 15px; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto;">
+        <% if (customers && customers.length > 0) { %>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px;">
+                <thead>
+                    <tr style="background: var(--bg-color); border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 12px 15px; text-align: right;">العميل</th>
+                        <th style="padding: 12px 15px; text-align: center;">البريد</th>
+                        <th style="padding: 12px 15px; text-align: center;">الهاتف</th>
+                        <th style="padding: 12px 15px; text-align: center;">الطلبات</th>
+                        <th style="padding: 12px 15px; text-align: center;">الإنفاق</th>
+                        <th style="padding: 12px 15px; text-align: center;">النقاط</th>
+                        <th style="padding: 12px 15px; text-align: center;">التسجيل</th>
+                        <th style="padding: 12px 15px; text-align: center;">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% customers.forEach(function(customer) { %>
+                        <tr style="border-bottom: 1px solid var(--border-light);">
+                            <td style="padding: 10px 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="<%= customer.profileImage || '/images/default-avatar.png' %>" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" onerror="this.src='/images/default-avatar.png'">
+                                    <div>
+                                        <strong><%= customer.name %></strong>
+                                        <br><small style="color: var(--text-muted);">@<%= customer.username %></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center; font-size: 12px;"><%= customer.email %></td>
+                            <td style="padding: 10px 15px; text-align: center; font-size: 12px;"><%= customer.phone || '-' %></td>
+                            <td style="padding: 10px 15px; text-align: center; font-weight: bold;"><%= customer.totalOrders || 0 %></td>
+                            <td style="padding: 10px 15px; text-align: center; font-weight: bold;"><%= customer.totalSpent || 0 %> ر.س</td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <span style="color: var(--gold-color);">⭐ <%= customer.loyaltyPoints || 0 %></span>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center; font-size: 11px; color: var(--text-muted);">
+                                <%= new Date(customer.createdAt).toLocaleDateString('ar-SA') %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <div style="display: flex; gap: 5px; justify-content: center;">
+                                    <a href="/admin/customers/<%= customer._id %>" class="btn btn-sm btn-outline" title="تفاصيل"><i class="fas fa-eye"></i></a>
+                                    <a href="mailto:<%= customer.email %>" class="btn btn-sm btn-outline" title="بريد"><i class="fas fa-envelope"></i></a>
+                                    <% if (customer.phone) { %>
+                                        <a href="https://wa.me/<%= customer.phone %>" class="btn btn-sm btn-outline" target="_blank" title="واتساب" style="color: #25D366; border-color: #25D366;"><i class="fab fa-whatsapp"></i></a>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            
+            <% if (pagination && pagination.pages > 1) { %>
+                <div class="pagination" style="padding: 20px;">
+                    <% for (var p = 1; p <= pagination.pages; p++) { %>
+                        <a href="/admin/customers?page=<%= p %><%= search ? '&search=' + search : '' %>" class="<%= p === pagination.page ? 'active' : '' %>"><%= p %></a>
+                    <% } %>
+                </div>
+            <% } %>
+            
+        <% } else { %>
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 60px; color: var(--text-muted); margin-bottom: 15px;"><i class="fas fa-user-slash"></i></div>
+                <h3>لا يوجد عملاء<% if (search) { %> بهذا البحث<% } %></h3>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
