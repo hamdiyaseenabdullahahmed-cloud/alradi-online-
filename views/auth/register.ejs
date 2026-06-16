@@ -1,0 +1,215 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة إنشاء حساب جديد                           %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div style="max-width: 520px; margin: 30px auto;">
+        
+        <%# ============================================= %>
+        <%# شعار المتجر                                     %>
+        <%# ============================================= %>
+        <div style="text-align: center; margin-bottom: 25px;">
+            <img src="<%= store.storeLogo || '/images/default-logo.png' %>" 
+                 alt="شعار المتجر" 
+                 style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold-color); margin-bottom: 12px; box-shadow: 0 0 25px rgba(255,215,0,0.5); object-fit: cover;">
+            <h2 style="font-size: 26px; font-weight: 900; color: var(--primary-color); margin-bottom: 5px;">
+                <%= currentLanguage === 'en' ? 'Create New Account' : 'إنشاء حساب جديد' %>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 14px;">
+                <%= currentLanguage === 'en' ? 'Join Al-Radi Online Store and enjoy shopping' : 'انضم إلى متجر الرعدي أون لاين واستمتع بالتسوق' %>
+            </p>
+        </div>
+        
+        <%# ============================================= %>
+        <%# نموذج إنشاء الحساب                               %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 25px rgba(0,0,0,0.1);">
+            <form action="/auth/register" method="POST" data-validate>
+                
+                <%# الاسم الكامل %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Full Name' : 'الاسم الكامل' %> *
+                    </label>
+                    <input type="text" 
+                           name="name" 
+                           class="form-control" 
+                           placeholder="<%= currentLanguage === 'en' ? 'Example: John Doe' : 'مثال: أبو يزن الرعدي' %>" 
+                           required>
+                </div>
+                
+                <%# اسم المستخدم %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-at" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Username' : 'اسم المستخدم' %> *
+                    </label>
+                    <input type="text" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="<%= currentLanguage === 'en' ? 'English letters, numbers and underscore only' : 'أحرف إنجليزية وأرقام وشرطة سفلية فقط' %>" 
+                           pattern="[a-zA-Z0-9_]+" 
+                           minlength="3"
+                           required>
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                        <i class="fas fa-info-circle"></i> 
+                        <%= currentLanguage === 'en' ? 'This will be used for login. Only English letters, numbers, and underscore (_) allowed.' : 'سيستخدم لتسجيل الدخول. مسموح فقط بالأحرف الإنجليزية والأرقام والشرطة السفلية (_).' %>
+                    </small>
+                </div>
+                
+                <%# البريد الإلكتروني %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Email Address' : 'البريد الإلكتروني' %> *
+                    </label>
+                    <input type="email" 
+                           name="email" 
+                           class="form-control" 
+                           placeholder="example@email.com" 
+                           required>
+                </div>
+                
+                <%# رقم الهاتف %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-phone" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Phone Number' : 'رقم الهاتف' %>
+                    </label>
+                    <input type="tel" 
+                           name="phone" 
+                           class="form-control" 
+                           placeholder="05xxxxxxxx"
+                           pattern="[0-9]{9,15}">
+                </div>
+                
+                <%# كلمة المرور %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Password' : 'كلمة المرور' %> *
+                    </label>
+                    <div style="position: relative;">
+                        <input type="password" 
+                               name="password" 
+                               class="form-control" 
+                               id="regPassword"
+                               placeholder="<%= currentLanguage === 'en' ? 'At least 6 characters' : '6 أحرف على الأقل' %>" 
+                               minlength="6" 
+                               required>
+                        <button type="button" 
+                                onclick="togglePasswordVisibility('regPassword', this)" 
+                                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px;"
+                                aria-label="إظهار كلمة المرور">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                        <i class="fas fa-shield-alt"></i> 
+                        <%= currentLanguage === 'en' ? 'Minimum 6 characters, use strong password for security' : 'الحد الأدنى 6 أحرف، استخدم كلمة مرور قوية للحماية' %>
+                    </small>
+                </div>
+                
+                <%# تأكيد كلمة المرور %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-check-circle" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        <%= currentLanguage === 'en' ? 'Confirm Password' : 'تأكيد كلمة المرور' %> *
+                    </label>
+                    <input type="password" 
+                           name="password2" 
+                           class="form-control" 
+                           placeholder="<%= currentLanguage === 'en' ? 'Re-enter your password' : 'أعد إدخال كلمة المرور' %>" 
+                           required>
+                </div>
+                
+                <%# الشروط والأحكام %>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 13px; color: var(--text-light); display: flex; align-items: flex-start; cursor: pointer;">
+                        <input type="checkbox" required style="margin-left: 8px; margin-top: 3px; accent-color: var(--secondary-color);">
+                        <span>
+                            <%= currentLanguage === 'en' ? 'I agree to the' : 'أوافق على' %>
+                            <a href="/terms" target="_blank" style="color: var(--secondary-color); text-decoration: none;">الشروط والأحكام</a>
+                            <%= currentLanguage === 'en' ? 'and' : 'و' %>
+                            <a href="/privacy-policy" target="_blank" style="color: var(--secondary-color); text-decoration: none;">سياسة الخصوصية</a>
+                        </span>
+                    </label>
+                </div>
+                
+                <%# زر إنشاء الحساب %>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-user-plus"></i> 
+                    <%= currentLanguage === 'en' ? 'Create Account' : 'إنشاء الحساب' %>
+                </button>
+                
+                <%# رابط تسجيل الدخول %>
+                <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 0;">
+                        <%= currentLanguage === 'en' ? 'Already have an account?' : 'لديك حساب بالفعل؟' %>
+                        <a href="/auth/login" style="color: var(--secondary-color); font-weight: bold; text-decoration: none;">
+                            <i class="fas fa-sign-in-alt"></i> 
+                            <%= currentLanguage === 'en' ? 'Login' : 'تسجيل الدخول' %>
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+        
+        <%# ============================================= %>
+        <%# مميزات التسجيل                                  %>
+        <%# ============================================= %>
+        <div style="margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+            <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <i class="fas fa-truck-fast" style="font-size: 24px; color: var(--secondary-color); margin-bottom: 8px;"></i>
+                <p style="font-size: 12px; font-weight: bold; margin: 0;">توصيل سريع</p>
+            </div>
+            <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <i class="fas fa-shield-alt" style="font-size: 24px; color: var(--success-color); margin-bottom: 8px;"></i>
+                <p style="font-size: 12px; font-weight: bold; margin: 0;">دفع آمن</p>
+            </div>
+            <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <i class="fas fa-star" style="font-size: 24px; color: var(--gold-color); margin-bottom: 8px;"></i>
+                <p style="font-size: 12px; font-weight: bold; margin: 0;">نقاط ولاء</p>
+            </div>
+        </div>
+        
+        <%# رابط العودة %>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/" style="font-size: 14px; color: var(--text-muted); text-decoration: none;">
+                <i class="fas fa-arrow-right"></i> 
+                <%= currentLanguage === 'en' ? 'Back to Home' : 'العودة للرئيسية' %>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+// التحقق من تطابق كلمة المرور
+document.querySelector('form').addEventListener('submit', function(e) {
+    const password = document.querySelector('input[name="password"]').value;
+    const password2 = document.querySelector('input[name="password2"]').value;
+    
+    if (password !== password2) {
+        e.preventDefault();
+        alert('<%= currentLanguage === "en" ? "Passwords do not match!" : "كلمات المرور غير متطابقة!" %>');
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>
