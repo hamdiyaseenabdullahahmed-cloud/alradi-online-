@@ -1,0 +1,215 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - إدارة المنتجات               %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# رأس الصفحة %>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+                <i class="fas fa-boxes" style="color: var(--secondary-color); margin-left: 10px;"></i>
+                إدارة المنتجات
+            </h1>
+            <p style="color: var(--text-muted);">
+                إجمالي <strong><%= pagination ? pagination.total : 0 %></strong> منتج
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="/admin/products/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> إضافة منتج جديد
+            </a>
+            <a href="/admin/categories" class="btn btn-outline">
+                <i class="fas fa-folder"></i> الأقسام
+            </a>
+        </div>
+    </div>
+    
+    <%# ============================================= %>
+    <%# شريط البحث والتصفية                             %>
+    <%# ============================================= %>
+    <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <form action="/admin/products" method="GET" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 200px;">
+                <input type="text" name="search" class="form-control" placeholder="🔍 بحث باسم المنتج أو SKU..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+            </div>
+            <div style="min-width: 150px;">
+                <select name="category" class="form-control">
+                    <option value="">جميع الأقسام</option>
+                    <% if (typeof categories !== 'undefined' && categories) { %>
+                        <% categories.forEach(function(cat) { %>
+                            <option value="<%= cat._id %>" <%= category === cat._id.toString() ? 'selected' : '' %>><%= cat.name %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+            <div style="min-width: 150px;">
+                <select name="status" class="form-control">
+                    <option value="">جميع الحالات</option>
+                    <option value="active" <%= status === 'active' ? 'selected' : '' %>>نشط</option>
+                    <option value="inactive" <%= status === 'inactive' ? 'selected' : '' %>>غير نشط</option>
+                    <option value="low_stock" <%= status === 'low_stock' ? 'selected' : '' %>>منخفض المخزون</option>
+                    <option value="out_of_stock" <%= status === 'out_of_stock' ? 'selected' : '' %>>نفد من المخزون</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> بحث
+            </button>
+            <a href="/admin/products" class="btn btn-outline">
+                <i class="fas fa-redo"></i> إعادة
+            </a>
+        </form>
+    </div>
+    
+    <%# ============================================= %>
+    <%# جدول المنتجات                                   %>
+    <%# ============================================= %>
+    <div style="background: white; border-radius: 15px; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto;">
+        <% if (products && products.length > 0) { %>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px;">
+                <thead>
+                    <tr style="background: var(--bg-color); border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 12px 15px; text-align: right; width: 60px;">صورة</th>
+                        <th style="padding: 12px 15px; text-align: right;">المنتج</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 120px;">القسم</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 100px;">السعر</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 80px;">الخصم</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 100px;">المخزون</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 80px;">المبيعات</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 80px;">الحالة</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 140px;">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% products.forEach(function(product) { %>
+                        <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s;">
+                            <td style="padding: 10px 15px;">
+                                <img src="<%= product.images && product.images.length > 0 ? product.images[0].url : '/images/default-product.png' %>" 
+                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                                     onerror="this.src='/images/default-product.png'">
+                            </td>
+                            <td style="padding: 10px 15px;">
+                                <a href="/products/<%= product.slug || product._id %>" target="_blank" style="font-weight: bold; color: var(--primary-color); text-decoration: none;">
+                                    <%= product.name %>
+                                </a>
+                                <% if (product.nameEn) { %>
+                                    <br><small style="color: var(--text-muted);"><%= product.nameEn %></small>
+                                <% } %>
+                                <% if (product.sku) { %>
+                                    <br><small style="color: var(--text-muted); font-size: 11px;">SKU: <%= product.sku %></small>
+                                <% } %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center; font-size: 12px;">
+                                <%= product.category && product.category.name ? product.category.name : '-' %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center; font-weight: bold;">
+                                <%= product.price %> ر.س
+                                <% if (product.comparePrice) { %>
+                                    <br><small style="text-decoration: line-through; color: var(--text-muted);"><%= product.comparePrice %> ر.س</small>
+                                <% } %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <% if (product.isOnSale && product.discount && product.discount.value > 0) { %>
+                                    <span style="background: var(--danger-bg); color: var(--danger-color); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                                        -<%= product.discount.value %><%= product.discount.type === 'percentage' ? '%' : ' ر.س' %>
+                                    </span>
+                                <% } else { %>
+                                    <span style="color: var(--text-muted);">-</span>
+                                <% } %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <span style="font-weight: bold; color: <%= product.stockStatus === 'out_of_stock' ? 'var(--danger-color)' : product.stockStatus === 'low_stock' ? 'var(--warning-color)' : 'var(--success-color)' %>;">
+                                    <%= product.isUnlimited ? '∞' : product.stock %>
+                                </span>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <span style="font-weight: bold;"><%= product.sales || 0 %></span>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <% if (product.isActive) { %>
+                                    <span style="background: var(--success-bg); color: var(--success-color); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">نشط</span>
+                                <% } else { %>
+                                    <span style="background: var(--danger-bg); color: var(--danger-color); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">غير نشط</span>
+                                <% } %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <div style="display: flex; gap: 5px; justify-content: center;">
+                                    <a href="/products/<%= product.slug || product._id %>" target="_blank" class="btn btn-sm btn-outline" title="معاينة">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/admin/products/edit/<%= product._id %>" class="btn btn-sm btn-outline" title="تعديل" style="color: var(--info-color); border-color: var(--info-color);">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button onclick="deleteProduct('<%= product._id %>', '<%= product.name %>')" class="btn btn-sm btn-outline" title="حذف" style="color: var(--danger-color); border-color: var(--danger-color);">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            
+            <%# Pagination %>
+            <% if (pagination && pagination.pages > 1) { %>
+                <div class="pagination" style="padding: 20px;">
+                    <% if (pagination.page > 1) { %>
+                        <a href="/admin/products?page=<%= pagination.page - 1 %><%= search ? '&search=' + search : '' %><%= category ? '&category=' + category : '' %><%= status ? '&status=' + status : '' %>">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } %>
+                    <% for (var p = 1; p <= pagination.pages; p++) { %>
+                        <a href="/admin/products?page=<%= p %><%= search ? '&search=' + search : '' %><%= category ? '&category=' + category : '' %><%= status ? '&status=' + status : '' %>" 
+                           class="<%= p === pagination.page ? 'active' : '' %>"><%= p %></a>
+                    <% } %>
+                    <% if (pagination.page < pagination.pages) { %>
+                        <a href="/admin/products?page=<%= pagination.page + 1 %><%= search ? '&search=' + search : '' %><%= category ? '&category=' + category : '' %><%= status ? '&status=' + status : '' %>">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <% } %>
+                </div>
+            <% } %>
+            
+        <% } else { %>
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 60px; color: var(--text-muted); margin-bottom: 15px;">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>لا توجد منتجات</h3>
+                <p style="color: var(--text-muted);">لم تتم إضافة أي منتجات بعد</p>
+                <a href="/admin/products/add" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> إضافة أول منتج
+                </a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+function deleteProduct(productId, productName) {
+    if (confirm('هل أنت متأكد من حذف المنتج: "' + productName + '"؟\n\nلا يمكن التراجع عن هذا الإجراء.')) {
+        fetch('/admin/products/delete/' + productId, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('تم حذف المنتج بنجاح', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast(data.message || 'حدث خطأ', 'error');
+                }
+            })
+            .catch(() => showToast('حدث خطأ في حذف المنتج', 'error'));
+    }
+}
+
+// تأثير hover على الصفوف
+document.querySelectorAll('table tbody tr').forEach(row => {
+    row.addEventListener('mouseenter', () => row.style.background = 'var(--bg-color)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+});
+</script>
+
+<%- include('../partials/footer') %>
