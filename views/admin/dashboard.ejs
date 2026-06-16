@@ -1,0 +1,211 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - الرئيسية                     %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# ============================================= %>
+    <%# رأس لوحة التحكم                                 %>
+    <%# ============================================= %>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+                <i class="fas fa-tachometer-alt" style="color: var(--secondary-color); margin-left: 10px;"></i>
+                لوحة التحكم
+            </h1>
+            <p style="color: var(--text-muted);">
+                <i class="fas fa-calendar"></i> 
+                <%= new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                | آخر تحديث: <%= new Date().toLocaleTimeString('ar-SA') %>
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="/" class="btn btn-outline btn-sm" target="_blank">
+                <i class="fas fa-eye"></i> معاينة المتجر
+            </a>
+            <a href="/admin/settings" class="btn btn-primary btn-sm">
+                <i class="fas fa-cog"></i> الإعدادات
+            </a>
+        </div>
+    </div>
+    
+    <%# ============================================= %>
+    <%# بطاقات الإحصائيات السريعة                        %>
+    <%# ============================================= %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+        
+        <%# إجمالي المشتركين %>
+        <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; background: rgba(233,69,96,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--secondary-color);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 900; color: var(--primary-color);"><%= stats.totalUsers || 0 %></div>
+                <div style="font-size: 12px; color: var(--text-muted);">مشترك نشط</div>
+            </div>
+        </div>
+        
+        <%# إجمالي المنتجات %>
+        <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; background: rgba(40,167,69,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--success-color);">
+                <i class="fas fa-box"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 900; color: var(--primary-color);"><%= stats.totalProducts || 0 %></div>
+                <div style="font-size: 12px; color: var(--text-muted);منتج في المستودع</div>
+            </div>
+        </div>
+        
+        <%# إجمالي المبيعات %>
+        <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; background: rgba(255,215,0,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--gold-color);">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 900; color: var(--primary-color);"><%= (stats.totalRevenue || 0).toFixed(0) %></div>
+                <div style="font-size: 12px; color: var(--text-muted);">ر.س إجمالي المبيعات</div>
+            </div>
+        </div>
+        
+        <%# تنبيهات المخزون %>
+        <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 55px; height: 55px; background: rgba(255,193,7,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--warning-color);">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: 900; color: var(--warning-color);"><%= stats.lowStockProducts || 0 %></div>
+                <div style="font-size: 12px; color: var(--text-muted);">منتج منخفض المخزون</div>
+            </div>
+        </div>
+    </div>
+    
+    <%# ============================================= %>
+    <%# الصف الثاني: أرباح + طلبات اليوم                  %>
+    <%# ============================================= %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px;">
+        <div style="background: linear-gradient(135deg, var(--success-color), #1e7e34); border-radius: 15px; padding: 20px; color: white; text-align: center;">
+            <div style="font-size: 14px; opacity: 0.9;">أرباح اليوم</div>
+            <div style="font-size: 28px; font-weight: 900; margin: 5px 0;"><%= stats.todayRevenue || 0 %> ر.س</div>
+            <div style="font-size: 12px; opacity: 0.8;"><%= stats.todayOrders || 0 %> طلب</div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, var(--info-color), #117a8b); border-radius: 15px; padding: 20px; color: white; text-align: center;">
+            <div style="font-size: 14px; opacity: 0.9;">أرباح الشهر</div>
+            <div style="font-size: 28px; font-weight: 900; margin: 5px 0;"><%= stats.monthRevenue || 0 %> ر.س</div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); border-radius: 15px; padding: 20px; color: white; text-align: center;">
+            <div style="font-size: 14px; opacity: 0.9;">أرباح السنة</div>
+            <div style="font-size: 28px; font-weight: 900; margin: 5px 0;"><%= stats.yearRevenue || 0 %> ر.س</div>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, var(--secondary-color), #c73e54); border-radius: 15px; padding: 20px; color: white; text-align: center;">
+            <div style="font-size: 14px; opacity: 0.9;">إجمالي الطلبات</div>
+            <div style="font-size: 28px; font-weight: 900; margin: 5px 0;"><%= stats.totalOrders || 0 %></div>
+            <div style="font-size: 12px; opacity: 0.8;">طلب</div>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+        
+        <%# ============================================= %>
+        <%# أحدث الطلبات                                     %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: 700; margin: 0;">
+                    <i class="fas fa-shopping-cart" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                    أحدث الطلبات
+                </h3>
+                <a href="/admin/orders" style="color: var(--secondary-color); font-size: 13px; font-weight: bold;">عرض الكل</a>
+            </div>
+            
+            <% if (recentOrders && recentOrders.length > 0) { %>
+                <% recentOrders.forEach(function(order) { %>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-light);">
+                        <div>
+                            <a href="/admin/orders/<%= order._id %>" style="font-weight: bold; color: var(--primary-color);">#<%= order.orderNumber %></a>
+                            <br><small style="color: var(--text-muted);"><%= order.customerName %></small>
+                        </div>
+                        <span style="font-weight: bold;"><%= order.totalAmount %> ر.س</span>
+                        <span style="background: <%= order.status === 'pending' ? 'var(--warning-bg)' : 'var(--success-bg)' %>; 
+                                     color: <%= order.status === 'pending' ? '#856404' : 'var(--success-color)' %>; 
+                                     padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                            <%= order.status === 'pending' ? 'قيد المراجعة' : order.status %>
+                        </span>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد طلبات بعد</p>
+            <% } %>
+        </div>
+        
+        <%# ============================================= %>
+        <%# أفضل المنتجات مبيعاً                             %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: 700; margin: 0;">
+                    <i class="fas fa-fire" style="color: var(--danger-color); margin-left: 8px;"></i>
+                    الأكثر مبيعاً
+                </h3>
+                <a href="/admin/products" style="color: var(--secondary-color); font-size: 13px; font-weight: bold;">عرض الكل</a>
+            </div>
+            
+            <% if (topProducts && topProducts.length > 0) { %>
+                <% topProducts.forEach(function(product, index) { %>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light);">
+                        <span style="font-weight: 900; font-size: 18px; color: var(--text-muted); min-width: 25px;">#<%= index + 1 %></span>
+                        <img src="<%= product.images && product.images.length > 0 ? product.images[0].url : '/images/default-product.png' %>" 
+                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;"
+                             onerror="this.src='/images/default-product.png'">
+                        <div style="flex: 1;">
+                            <strong style="font-size: 13px;"><%= product.name %></strong>
+                            <br><small style="color: var(--text-muted);"><%= product.price %> ر.س</small>
+                        </div>
+                        <span style="background: var(--bg-color); padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                            <%= product.sales || 0 %> مبيعاً
+                        </span>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p style="color: var(--text-muted); text-align: center; padding: 20px;">لا توجد مبيعات بعد</p>
+            <% } %>
+        </div>
+    </div>
+    
+    <%# ============================================= %>
+    <%# روابط سريعة للإدارة                              %>
+    <%# ============================================= %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+        <a href="/admin/products" style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none;">
+            <i class="fas fa-boxes" style="font-size: 24px; color: var(--secondary-color); margin-bottom: 8px; display: block;"></i>
+            <span style="font-weight: bold; font-size: 13px; color: var(--primary-color);">المنتجات</span>
+        </a>
+        <a href="/admin/orders" style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none;">
+            <i class="fas fa-receipt" style="font-size: 24px; color: var(--success-color); margin-bottom: 8px; display: block;"></i>
+            <span style="font-weight: bold; font-size: 13px; color: var(--primary-color);">الطلبات</span>
+        </a>
+        <a href="/admin/customers" style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none;">
+            <i class="fas fa-users" style="font-size: 24px; color: var(--info-color); margin-bottom: 8px; display: block;"></i>
+            <span style="font-weight: bold; font-size: 13px; color: var(--primary-color);">العملاء</span>
+        </a>
+        <a href="/admin/categories" style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none;">
+            <i class="fas fa-folder" style="font-size: 24px; color: var(--gold-color); margin-bottom: 8px; display: block;"></i>
+            <span style="font-weight: bold; font-size: 13px; color: var(--primary-color);">الأقسام</span>
+        </a>
+        <a href="/admin/chat" style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none;">
+            <i class="fas fa-comments" style="font-size: 24px; color: var(--info-color); margin-bottom: 8px; display: block;"></i>
+            <span style="font-weight: bold; font-size: 13px; color: var(--primary-color);">المحادثات</span>
+        </a>
+        <a href="/admin/settings" style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none;">
+            <i class="fas fa-cog" style="font-size: 24px; color: var(--text-muted); margin-bottom: 8px; display: block;"></i>
+            <span style="font-weight: bold; font-size: 13px; color: var(--primary-color);">الإعدادات</span>
+        </a>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
