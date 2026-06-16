@@ -1,0 +1,198 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة نجاح الطلب                                %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        
+        <%# ============================================= %>
+        <%# رسالة النجاح                                    %>
+        <%# ============================================= %>
+        <div style="text-align: center; padding: 40px 20px;">
+            <div style="font-size: 80px; color: var(--success-color); margin-bottom: 20px; animation: pulse 2s infinite;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 style="font-size: 32px; font-weight: 900; color: var(--success-color); margin-bottom: 10px;">
+                🎉 <%= currentLanguage === 'en' ? 'Order Placed Successfully!' : 'تم تقديم طلبك بنجاح!' %>
+            </h1>
+            <p style="font-size: 18px; color: var(--text-light); margin-bottom: 10px;">
+                <%= currentLanguage === 'en' ? 'Thank you for shopping with us' : 'شكراً لتسوقك معنا في متجر الرعدي أون لاين' %>
+            </p>
+            <p style="color: var(--text-muted);">
+                <%= currentLanguage === 'en' ? 'Your order has been received and is being processed' : 'تم استلام طلبك وجاري تجهيزه' %>
+            </p>
+        </div>
+        
+        <%# ============================================= %>
+        <%# بطاقة معلومات الطلب                              %>
+        <%# ============================================= %>
+        <div style="background: white; border-radius: 20px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 25px;">
+            
+            <%# رقم الطلب %>
+            <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px dashed var(--border-color);">
+                <span style="font-size: 14px; color: var(--text-muted); display: block; margin-bottom: 8px;">
+                    <%= currentLanguage === 'en' ? 'Order Number' : 'رقم الطلب' %>
+                </span>
+                <span style="font-size: 28px; font-weight: 900; color: var(--primary-color); letter-spacing: 2px;">
+                    #<%= order.orderNumber %>
+                </span>
+                <br>
+                <span style="font-size: 13px; color: var(--text-muted);">
+                    <%= currentLanguage === 'en' ? 'Invoice Number' : 'رقم الفاتورة' %>: <%= order.invoiceNumber %>
+                </span>
+            </div>
+            
+            <%# تفاصيل الطلب %>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                
+                <%# معلومات الشحن %>
+                <div>
+                    <h4 style="font-weight: 700; margin-bottom: 12px; color: var(--primary-color);">
+                        <i class="fas fa-truck" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                        <%= currentLanguage === 'en' ? 'Shipping Details' : 'تفاصيل الشحن' %>
+                    </h4>
+                    <div style="font-size: 14px; color: var(--text-light); line-height: 2;">
+                        <p><strong><%= order.customerName %></strong></p>
+                        <p><%= order.customerPhone %></p>
+                        <p><%= order.customerEmail %></p>
+                        <p><%= order.shippingAddress.fullAddress %></p>
+                        <p>
+                            <strong><%= currentLanguage === 'en' ? 'Method' : 'الطريقة' %>:</strong>
+                            <%= order.shippingMethod === 'international' ? (currentLanguage === 'en' ? 'International Shipping' : 'شحن دولي') : 
+                                order.shippingMethod === 'pickup' ? (currentLanguage === 'en' ? 'Pickup' : 'استلام') : 
+                                (currentLanguage === 'en' ? 'Domestic Shipping' : 'شحن داخلي') %>
+                        </p>
+                        <p>
+                            <strong><%= currentLanguage === 'en' ? 'Estimated Delivery' : 'التسليم المتوقع' %>:</strong>
+                            <%= order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : (currentLanguage === 'en' ? 'To be determined' : 'يحدد لاحقاً') %>
+                        </p>
+                    </div>
+                </div>
+                
+                <%# معلومات الدفع %>
+                <div>
+                    <h4 style="font-weight: 700; margin-bottom: 12px; color: var(--primary-color);">
+                        <i class="fas fa-credit-card" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                        <%= currentLanguage === 'en' ? 'Payment Details' : 'تفاصيل الدفع' %>
+                    </h4>
+                    <div style="font-size: 14px; color: var(--text-light); line-height: 2;">
+                        <p>
+                            <strong><%= currentLanguage === 'en' ? 'Method' : 'الطريقة' %>:</strong>
+                            <%= order.paymentMethod === 'cash_on_delivery' ? (currentLanguage === 'en' ? 'Cash on Delivery' : 'الدفع عند الاستلام') :
+                                order.paymentMethod === 'credit_card' ? (currentLanguage === 'en' ? 'Credit Card' : 'بطاقة ائتمان') :
+                                order.paymentMethod === 'bank_transfer' ? (currentLanguage === 'en' ? 'Bank Transfer' : 'تحويل بنكي') : order.paymentMethod %>
+                        </p>
+                        <p>
+                            <strong><%= currentLanguage === 'en' ? 'Status' : 'الحالة' %>:</strong>
+                            <span style="color: <%= order.paymentStatus === 'paid' ? 'var(--success-color)' : 'var(--warning-color)' %>; font-weight: bold;">
+                                <%= order.paymentStatus === 'paid' ? (currentLanguage === 'en' ? 'Paid' : 'مدفوع') :
+                                    order.paymentStatus === 'pending' ? (currentLanguage === 'en' ? 'Pending' : 'معلق') : order.paymentStatus %>
+                            </span>
+                        </p>
+                        <p>
+                            <strong><%= currentLanguage === 'en' ? 'Order Status' : 'حالة الطلب' %>:</strong>
+                            <span style="color: var(--info-color); font-weight: bold;">
+                                <%= order.status === 'pending' ? (currentLanguage === 'en' ? 'Pending Review' : 'قيد المراجعة') : order.status %>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <%# المنتجات %>
+            <h4 style="font-weight: 700; margin-bottom: 15px; color: var(--primary-color);">
+                <i class="fas fa-shopping-bag" style="color: var(--secondary-color); margin-left: 8px;"></i>
+                <%= currentLanguage === 'en' ? 'Order Items' : 'محتويات الطلب' %>
+            </h4>
+            
+            <div style="margin-bottom: 20px;">
+                <% order.items.forEach(function(item) { %>
+                    <div style="display: flex; gap: 15px; padding: 12px 0; border-bottom: 1px solid var(--border-light); align-items: center;">
+                        <img src="<%= item.image || '/images/default-product.png' %>" 
+                             alt="<%= item.name %>"
+                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                             onerror="this.src='/images/default-product.png'">
+                        <div style="flex: 1;">
+                            <strong><%= item.name %></strong>
+                            <br><small style="color: var(--text-muted);"><%= item.quantity %> × <%= item.price %> <%= currencySymbol %></small>
+                        </div>
+                        <span style="font-weight: bold;"><%= item.total %> <%= currencySymbol %></span>
+                    </div>
+                <% }); %>
+            </div>
+            
+            <%# الإجماليات %>
+            <div style="background: var(--bg-color); border-radius: 10px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                    <span><%= currentLanguage === 'en' ? 'Subtotal' : 'المجموع الفرعي' %></span>
+                    <span><%= order.subtotal %> <%= currencySymbol %></span>
+                </div>
+                
+                <% if (order.couponDiscount > 0) { %>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: var(--success-color);">
+                        <span><%= currentLanguage === 'en' ? 'Coupon' : 'كوبون' %></span>
+                        <span>-<%= order.couponDiscount %> <%= currencySymbol %></span>
+                    </div>
+                <% } %>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                    <span><%= currentLanguage === 'en' ? 'Shipping' : 'الشحن' %></span>
+                    <span><%= order.shippingCost === 0 ? (currentLanguage === 'en' ? 'Free' : 'مجاني') : order.shippingCost + ' ' + currencySymbol %></span>
+                </div>
+                
+                <hr style="border: none; border-top: 2px solid var(--border-color); margin: 12px 0;">
+                
+                <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 800; color: var(--secondary-color);">
+                    <span><%= currentLanguage === 'en' ? 'Total' : 'الإجمالي' %></span>
+                    <span><%= order.totalAmount %> <%= currencySymbol %></span>
+                </div>
+            </div>
+        </div>
+        
+        <%# ============================================= %>
+        <%# أزرار الإجراءات                                  %>
+        <%# ============================================= %>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
+            <a href="/cart/invoice/<%= order._id %>" class="btn btn-primary btn-lg" target="_blank">
+                <i class="fas fa-print"></i> <%= currentLanguage === 'en' ? 'Print Invoice' : 'طباعة الفاتورة' %>
+            </a>
+            <a href="/cart/invoice/<%= order._id %>" class="btn btn-outline btn-lg" download>
+                <i class="fas fa-download"></i> <%= currentLanguage === 'en' ? 'Download PDF' : 'تحميل PDF' %>
+            </a>
+            <a href="/account/orders" class="btn btn-outline btn-lg">
+                <i class="fas fa-list"></i> <%= currentLanguage === 'en' ? 'My Orders' : 'طلباتي' %>
+            </a>
+            <a href="/track-order?orderNumber=<%= order.orderNumber %>" class="btn btn-outline btn-lg">
+                <i class="fas fa-search-location"></i> <%= currentLanguage === 'en' ? 'Track Order' : 'تتبع الطلب' %>
+            </a>
+        </div>
+        
+        <%# ============================================= %>
+        <%# الشروط القانونية                                %>
+        <%# ============================================= %>
+        <div style="background: var(--warning-bg); border-radius: 15px; padding: 20px; margin-bottom: 25px; border-right: 4px solid var(--warning-color);">
+            <h4 style="font-weight: 700; color: var(--warning-color); margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                <%= currentLanguage === 'en' ? 'Important Notes' : 'ملاحظات هامة' %>
+            </h4>
+            <ul style="font-size: 14px; color: #856404; line-height: 2; padding-right: 20px;">
+                <li><%= currentLanguage === 'en' ? 'Cash refunds are strictly prohibited after purchase for any reason.' : 'يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.' %></li>
+                <li><%= currentLanguage === 'en' ? 'Exchange is available within 3 days only from the date of receipt in case of clear manufacturing defect.' : 'يحق للزبون استبدال السلعة بأخرى خلال 3 أيام فقط من تاريخ الاستلام في حال وجود خلل مصنعي واضح.' %></li>
+                <li><%= currentLanguage === 'en' ? 'Any damage to warranty stickers or original packaging voids the warranty and cancels the right to exchange.' : 'أي كشط أو تلف في ملصقات الضمان أو العبوات الأصلية يلغي الضمان بشكل فوري ويسقط حق الاستبدال.' %></li>
+            </ul>
+        </div>
+        
+        <%# متابعة التسوق %>
+        <div style="text-align: center;">
+            <a href="/products" class="btn btn-gold btn-lg">
+                <i class="fas fa-shopping-bag"></i> <%= currentLanguage === 'en' ? 'Continue Shopping' : 'متابعة التسوق' %>
+            </a>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
