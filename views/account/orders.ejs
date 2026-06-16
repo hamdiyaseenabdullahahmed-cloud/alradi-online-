@@ -1,0 +1,213 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة سجل الطلبات                               %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# عنوان الصفحة %>
+    <div style="margin-bottom: 30px;">
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-shopping-bag" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            <%= currentLanguage === 'en' ? 'My Orders' : 'طلباتي' %>
+        </h1>
+        <p style="color: var(--text-muted);">
+            <%= currentLanguage === 'en' ? 'View and track all your orders' : 'عرض وتتبع جميع طلباتك السابقة' %>
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 250px 1fr; gap: 30px;">
+        
+        <%# القائمة الجانبية %>
+        <aside>
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px;">
+                    <img src="<%= user.profileImage || '/images/default-avatar.png' %>" 
+                         alt="<%= user.name %>"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold-color); margin-bottom: 10px;"
+                         onerror="this.src='/images/default-avatar.png'">
+                    <h4 style="font-weight: 700; margin-bottom: 3px;"><%= user.name %></h4>
+                </div>
+                <nav>
+                    <a href="/account" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-th-large"></i> لوحة التحكم
+                    </a>
+                    <a href="/account/profile" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-user"></i> الملف الشخصي
+                    </a>
+                    <a href="/account/orders" class="account-nav-link active" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: white; background: var(--secondary-color); font-weight: bold; font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-shopping-bag"></i> طلباتي
+                    </a>
+                    <a href="/account/wishlist" class="account-nav-link" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); font-size: 14px; margin-bottom: 5px; text-decoration: none;">
+                        <i class="fas fa-heart"></i> المفضلة
+                    </a>
+                    <a href="/auth/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; color: var(--danger-color); font-size: 14px; text-decoration: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </a>
+                </nav>
+            </div>
+            
+            <%# فلتر الحالة %>
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 15px;">
+                <h4 style="font-weight: 700; margin-bottom: 15px; font-size: 14px;">
+                    <i class="fas fa-filter"></i> تصفية حسب الحالة
+                </h4>
+                <a href="/account/orders" class="filter-link" style="display: block; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; text-decoration: none; color: var(--text-color); font-size: 13px; <%= !status ? 'background: var(--secondary-color); color: white; font-weight: bold;' : '' %>">
+                    جميع الطلبات
+                </a>
+                <a href="/account/orders?status=pending" class="filter-link" style="display: block; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; text-decoration: none; color: var(--text-color); font-size: 13px; <%= status === 'pending' ? 'background: var(--info-color); color: white; font-weight: bold;' : '' %>">
+                    <i class="fas fa-clock"></i> قيد المراجعة
+                </a>
+                <a href="/account/orders?status=processing" class="filter-link" style="display: block; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; text-decoration: none; color: var(--text-color); font-size: 13px; <%= status === 'processing' ? 'background: var(--info-color); color: white; font-weight: bold;' : '' %>">
+                    <i class="fas fa-cog"></i> قيد التجهيز
+                </a>
+                <a href="/account/orders?status=shipped" class="filter-link" style="display: block; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; text-decoration: none; color: var(--text-color); font-size: 13px; <%= status === 'shipped' ? 'background: var(--warning-color); color: white; font-weight: bold;' : '' %>">
+                    <i class="fas fa-truck"></i> تم الشحن
+                </a>
+                <a href="/account/orders?status=delivered" class="filter-link" style="display: block; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; text-decoration: none; color: var(--text-color); font-size: 13px; <%= status === 'delivered' ? 'background: var(--success-color); color: white; font-weight: bold;' : '' %>">
+                    <i class="fas fa-check-circle"></i> تم التسليم
+                </a>
+                <a href="/account/orders?status=cancelled" class="filter-link" style="display: block; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--text-color); font-size: 13px; <%= status === 'cancelled' ? 'background: var(--danger-color); color: white; font-weight: bold;' : '' %>">
+                    <i class="fas fa-times-circle"></i> ملغي
+                </a>
+            </div>
+        </aside>
+        
+        <%# المحتوى الرئيسي %>
+        <main>
+            <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                
+                <% if (orders && orders.length > 0) { %>
+                    
+                    <%# جدول الطلبات %>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-color);">
+                                    <th style="padding: 15px; text-align: right;">رقم الطلب</th>
+                                    <th style="padding: 15px; text-align: center;">التاريخ</th>
+                                    <th style="padding: 15px; text-align: center;">طريقة الشحن</th>
+                                    <th style="padding: 15px; text-align: center;">الحالة</th>
+                                    <th style="padding: 15px; text-align: center;">الإجمالي</th>
+                                    <th style="padding: 15px; text-align: center;">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(function(order) { %>
+                                    <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s;">
+                                        <td style="padding: 15px;">
+                                            <a href="/account/orders/<%= order._id %>" style="font-weight: bold; color: var(--primary-color); text-decoration: none;">
+                                                #<%= order.orderNumber %>
+                                            </a>
+                                            <br>
+                                            <small style="color: var(--text-muted); font-size: 11px;">فاتورة: <%= order.invoiceNumber %></small>
+                                        </td>
+                                        <td style="padding: 15px; text-align: center; color: var(--text-muted);">
+                                            <%= new Date(order.createdAt).toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                        </td>
+                                        <td style="padding: 15px; text-align: center;">
+                                            <span style="font-size: 12px; background: var(--bg-color); padding: 4px 10px; border-radius: 12px;">
+                                                <%= order.shippingMethod === 'international' ? '🌍 دولي' : 
+                                                    order.shippingMethod === 'pickup' ? '📍 استلام' : '🇸🇦 داخلي' %>
+                                            </span>
+                                        </td>
+                                        <td style="padding: 15px; text-align: center;">
+                                            <span style="background: <%= order.status === 'delivered' ? 'var(--success-bg)' : 
+                                                                          order.status === 'cancelled' ? 'var(--danger-bg)' : 
+                                                                          order.status === 'shipped' ? 'var(--warning-bg)' : 'var(--info-bg)' %>; 
+                                                         color: <%= order.status === 'delivered' ? 'var(--success-color)' : 
+                                                                   order.status === 'cancelled' ? 'var(--danger-color)' : 
+                                                                   order.status === 'shipped' ? '#856404' : 'var(--info-color)' %>; 
+                                                         padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; white-space: nowrap;">
+                                                <%= order.status === 'pending' ? 'قيد المراجعة' : 
+                                                    order.status === 'confirmed' ? 'مؤكد' :
+                                                    order.status === 'processing' ? 'قيد التجهيز' :
+                                                    order.status === 'shipped' ? 'تم الشحن' :
+                                                    order.status === 'in_transit' ? 'في الطريق' :
+                                                    order.status === 'delivered' ? 'تم التسليم' :
+                                                    order.status === 'cancelled' ? 'ملغي' : order.status %>
+                                            </span>
+                                        </td>
+                                        <td style="padding: 15px; text-align: center; font-weight: bold;">
+                                            <%= order.totalAmount %> <%= currencySymbol %>
+                                        </td>
+                                        <td style="padding: 15px; text-align: center;">
+                                            <a href="/account/orders/<%= order._id %>" class="btn btn-sm btn-outline" style="margin-bottom: 5px;">
+                                                <i class="fas fa-eye"></i> تفاصيل
+                                            </a>
+                                            <a href="/cart/invoice/<%= order._id %>" class="btn btn-sm btn-outline" target="_blank">
+                                                <i class="fas fa-file-pdf"></i> فاتورة
+                                            </a>
+                                            <% if (order.status === 'delivered') { %>
+                                                <br>
+                                                <a href="/account/orders/<%= order._id %>?return=true" class="btn btn-sm btn-outline" style="margin-top: 5px; color: var(--warning-color); border-color: var(--warning-color);">
+                                                    <i class="fas fa-exchange-alt"></i> استبدال
+                                                </a>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <%# Pagination %>
+                    <% if (pagination && pagination.pages > 1) { %>
+                        <div class="pagination" style="margin-top: 25px;">
+                            <% if (pagination.page > 1) { %>
+                                <a href="/account/orders?page=<%= pagination.page - 1 %><%= status ? '&status=' + status : '' %>">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            <% } %>
+                            
+                            <% for (var p = 1; p <= pagination.pages; p++) { %>
+                                <a href="/account/orders?page=<%= p %><%= status ? '&status=' + status : '' %>" 
+                                   class="<%= p === pagination.page ? 'active' : '' %>"><%= p %></a>
+                            <% } %>
+                            
+                            <% if (pagination.page < pagination.pages) { %>
+                                <a href="/account/orders?page=<%= pagination.page + 1 %><%= status ? '&status=' + status : '' %>">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                    
+                <% } else { %>
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 80px; color: var(--text-muted); margin-bottom: 15px;">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <h3 style="font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">
+                            <%= status ? 'لا توجد طلبات بهذه الحالة' : 'لا توجد طلبات بعد' %>
+                        </h3>
+                        <p style="color: var(--text-muted); margin-bottom: 20px;">
+                            <%= currentLanguage === 'en' ? 'Start shopping and your orders will appear here' : 'ابدأ التسوق وستظهر طلباتك هنا' %>
+                        </p>
+                        <a href="/products" class="btn btn-primary">
+                            <i class="fas fa-shopping-cart"></i> ابدأ التسوق
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+.account-nav-link:hover {
+    background: rgba(233, 69, 96, 0.05);
+    color: var(--secondary-color);
+}
+.filter-link:hover {
+    background: rgba(233, 69, 96, 0.05);
+    color: var(--secondary-color);
+}
+table tbody tr:hover {
+    background: var(--bg-color);
+}
+</style>
+
+<%- include('../partials/footer') %>
