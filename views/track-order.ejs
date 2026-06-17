@@ -1,0 +1,144 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة تتبع الطلب                                 %>
+<%# ============================================= %>
+
+<%- include('partials/header') %>
+
+<div class="container" style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+    
+    <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 10px; text-align: center;">
+        <i class="fas fa-search-location" style="color: var(--secondary-color); margin-left: 10px;"></i>
+        تتبع الطلب
+    </h1>
+    <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">
+        أدخل رقم الطلب للاطلاع على حالة طلبك ومتابعة شحنته
+    </p>
+    
+    <% if (!order) { %>
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <form action="/track-order" method="POST">
+                <div class="form-group">
+                    <label class="form-label">رقم الطلب *</label>
+                    <input type="text" name="orderNumber" class="form-control" 
+                           placeholder="مثلاً: ORD-260617-9451" required
+                           style="text-align: center; font-size: 18px; letter-spacing: 2px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" name="email" class="form-control" placeholder="للتأكيد (اختياري)">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-search"></i> تتبع الطلب
+                </button>
+            </form>
+            
+            <% if (typeof notFound !== 'undefined' && notFound) { %>
+                <div class="alert alert-danger" style="margin-top: 20px;">
+                    <i class="fas fa-times-circle"></i>
+                    لم يتم العثور على طلب بهذا الرقم. تأكد من رقم الطلب وحاول مرة أخرى.
+                </div>
+            <% } %>
+        </div>
+        
+        <div style="text-align: center; margin-top: 25px;">
+            <p style="color: var(--text-muted); font-size: 14px;">
+                <i class="fas fa-info-circle"></i> 
+                يمكنك العثور على رقم الطلب في رسالة تأكيد الطلب المرسلة إلى بريدك الإلكتروني.
+            </p>
+        </div>
+        
+    <% } else { %>
+        
+        <%# بطاقة الطلب %>
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+            
+            <div style="text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color);">
+                <h2 style="font-size: 24px; font-weight: 800; color: var(--primary-color);">
+                    الطلب #<%= order.orderNumber %>
+                </h2>
+                <p style="color: var(--text-muted);">
+                    <i class="fas fa-calendar"></i> <%= new Date(order.createdAt).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                </p>
+            </div>
+            
+            <%# شريط التقدم %>
+            <div style="margin-bottom: 30px;">
+                <% 
+                    var steps = [
+                        { key: 'pending', label: 'قيد المراجعة', icon: 'fa-clock' },
+                        { key: 'processing', label: 'قيد التجهيز', icon: 'fa-cog' },
+                        { key: 'shipped', label: 'تم الشحن', icon: 'fa-truck' },
+                        { key: 'in_transit', label: 'في الطريق', icon: 'fa-road' },
+                        { key: 'delivered', label: 'تم التسليم', icon: 'fa-check-circle' }
+                    ];
+                    var statusOrder = ['pending', 'processing', 'shipped', 'in_transit', 'delivered'];
+                    var currentIndex = statusOrder.indexOf(order.status);
+                    if (currentIndex === -1) currentIndex = order.status === 'cancelled' ? -1 : 0;
+                %>
+                
+                <% if (order.status === 'cancelled') { %>
+                    <div style="text-align: center; padding: 30px; background: var(--danger-bg); border-radius: 10px;">
+                        <i class="fas fa-times-circle" style="font-size: 50px; color: var(--danger-color); margin-bottom: 10px;"></i>
+                        <h3 style="color: var(--danger-color);">تم إلغاء الطلب</h3>
+                    </div>
+                <% } else { %>
+                    <div style="display: flex; justify-content: space-between; position: relative; padding: 10px 0;">
+                        <div style="position: absolute; top: 20px; right: 0; left: 0; height: 3px; background: var(--border-color); z-index: 0;"></div>
+                        <div style="position: absolute; top: 20px; right: 0; height: 3px; background: var(--success-color); z-index: 1; 
+                                    width: <%= order.status === 'delivered' ? '100%' : order.status === 'in_transit' ? '80%' : order.status === 'shipped' ? '60%' : order.status === 'processing' ? '40%' : '20%' %>; transition: width 0.5s;"></div>
+                        
+                        <% steps.forEach(function(step, index) { 
+                            var isCompleted = currentIndex >= index;
+                            var isCurrent = currentIndex === index;
+                        %>
+                            <div style="text-align: center; position: relative; z-index: 2; flex: 1;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center;
+                                            background: <%= isCompleted ? 'var(--success-color)' : 'var(--border-color)' %>; 
+                                            color: white; font-size: 16px;
+                                            <%= isCurrent ? 'box-shadow: 0 0 0 5px rgba(40,167,69,0.3);' : '' %>">
+                                    <i class="fas <%= step.icon %>"></i>
+                                </div>
+                                <p style="font-size: 11px; font-weight: <%= isCurrent ? 'bold' : 'normal' %>; 
+                                          color: <%= isCompleted ? 'var(--success-color)' : 'var(--text-muted)' %>; margin: 0;">
+                                    <%= step.label %>
+                                </p>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+            
+            <%# معلومات إضافية %>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
+                <div style="background: var(--bg-color); padding: 15px; border-radius: 8px;">
+                    <strong>طريقة الشحن:</strong> 
+                    <%= order.shippingMethod === 'international' ? '🌍 شحن دولي خارجي' : order.shippingMethod === 'pickup' ? '📍 استلام' : '🇸🇦 شحن داخلي' %>
+                </div>
+                <div style="background: var(--bg-color); padding: 15px; border-radius: 8px;">
+                    <strong>الإجمالي:</strong> <%= order.totalAmount %> ر.س
+                </div>
+                <% if (order.estimatedDeliveryDate) { %>
+                    <div style="background: var(--bg-color); padding: 15px; border-radius: 8px;">
+                        <strong>التسليم المتوقع:</strong> 
+                        <%= new Date(order.estimatedDeliveryDate).toLocaleDateString('ar-SA') %>
+                    </div>
+                <% } %>
+                <% if (order.shippingTrackingNumber) { %>
+                    <div style="background: var(--bg-color); padding: 15px; border-radius: 8px;">
+                        <strong>رقم التتبع:</strong> <%= order.shippingTrackingNumber %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/track-order" class="btn btn-outline">
+                <i class="fas fa-search"></i> تتبع طلب آخر
+            </a>
+        </div>
+        
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>
