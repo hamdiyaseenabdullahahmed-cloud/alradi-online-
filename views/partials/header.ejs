@@ -13,8 +13,8 @@
     <meta name="author" content="متجر الرعدي أون لاين">
     <meta name="theme-color" content="#1a1a2e">
     
-    <link rel="icon" type="image/png" href="<%= store.storeFavicon || store.storeLogo || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦅</text></svg>' %>">
-    <link rel="apple-touch-icon" href="<%= store.storeLogo || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦅</text></svg>' %>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
     
     <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : '' %><%= store.storeName || 'متجر الرعدي أون لاين' %></title>
     
@@ -34,7 +34,7 @@
 </head>
 <body class="<%= currentLanguage === 'en' ? 'en' : '' %>">
 
-    <%# شريط الإعلانات الترويجي %>
+    <%# شريط الإعلانات الترويجي العلوي %>
     <% if (store.showPromoBanner !== false) { %>
     <div class="promo-banner" id="promoBanner">
         <span>
@@ -52,26 +52,20 @@
         <div class="container">
             <div class="header-content">
                 
+                <%# زر القائمة للموبايل %>
                 <button class="mobile-menu-toggle" aria-label="القائمة">
                     <i class="fas fa-bars"></i>
                 </button>
                 
+                <%# الشعار %>
                 <div class="logo-container">
                     <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
-                        <% if (store.storeLogo) { %>
-                            <img src="<%= store.storeLogo %>" 
-                                 alt="<%= store.storeName %>" 
-                                 class="store-logo"
-                                 width="55" height="55"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <% } %>
-                        <div class="store-logo-placeholder" style="<%= store.storeLogo ? 'display:none;' : '' %>width:55px;height:55px;border-radius:50%;background:linear-gradient(135deg,var(--gold-color),#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:30px;border:2px solid var(--gold-color);">
-                            🦅
-                        </div>
+                        <span style="font-size: 45px;">🦅</span>
                         <span class="store-name"><%= store.storeName || 'متجر الرعدي أون لاين' %></span>
                     </a>
                 </div>
                 
+                <%# شريط البحث %>
                 <div class="search-container">
                     <form class="search-bar" action="/search" method="GET">
                         <input type="text" 
@@ -86,8 +80,10 @@
                     </form>
                 </div>
                 
+                <%# أيقونات الهيدر %>
                 <div class="header-actions">
                     
+                    <%# تبديل اللغة %>
                     <a href="/switch-language/<%= currentLanguage === 'ar' ? 'en' : 'ar' %>" 
                        class="header-icon" 
                        title="<%= currentLanguage === 'ar' ? 'English' : 'العربية' %>"
@@ -98,16 +94,19 @@
                         </span>
                     </a>
                     
+                    <%# الوضع الليلي %>
                     <button class="header-icon" id="dark-mode-toggle" title="الوضع الليلي">
                         <i class="fas fa-moon"></i>
                     </button>
                     
+                    <%# المفضلة %>
                     <% if (user) { %>
                     <a href="/account/wishlist" class="header-icon" title="المفضلة">
                         <i class="fas fa-heart"></i>
                     </a>
                     <% } %>
                     
+                    <%# سلة التسوق %>
                     <a href="/cart" class="header-icon cart-icon" title="سلة التسوق">
                         <i class="fas fa-shopping-cart"></i>
                         <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
@@ -115,19 +114,22 @@
                         <% } %>
                     </a>
                     
+                    <%# حساب المستخدم %>
                     <% if (user) { %>
                         <div class="user-menu">
                             <a href="/account" class="header-icon" title="حسابي">
-                                <% if (user.profileImage) { %>
-                                    <img src="<%= user.profileImage %>" 
-                                         alt="<%= user.name %>"
-                                         style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold-color);"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <% } %>
-                                <div style="<%= user.profileImage ? 'display:none;' : '' %>width:35px;height:35px;border-radius:50%;background:var(--secondary-color);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px;border:2px solid var(--gold-color);">
-                                    <%= user.name.charAt(0) %>
-                                </div>
+                                <i class="fas fa-user-circle" style="font-size: 30px;"></i>
                             </a>
+                            <div class="user-dropdown" style="display: none;">
+                                <span class="user-name"><%= user.name %></span>
+                                <a href="/account">حسابي</a>
+                                <a href="/account/orders">طلباتي</a>
+                                <a href="/account/wishlist">المفضلة</a>
+                                <% if (user.role === 'admin' || user.role === 'superadmin') { %>
+                                    <a href="/admin/dashboard" style="color: var(--gold-color);">لوحة التحكم</a>
+                                <% } %>
+                                <a href="/auth/logout" style="color: var(--secondary-color);">تسجيل الخروج</a>
+                            </div>
                         </div>
                     <% } else { %>
                         <a href="/auth/login" class="login-btn">
@@ -138,6 +140,7 @@
                 </div>
             </div>
             
+            <%# القائمة الرئيسية %>
             <nav class="main-nav" id="mainNav">
                 <ul>
                     <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">
@@ -145,6 +148,15 @@
                     </a></li>
                     <li><a href="/products" class="<%= currentPath.startsWith('/products') ? 'active' : '' %>">
                         <i class="fas fa-th-large"></i> <%= currentLanguage === 'en' ? 'All Products' : 'كل المنتجات' %>
+                    </a></li>
+                    <li><a href="/products?category=electronics">
+                        <i class="fas fa-laptop"></i> <%= currentLanguage === 'en' ? 'Electronics' : 'إلكترونيات' %>
+                    </a></li>
+                    <li><a href="/products?category=clothing">
+                        <i class="fas fa-tshirt"></i> <%= currentLanguage === 'en' ? 'Clothing' : 'ملابس' %>
+                    </a></li>
+                    <li><a href="/products?category=home">
+                        <i class="fas fa-home"></i> <%= currentLanguage === 'en' ? 'Home' : 'منزل' %>
                     </a></li>
                     <li><a href="/offers" class="<%= currentPath === '/offers' ? 'active' : '' %>">
                         <i class="fas fa-tags" style="color: var(--gold-color);"></i> <%= currentLanguage === 'en' ? 'Offers' : 'العروض' %>
@@ -157,8 +169,10 @@
         </div>
     </header>
 
+    <%# المحتوى الرئيسي %>
     <main class="main-content">
         
+        <%# رسائل التنبيه %>
         <% if (success_msg && success_msg.length > 0) { %>
             <div class="container">
                 <div class="alert alert-success animate-fadeIn">
