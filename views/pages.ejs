@@ -1,0 +1,196 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# الصفحات العامة (6 في 1)                         %>
+<%# ============================================= %>
+
+<%- include('partials/header') %>
+
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
+
+    <%# ============================================= %>
+    <%# 1. صفحة العروض والتخفيضات                       %>
+    <%# ============================================= %>
+    <% if (page === 'offers') { %>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 30px;">
+            <i class="fas fa-tags" style="color: var(--gold-color); margin-left: 10px;"></i>
+            العروض والتخفيضات
+        </h1>
+        
+        <% if (products && products.length > 0) { %>
+            <div class="products-grid cols-3">
+                <% products.forEach(function(product) { %>
+                    <%- include('partials/product-card', { product: product }) %>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div style="text-align: center; padding: 80px 20px; background: white; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="font-size: 80px; margin-bottom: 20px;">🏷️</div>
+                <h3>لا توجد عروض حالياً</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">لم يتم إضافة أي عروض أو تخفيضات حتى الآن</p>
+                <a href="/products" class="btn btn-primary btn-lg">تصفح المنتجات</a>
+            </div>
+        <% } %>
+        
+    <% } %>
+
+    <%# ============================================= %>
+    <%# 2. صفحة من نحن                                   %>
+    <%# ============================================= %>
+    <% if (page === 'about') { %>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px;">
+            <i class="fas fa-info-circle" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            من نحن
+        </h1>
+        
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); line-height: 2.2;">
+            <p style="font-size: 18px; font-weight: bold; color: var(--primary-color);">
+                🦅 مرحباً بكم في <strong><%= store.storeName || 'متجر الرعدي أون لاين' %></strong>
+            </p>
+            <p style="color: var(--text-light);">
+                وجهتكم المفضلة للتسوق الإلكتروني العالمي. نقدم لكم أفضل المنتجات العالمية بأسعار تنافسية وجودة عالية مع خدمة توصيل سريعة وآمنة إلى باب منزلكم.
+            </p>
+            <p style="color: var(--text-light);">
+                نسعى دائماً لتقديم تجربة تسوق فريدة تجمع بين السهولة والأمان والجودة. فريقنا ملتزم بتوفير أحدث المنتجات وأفضلها لعملائنا الكرام.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 25px;">
+                <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+                    <div style="font-size: 30px; color: var(--secondary-color); margin-bottom: 8px;"><i class="fas fa-truck-fast"></i></div>
+                    <strong>توصيل سريع</strong>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+                    <div style="font-size: 30px; color: var(--success-color); margin-bottom: 8px;"><i class="fas fa-shield-alt"></i></div>
+                    <strong>دفع آمن</strong>
+                </div>
+                <div style="text-align: center; padding: 20px; background: var(--bg-color); border-radius: 10px;">
+                    <div style="font-size: 30px; color: var(--gold-color); margin-bottom: 8px;"><i class="fas fa-headset"></i></div>
+                    <strong>دعم 24/7</strong>
+                </div>
+            </div>
+        </div>
+        
+    <% } %>
+
+    <%# ============================================= %>
+    <%# 3. صفحة سياسة الخصوصية                            %>
+    <%# ============================================= %>
+    <% if (page === 'privacy-policy') { %>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px;">
+            <i class="fas fa-lock" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            سياسة الخصوصية
+        </h1>
+        
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); line-height: 2.2;">
+            <p style="color: var(--text-light);">
+                نحن في <strong><%= store.storeName || 'متجر الرعدي أون لاين' %></strong> نلتزم بحماية خصوصية عملائنا. نوضح لك كيفية جمع واستخدام وحماية معلوماتك الشخصية.
+            </p>
+            <h4>المعلومات التي نجمعها:</h4>
+            <ul style="color: var(--text-light); padding-right: 20px;">
+                <li>الاسم الكامل</li>
+                <li>البريد الإلكتروني</li>
+                <li>رقم الهاتف</li>
+                <li>عنوان الشحن</li>
+            </ul>
+            <h4>كيفية استخدام المعلومات:</h4>
+            <ul style="color: var(--text-light); padding-right: 20px;">
+                <li>تنفيذ الطلبات وتوصيلها</li>
+                <li>تحسين تجربة التسوق</li>
+                <li>إرسال العروض والتخفيضات (بموافقتك)</li>
+            </ul>
+            <p style="color: var(--danger-color); font-weight: bold;">لا نقوم بمشاركة معلوماتك مع أي طرف ثالث.</p>
+        </div>
+        
+    <% } %>
+
+    <%# ============================================= %>
+    <%# 4. صفحة الشروط والأحكام                           %>
+    <%# ============================================= %>
+    <% if (page === 'terms') { %>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px;">
+            <i class="fas fa-file-contract" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            الشروط والأحكام
+        </h1>
+        
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); line-height: 2.2;">
+            <p style="color: var(--text-light);">
+                باستخدامك لموقع <strong><%= store.storeName || 'متجر الرعدي أون لاين' %></strong>، فإنك توافق على الشروط والأحكام التالية:
+            </p>
+            <ol style="color: var(--text-light); padding-right: 20px;">
+                <li>جميع المنتجات المعروضة تخضع للتوفر في المخزون.</li>
+                <li>الأسعار قابلة للتغيير دون إشعار مسبق.</li>
+                <li>يمنع استخدام الموقع لأي غرض غير قانوني.</li>
+                <li>المتجر غير مسؤول عن سوء استخدام المنتجات.</li>
+                <li>جميع المعاملات تخضع لأنظمة المملكة العربية السعودية.</li>
+            </ol>
+        </div>
+        
+    <% } %>
+
+    <%# ============================================= %>
+    <%# 5. صفحة سياسة الشحن والتسليم                      %>
+    <%# ============================================= %>
+    <% if (page === 'shipping-policy') { %>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px;">
+            <i class="fas fa-truck" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            سياسة الشحن والتسليم
+        </h1>
+        
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); line-height: 2.2;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div style="background: var(--bg-color); padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🇸🇦</div>
+                    <h4>شحن داخلي</h4>
+                    <p style="color: var(--text-light);">توصيل خلال 2-5 أيام عمل</p>
+                    <strong><%= store.shippingInternal || 25 %> ر.س</strong>
+                </div>
+                <div style="background: var(--bg-color); padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🌍</div>
+                    <h4>شحن دولي</h4>
+                    <p style="color: var(--text-light);">توصيل خلال 7-14 يوم عمل</p>
+                    <strong><%= store.shippingInternational || 75 %> ر.س</strong>
+                </div>
+            </div>
+            
+            <p style="color: var(--text-light);">
+                🚀 <strong>شحن مجاني</strong> للطلبات التي تزيد عن <strong><%= store.freeShippingMin || 300 %> ر.س</strong>.
+            </p>
+        </div>
+        
+    <% } %>
+
+    <%# ============================================= %>
+    <%# 6. صفحة سياسة الاستبدال والاسترجاع                 %>
+    <%# ============================================= %>
+    <% if (page === 'return-policy') { %>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 20px;">
+            <i class="fas fa-exchange-alt" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            سياسة الاستبدال والاسترجاع
+        </h1>
+        
+        <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); line-height: 2.2;">
+            
+            <div style="background: var(--danger-bg); padding: 15px; border-radius: 10px; border-right: 4px solid var(--danger-color); margin-bottom: 20px;">
+                <p style="color: #721c24; margin: 0; font-weight: bold;">⚠️ هام: يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.</p>
+            </div>
+            
+            <ol style="color: var(--text-light); padding-right: 20px;">
+                <li>يحق للزبون استبدال السلعة بأخرى خلال <strong>3 أيام فقط</strong> من تاريخ الاستلام.</li>
+                <li>الاستبدال متاح فقط في حال وجود <strong>خلل مصنعي واضح</strong>.</li>
+                <li>لا يشمل الاستبدال الأضرار الناتجة عن <strong>سوء الاستخدام</strong>.</li>
+                <li>أي كشط أو تلف في <strong>ملصقات الضمان</strong> أو العبوات الأصلية يلغي الضمان.</li>
+                <li>يجب إحضار <strong>الفاتورة الأصلية</strong> عند طلب الاستبدال.</li>
+            </ol>
+        </div>
+        
+    <% } %>
+
+</div>
+
+<%- include('partials/footer') %>
