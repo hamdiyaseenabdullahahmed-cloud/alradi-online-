@@ -8,7 +8,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { isAdmin, isSuperAdmin, logAdminActivity } = require('../middleware/auth');
+const { isAdmin, isSuperAdmin } = require('../middleware/auth');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const Order = require('../models/Order');
@@ -26,7 +26,6 @@ const ExcelJS = require('exceljs');
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         let uploadPath = 'public/uploads/';
-        
         if (file.fieldname === 'logo' || file.fieldname === 'favicon') {
             uploadPath += 'logos/';
         } else if (file.fieldname === 'profileImage') {
@@ -36,11 +35,9 @@ const storage = multer.diskStorage({
         } else {
             uploadPath += 'products/';
         }
-        
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
-        
         cb(null, uploadPath);
     },
     filename: function(req, file, cb) {
@@ -51,22 +48,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    limits: {
-        fileSize: 50 * 1024 * 1024 // 50MB
-    },
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: function(req, file, cb) {
         const imageTypes = /jpeg|jpg|png|gif|webp|svg/;
         const audioTypes = /mp3|wav|ogg|m4a/;
-        
         const extname = path.extname(file.originalname).toLowerCase();
-        
         if (file.fieldname === 'audio') {
-            const isValidAudio = audioTypes.test(extname);
-            if (isValidAudio) return cb(null, true);
+            if (audioTypes.test(extname)) return cb(null, true);
             return cb(new Error('ملفات الصوت المسموحة: mp3, wav, ogg, m4a'));
         } else {
-            const isValidImage = imageTypes.test(extname);
-            if (isValidImage) return cb(null, true);
+            if (imageTypes.test(extname)) return cb(null, true);
             return cb(new Error('ملفات الصور المسموحة: jpeg, jpg, png, gif, webp, svg'));
         }
     }
@@ -84,14 +75,11 @@ router.use(isAdmin);
 
 router.get('/dashboard', async (req, res) => {
     try {
-        // إحصائيات عامة
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
-        
-        // تنفيذ جميع الاستعلامات بالتوازي
+
         const [
             totalUsers,
             totalProducts,
@@ -131,14 +119,11 @@ router.get('/dashboard', async (req, res) => {
             Product.countDocuments({ stock: { $lte: 5, $gt: 0 }, isActive: true, isUnlimited: false }),
             Order.find().sort('-createdAt').limit(5).populate('user', 'name email'),
             User.find({ role: 'customer' }).sort('-createdAt').limit(5).select('name email createdAt'),
-            Order.aggregate([
-                { $group: { _id: '$status', count: { $sum: 1 } } }
-            ]),
+            Order.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
             Product.find({ isActive: true }).sort('-sales').limit(10).select('name sales price images'),
             Message.find({ isDeleted: false }).sort('-createdAt').limit(5)
         ]);
-        
-        // تجهيز البيانات للعرض
+
         const stats = {
             totalUsers,
             totalProducts,
@@ -150,7 +135,7 @@ router.get('/dashboard', async (req, res) => {
             yearRevenue: yearRevenue.length > 0 ? yearRevenue[0].total : 0,
             lowStockProducts
         };
-        
+
         res.render('admin/dashboard', {
             pageTitle: 'لوحة التحكم',
             activeMenu: 'dashboard',
@@ -163,7 +148,6 @@ router.get('/dashboard', async (req, res) => {
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
-        
     } catch (error) {
         console.error('خطأ في تحميل لوحة التحكم:', error);
         req.flash('error_msg', 'حدث خطأ في تحميل البيانات');
@@ -183,9 +167,7 @@ router.get('/products', async (req, res) => {
         const category = req.query.category || '';
         const status = req.query.status || '';
         const sort = req.query.sort || '-createdAt';
-        
         const filter = {};
-        
         if (search) {
             filter.$or = [
                 { name: { $regex: search, $options: 'i' } },
@@ -193,9 +175,7 @@ router.get('/products', async (req, res) => {
                 { sku: { $regex: search, $options: 'i' } }
             ];
         }
-        
         if (category) filter.category = category;
-        
         if (status === 'active') filter.isActive = true;
         if (status === 'inactive') filter.isActive = false;
         if (status === 'low_stock') {
@@ -203,26 +183,18 @@ router.get('/products', async (req, res) => {
             filter.isUnlimited = false;
         }
         if (status === 'out_of_stock') filter.stockStatus = 'out_of_stock';
-        
         const skip = (page - 1) * limit;
-        
         const [products, total, categories] = await Promise.all([
             Product.find(filter).sort(sort).skip(skip).limit(limit).populate('category', 'name'),
             Product.countDocuments(filter),
             Category.find({ isActive: true }).select('name')
         ]);
-        
         res.render('admin/products', {
             pageTitle: 'إدارة المنتجات',
             activeMenu: 'products',
             products,
             categories,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            },
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
             search,
             category,
             status,
@@ -230,7 +202,6 @@ router.get('/products', async (req, res) => {
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
-        
     } catch (error) {
         console.error('خطأ في تحميل المنتجات:', error);
         req.flash('error_msg', 'حدث خطأ في تحميل المنتجات');
@@ -245,7 +216,6 @@ router.get('/products', async (req, res) => {
 router.get('/products/add', async (req, res) => {
     try {
         const categories = await Category.find({ isActive: true }).select('name');
-        
         res.render('admin/product-form', {
             pageTitle: 'إضافة منتج جديد',
             activeMenu: 'products',
@@ -274,8 +244,7 @@ router.post('/products/add', upload.array('images', 10), async (req, res) => {
             stock, sku, isUnlimited, isFeatured, isNewArrival,
             discountType, discountValue
         } = req.body;
-        
-        // تجهيز الصور
+
         const images = [];
         if (req.files && req.files.length > 0) {
             req.files.forEach((file, index) => {
@@ -287,8 +256,6 @@ router.post('/products/add', upload.array('images', 10), async (req, res) => {
                 });
             });
         }
-        
-        // إذا تم إدخال روابط صور خارجية
         if (req.body.imageUrls) {
             const urls = req.body.imageUrls.split('\n').filter(url => url.trim());
             urls.forEach((url, index) => {
@@ -300,37 +267,13 @@ router.post('/products/add', upload.array('images', 10), async (req, res) => {
                 });
             });
         }
-        
-        // تجهيز الخيارات (ألوان، مقاسات)
-        const options = [];
-        if (req.body.optionNames) {
-            const optionNames = Array.isArray(req.body.optionNames) ? req.body.optionNames : [req.body.optionNames];
-            for (const optName of optionNames) {
-                const values = [];
-                const valueKeys = Object.keys(req.body).filter(k => k.startsWith(`optionValue_${optName}_`));
-                for (const key of valueKeys) {
-                    const index = key.split('_').pop();
-                    values.push({
-                        value: req.body[key],
-                        additionalPrice: parseFloat(req.body[`optionPrice_${optName}_${index}`]) || 0,
-                        stock: parseInt(req.body[`optionStock_${optName}_${index}`]) || 0
-                    });
-                }
-                options.push({
-                    name: optName,
-                    type: 'custom',
-                    values
-                });
-            }
-        }
-        
-        // تجهيز الخصم
+
         const discount = {
             type: discountType || 'none',
             value: parseFloat(discountValue) || 0,
             isActive: discountType && discountType !== 'none' && parseFloat(discountValue) > 0
         };
-        
+
         const product = new Product({
             name,
             nameEn: nameEn || '',
@@ -347,21 +290,16 @@ router.post('/products/add', upload.array('images', 10), async (req, res) => {
             isFeatured: isFeatured === 'on',
             isNewArrival: isNewArrival === 'on',
             images,
-            options,
             discount
         });
-        
+
         await product.save();
-        
-        // تحديث عدد منتجات القسم
+
         const categoryDoc = await Category.findById(category);
-        if (categoryDoc) {
-            await categoryDoc.updateProductCount();
-        }
-        
+        if (categoryDoc) await categoryDoc.updateProductCount();
+
         req.flash('success_msg', 'تم إضافة المنتج بنجاح');
         res.redirect('/admin/products');
-        
     } catch (error) {
         console.error('خطأ في إضافة المنتج:', error);
         req.flash('error_msg', 'حدث خطأ في إضافة المنتج: ' + error.message);
@@ -380,9 +318,7 @@ router.get('/products/edit/:id', async (req, res) => {
             req.flash('error_msg', 'المنتج غير موجود');
             return res.redirect('/admin/products');
         }
-        
         const categories = await Category.find({ isActive: true }).select('name');
-        
         res.render('admin/product-form', {
             pageTitle: 'تعديل المنتج: ' + product.name,
             activeMenu: 'products',
@@ -410,8 +346,7 @@ router.post('/products/edit/:id', upload.array('images', 10), async (req, res) =
             req.flash('error_msg', 'المنتج غير موجود');
             return res.redirect('/admin/products');
         }
-        
-        // تحديث الحقول الأساسية
+
         product.name = req.body.name;
         product.nameEn = req.body.nameEn || '';
         product.description = req.body.description;
@@ -427,8 +362,7 @@ router.post('/products/edit/:id', upload.array('images', 10), async (req, res) =
         product.isFeatured = req.body.isFeatured === 'on';
         product.isNewArrival = req.body.isNewArrival === 'on';
         product.isActive = req.body.isActive === 'on';
-        
-        // تحديث الصور إذا تم رفع صور جديدة
+
         if (req.files && req.files.length > 0) {
             product.images = req.files.map((file, index) => ({
                 url: '/' + file.path.replace(/\\/g, '/').replace('public/', ''),
@@ -437,19 +371,17 @@ router.post('/products/edit/:id', upload.array('images', 10), async (req, res) =
                 order: index
             }));
         }
-        
-        // تحديث الخصم
+
         product.discount = {
             type: req.body.discountType || 'none',
             value: parseFloat(req.body.discountValue) || 0,
             isActive: req.body.discountType && req.body.discountType !== 'none' && parseFloat(req.body.discountValue) > 0
         };
-        
+
         await product.save();
-        
+
         req.flash('success_msg', 'تم تحديث المنتج بنجاح');
         res.redirect('/admin/products');
-        
     } catch (error) {
         console.error('خطأ في تحديث المنتج:', error);
         req.flash('error_msg', 'حدث خطأ في تحديث المنتج');
@@ -464,14 +396,9 @@ router.post('/products/edit/:id', upload.array('images', 10), async (req, res) =
 router.delete('/products/delete/:id', async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
-        
         if (product) {
-            // تحديث عدد منتجات القسم
             const category = await Category.findById(product.category);
-            if (category) {
-                await category.updateProductCount();
-            }
-            
+            if (category) await category.updateProductCount();
             res.json({ success: true, message: 'تم حذف المنتج بنجاح' });
         } else {
             res.status(404).json({ success: false, message: 'المنتج غير موجود' });
@@ -483,13 +410,12 @@ router.delete('/products/delete/:id', async (req, res) => {
 });
 
 // =============================================
-// إدارة الأقسام
+// إدارة الأقسام - عرض
 // =============================================
 
 router.get('/categories', async (req, res) => {
     try {
         const categories = await Category.find().sort('order').populate('parent', 'name');
-        
         res.render('admin/categories', {
             pageTitle: 'إدارة الأقسام',
             activeMenu: 'categories',
@@ -505,7 +431,58 @@ router.get('/categories', async (req, res) => {
 });
 
 // =============================================
-// إضافة قسم جديد
+// صفحة إضافة قسم جديد
+// =============================================
+
+router.get('/categories/add', async (req, res) => {
+    try {
+        const categories = await Category.find({ isActive: true }).select('name');
+        res.render('admin/category-form', {
+            pageTitle: 'إضافة قسم جديد',
+            activeMenu: 'categories',
+            isEdit: false,
+            category: null,
+            categories,
+            success_msg: req.flash('success_msg'),
+            error_msg: req.flash('error_msg')
+        });
+    } catch (error) {
+        console.error('خطأ في صفحة إضافة قسم:', error);
+        req.flash('error_msg', 'حدث خطأ في تحميل الصفحة');
+        res.redirect('/admin/categories');
+    }
+});
+
+// =============================================
+// صفحة تعديل قسم
+// =============================================
+
+router.get('/categories/edit/:id', async (req, res) => {
+    try {
+        const category = await Category.findById(req.params.id);
+        if (!category) {
+            req.flash('error_msg', 'القسم غير موجود');
+            return res.redirect('/admin/categories');
+        }
+        const categories = await Category.find({ isActive: true, _id: { $ne: req.params.id } }).select('name');
+        res.render('admin/category-form', {
+            pageTitle: 'تعديل القسم',
+            activeMenu: 'categories',
+            isEdit: true,
+            category,
+            categories,
+            success_msg: req.flash('success_msg'),
+            error_msg: req.flash('error_msg')
+        });
+    } catch (error) {
+        console.error('خطأ في صفحة تعديل القسم:', error);
+        req.flash('error_msg', 'حدث خطأ في تحميل الصفحة');
+        res.redirect('/admin/categories');
+    }
+});
+
+// =============================================
+// إضافة قسم جديد - معالجة
 // =============================================
 
 router.post('/categories/add', upload.single('image'), async (req, res) => {
@@ -521,16 +498,12 @@ router.post('/categories/add', upload.single('image'), async (req, res) => {
             showInMenu: req.body.showInMenu === 'on',
             icon: req.body.icon || 'fa-folder'
         });
-        
         if (req.file) {
             category.image = '/' + req.file.path.replace(/\\/g, '/').replace('public/', '');
         }
-        
         await category.save();
-        
         req.flash('success_msg', 'تم إضافة القسم بنجاح');
         res.redirect('/admin/categories');
-        
     } catch (error) {
         console.error('خطأ في إضافة القسم:', error);
         req.flash('error_msg', 'حدث خطأ في إضافة القسم');
@@ -539,7 +512,7 @@ router.post('/categories/add', upload.single('image'), async (req, res) => {
 });
 
 // =============================================
-// تعديل قسم
+// تعديل قسم - معالجة
 // =============================================
 
 router.post('/categories/edit/:id', upload.single('image'), async (req, res) => {
@@ -549,7 +522,6 @@ router.post('/categories/edit/:id', upload.single('image'), async (req, res) => 
             req.flash('error_msg', 'القسم غير موجود');
             return res.redirect('/admin/categories');
         }
-        
         category.name = req.body.name;
         category.nameEn = req.body.nameEn || '';
         category.description = req.body.description || '';
@@ -559,16 +531,12 @@ router.post('/categories/edit/:id', upload.single('image'), async (req, res) => 
         category.isFeatured = req.body.isFeatured === 'on';
         category.showInMenu = req.body.showInMenu === 'on';
         category.icon = req.body.icon || 'fa-folder';
-        
         if (req.file) {
             category.image = '/' + req.file.path.replace(/\\/g, '/').replace('public/', '');
         }
-        
         await category.save();
-        
         req.flash('success_msg', 'تم تحديث القسم بنجاح');
         res.redirect('/admin/categories');
-        
     } catch (error) {
         console.error('خطأ في تحديث القسم:', error);
         req.flash('error_msg', 'حدث خطأ في تحديث القسم');
@@ -601,7 +569,6 @@ router.get('/orders', async (req, res) => {
         const status = req.query.status || '';
         const search = req.query.search || '';
         const sort = req.query.sort || '-createdAt';
-        
         const filter = {};
         if (status) filter.status = status;
         if (search) {
@@ -611,30 +578,21 @@ router.get('/orders', async (req, res) => {
                 { customerEmail: { $regex: search, $options: 'i' } }
             ];
         }
-        
         const skip = (page - 1) * limit;
-        
         const [orders, total] = await Promise.all([
             Order.find(filter).sort(sort).skip(skip).limit(limit).populate('user', 'name email'),
             Order.countDocuments(filter)
         ]);
-        
         res.render('admin/orders', {
             pageTitle: 'إدارة الطلبات',
             activeMenu: 'orders',
             orders,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            },
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
             status,
             search,
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
-        
     } catch (error) {
         console.error('خطأ في تحميل الطلبات:', error);
         req.flash('error_msg', 'حدث خطأ في تحميل الطلبات');
@@ -651,12 +609,10 @@ router.get('/orders/:id', async (req, res) => {
         const order = await Order.findById(req.params.id)
             .populate('user', 'name email phone')
             .populate('items.product', 'name images');
-        
         if (!order) {
             req.flash('error_msg', 'الطلب غير موجود');
             return res.redirect('/admin/orders');
         }
-        
         res.render('admin/order-detail', {
             pageTitle: 'تفاصيل الطلب: ' + order.orderNumber,
             activeMenu: 'orders',
@@ -679,13 +635,10 @@ router.post('/orders/update-status/:id', async (req, res) => {
     try {
         const { status, note } = req.body;
         const order = await Order.findById(req.params.id);
-        
         if (!order) {
             return res.json({ success: false, message: 'الطلب غير موجود' });
         }
-        
         await order.updateStatus(status, note, req.user._id);
-        
         res.json({ success: true, message: 'تم تحديث حالة الطلب بنجاح' });
     } catch (error) {
         console.error('خطأ في تحديث حالة الطلب:', error);
@@ -703,7 +656,6 @@ router.get('/customers', async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const search = req.query.search || '';
         const sort = req.query.sort || '-createdAt';
-        
         const filter = { role: 'customer' };
         if (search) {
             filter.$or = [
@@ -712,24 +664,16 @@ router.get('/customers', async (req, res) => {
                 { username: { $regex: search, $options: 'i' } }
             ];
         }
-        
         const skip = (page - 1) * limit;
-        
         const [customers, total] = await Promise.all([
             User.find(filter).sort(sort).skip(skip).limit(limit).select('-password'),
             User.countDocuments(filter)
         ]);
-        
         res.render('admin/customers', {
             pageTitle: 'إدارة العملاء',
             activeMenu: 'customers',
             customers,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            },
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
             search,
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
@@ -748,14 +692,11 @@ router.get('/customers', async (req, res) => {
 router.get('/customers/:id', async (req, res) => {
     try {
         const customer = await User.findById(req.params.id).select('-password');
-        
         if (!customer) {
             req.flash('error_msg', 'العميل غير موجود');
             return res.redirect('/admin/customers');
         }
-        
         const orders = await Order.find({ user: customer._id }).sort('-createdAt');
-        
         res.render('admin/customer-detail', {
             pageTitle: 'تفاصيل العميل: ' + customer.name,
             activeMenu: 'customers',
@@ -778,7 +719,6 @@ router.get('/customers/:id', async (req, res) => {
 router.get('/settings', async (req, res) => {
     try {
         const settings = await StoreSettings.getSettings();
-        
         res.render('admin/settings', {
             pageTitle: 'إعدادات المتجر',
             activeMenu: 'settings',
@@ -808,8 +748,6 @@ router.post('/settings', upload.fields([
 ]), async (req, res) => {
     try {
         const updateData = { ...req.body };
-        
-        // تحديث مسارات الملفات المرفوعة
         if (req.files) {
             if (req.files.storeLogo) {
                 updateData.storeLogo = '/' + req.files.storeLogo[0].path.replace(/\\/g, '/').replace('public/', '');
@@ -817,7 +755,6 @@ router.post('/settings', upload.fields([
             if (req.files.storeFavicon) {
                 updateData.storeFavicon = '/' + req.files.storeFavicon[0].path.replace(/\\/g, '/').replace('public/', '');
             }
-            // تحديث ملفات الصوت
             const audioFields = ['voiceGreetingFile', 'voiceAddToCartFile', 'voiceSaveFile', 'voicePrintFile', 'voiceSortFile'];
             audioFields.forEach(field => {
                 if (req.files[field]) {
@@ -825,8 +762,6 @@ router.post('/settings', upload.fields([
                 }
             });
         }
-        
-        // تحويل القيم المنطقية
         const booleanFields = [
             'enableInternationalShipping', 'voiceGreetingEnabled', 'voiceInteractionsEnabled',
             'showHeroSlider', 'showFeaturedProducts', 'showNewArrivals', 'showBestSellers',
@@ -835,16 +770,12 @@ router.post('/settings', upload.fields([
             'lowStockAlert', 'enableLoyaltyProgram', 'maintenanceMode', 'enableWishlist',
             'enableProductComparison', 'enableReviews', 'reviewsAutoApprove', 'enableGuestCheckout'
         ];
-        
         booleanFields.forEach(field => {
             updateData[field] = req.body[field] === 'on' || req.body[field] === 'true';
         });
-        
         await StoreSettings.updateSettings(updateData);
-        
         req.flash('success_msg', 'تم تحديث إعدادات المتجر بنجاح');
         res.redirect('/admin/settings');
-        
     } catch (error) {
         console.error('خطأ في تحديث الإعدادات:', error);
         req.flash('error_msg', 'حدث خطأ في تحديث الإعدادات');
@@ -860,7 +791,6 @@ router.get('/chat', async (req, res) => {
     try {
         const conversations = await Message.getConversationsList(req.user._id.toString(), 'admin');
         const connectedUsers = req.app.get('connectedUsers');
-        
         res.render('admin/chat', {
             pageTitle: 'مركز المحادثات',
             activeMenu: 'chat',
@@ -884,24 +814,16 @@ router.get('/activity-log', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 50;
-        
         const errors = await ErrorLog.find()
             .sort('-createdAt')
             .skip((page - 1) * limit)
             .limit(limit);
-        
         const total = await ErrorLog.countDocuments();
-        
         res.render('admin/activity-log', {
             pageTitle: 'سجل النشاطات',
             activeMenu: 'activity-log',
             errors,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            },
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) },
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
@@ -920,10 +842,8 @@ router.get('/reports', async (req, res) => {
     try {
         const type = req.query.type || 'sales';
         const period = req.query.period || 'month';
-        
         let startDate, endDate;
         const now = new Date();
-        
         if (period === 'today') {
             startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             endDate = now;
@@ -940,9 +860,7 @@ router.get('/reports', async (req, res) => {
             startDate = new Date(req.query.startDate);
             endDate = new Date(req.query.endDate);
         }
-        
         let reportData = {};
-        
         if (type === 'sales') {
             reportData = await Order.getStats(startDate, endDate);
         } else if (type === 'products') {
@@ -956,7 +874,6 @@ router.get('/reports', async (req, res) => {
                 .limit(20)
                 .select('name totalSpent totalOrders email');
         }
-        
         res.render('admin/reports', {
             pageTitle: 'التقارير',
             activeMenu: 'reports',
@@ -982,22 +899,15 @@ router.get('/reports', async (req, res) => {
 router.get('/reports/export-pdf', async (req, res) => {
     try {
         const type = req.query.type || 'sales';
-        
         const doc = new PDFDocument({ size: 'A4', margin: 50 });
-        
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=report-${type}-${Date.now()}.pdf`);
-        
         doc.pipe(res);
-        
-        // ترويسة التقرير
         doc.fontSize(20).text('متجر الرعدي أون لاين', { align: 'center' });
         doc.fontSize(14).text(`تقرير ${type === 'sales' ? 'المبيعات' : type === 'products' ? 'المنتجات' : 'العملاء'}`, { align: 'center' });
         doc.moveDown();
         doc.fontSize(10).text(`تاريخ التصدير: ${new Date().toLocaleDateString('ar-SA')}`, { align: 'left' });
         doc.moveDown();
-        
-        // محتوى التقرير حسب النوع
         if (type === 'sales') {
             const stats = await Order.getStats();
             doc.fontSize(12).text(`إجمالي الطلبات: ${stats.totalOrders}`);
@@ -1009,9 +919,7 @@ router.get('/reports/export-pdf', async (req, res) => {
                 doc.text(`${index + 1}. ${product.name} - ${product.sales} مبيعات - ${product.revenue} ر.س`);
             });
         }
-        
         doc.end();
-        
     } catch (error) {
         console.error('خطأ في تصدير PDF:', error);
         res.status(500).json({ success: false, message: 'حدث خطأ في تصدير التقرير' });
@@ -1025,34 +933,23 @@ router.get('/reports/export-pdf', async (req, res) => {
 router.get('/reports/export-excel', async (req, res) => {
     try {
         const type = req.query.type || 'sales';
-        
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('التقرير');
-        
         worksheet.columns = [
             { header: 'الرقم', key: 'id', width: 10 },
             { header: 'الاسم', key: 'name', width: 30 },
             { header: 'القيمة', key: 'value', width: 20 }
         ];
-        
-        // إضافة البيانات حسب النوع
         if (type === 'products') {
             const products = await Product.find({ isActive: true }).sort('-sales').limit(50);
             products.forEach((product, index) => {
-                worksheet.addRow({
-                    id: index + 1,
-                    name: product.name,
-                    value: product.sales
-                });
+                worksheet.addRow({ id: index + 1, name: product.name, value: product.sales });
             });
         }
-        
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename=report-${type}-${Date.now()}.xlsx`);
-        
         await workbook.xlsx.write(res);
         res.end();
-        
     } catch (error) {
         console.error('خطأ في تصدير Excel:', error);
         res.status(500).json({ success: false, message: 'حدث خطأ في تصدير التقرير' });
@@ -1067,7 +964,6 @@ router.get('/backup', isSuperAdmin, async (req, res) => {
     try {
         const backupDir = path.join(__dirname, '..', 'backups');
         let backups = [];
-        
         if (fs.existsSync(backupDir)) {
             backups = fs.readdirSync(backupDir)
                 .filter(file => file.endsWith('.zip'))
@@ -1078,7 +974,6 @@ router.get('/backup', isSuperAdmin, async (req, res) => {
                 }))
                 .sort((a, b) => b.date - a.date);
         }
-        
         res.render('admin/backup', {
             pageTitle: 'النسخ الاحتياطي',
             activeMenu: 'backup',
