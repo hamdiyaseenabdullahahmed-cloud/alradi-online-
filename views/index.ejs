@@ -47,7 +47,6 @@
                      alt="متجر الرعدي" 
                      style="width: 200px; height: 200px; border-radius: 50%; border: 5px solid var(--gold-color); box-shadow: 0 0 50px rgba(255,215,0,0.5); object-fit: cover;">
             </div>
-            <%# زخرفة خلفية %>
             <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
             <div style="position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
         </div>
@@ -74,7 +73,7 @@
         </div>
         <div class="products-grid cols-4" style="gap: 20px;">
             <% featuredCategories.forEach(function(category) { %>
-                <a href="/products?category=<%= category._id %>" class="category-card" style="
+                <a href="/products/category/<%= category.slug || category._id %>" class="category-card" style="
                     text-align: center;
                     padding: 30px 20px;
                     background: white;
