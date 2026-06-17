@@ -1,177 +1,755 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# لوحة تحكم المدير - تصميم احترافي                %>
+<%# لوحة تحكم المدير - تصميم احترافي فاخر            %>
 <%# ============================================= %>
 
 <%- include('../partials/header') %>
 
 <style>
-    .admin-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; min-height: 70vh; }
-    .admin-sidebar { background: white; border-radius: 15px; padding: 0; box-shadow: 0 2px 15px rgba(0,0,0,0.08); height: fit-content; position: sticky; top: 100px; overflow: hidden; }
-    .admin-sidebar .sidebar-header { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; padding: 25px 20px; text-align: center; }
-    .admin-sidebar .sidebar-header h3 { margin: 10px 0 0 0; font-size: 18px; }
-    .admin-sidebar .sidebar-header p { margin: 5px 0 0 0; font-size: 12px; opacity: 0.8; }
-    .admin-sidebar .sidebar-nav { padding: 10px 0; }
-    .admin-sidebar .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 14px 25px; color: var(--text-color); text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s; border-right: 3px solid transparent; }
-    .admin-sidebar .sidebar-nav a:hover { background: rgba(233,69,96,0.05); color: var(--secondary-color); border-right-color: var(--secondary-color); }
-    .admin-sidebar .sidebar-nav a.active { background: rgba(233,69,96,0.1); color: var(--secondary-color); border-right-color: var(--secondary-color); font-weight: 700; }
-    .admin-sidebar .sidebar-nav a i { width: 22px; text-align: center; font-size: 16px; }
-    .admin-sidebar .sidebar-nav .divider { border-top: 1px solid var(--border-color); margin: 10px 0; }
-    
-    .stat-card { background: white; border-radius: 15px; padding: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 18px; transition: transform 0.2s; }
-    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-    .stat-icon { width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-    .stat-info .stat-value { font-size: 24px; font-weight: 900; color: var(--primary-color); }
-    .stat-info .stat-label { font-size: 12px; color: var(--text-muted); }
-    
-    .panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .panel h3 { font-size: 16px; font-weight: 700; margin: 0 0 18px 0; }
-    
-    .recent-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .recent-table th { background: var(--bg-color); padding: 12px 15px; text-align: right; border-bottom: 2px solid var(--border-color); font-weight: 700; }
-    .recent-table td { padding: 10px 15px; border-bottom: 1px solid var(--border-light); }
-    .recent-table tr:hover { background: var(--bg-color); }
-    
-    .top-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
-    .top-item .rank { font-weight: 900; color: var(--text-muted); min-width: 30px; font-size: 16px; }
-    
-    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-    .quick-action { background: var(--bg-color); border-radius: 10px; padding: 18px 12px; text-align: center; text-decoration: none; color: var(--primary-color); font-weight: 600; font-size: 13px; transition: all 0.2s; display: block; }
-    .quick-action:hover { background: var(--secondary-color); color: white; transform: translateY(-2px); }
-    .quick-action i { font-size: 22px; margin-bottom: 8px; display: block; }
-    
+    /* ========== تنسيق لوحة التحكم ========== */
+    :root {
+        --admin-primary: #1a1a2e;
+        --admin-accent: #0f3460;
+        --admin-danger: #e94560;
+        --admin-success: #28a745;
+        --admin-warning: #ffc107;
+        --admin-info: #17a2b8;
+        --admin-gold: #ffd700;
+        --admin-card-bg: #ffffff;
+        --admin-body-bg: #f0f2f5;
+        --admin-border: #e8eaed;
+        --admin-text: #333333;
+        --admin-text-muted: #888888;
+        --admin-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        --admin-radius: 16px;
+        --admin-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .admin-wrapper {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+        min-height: 75vh;
+        align-items: start;
+    }
+
+    /* ========== القائمة الجانبية ========== */
+    .admin-sidebar {
+        background: var(--admin-card-bg);
+        border-radius: var(--admin-radius);
+        box-shadow: var(--admin-shadow);
+        overflow: hidden;
+        position: sticky;
+        top: 100px;
+        border: 1px solid var(--admin-border);
+    }
+
+    .admin-sidebar .sidebar-profile {
+        background: linear-gradient(135deg, var(--admin-primary), var(--admin-accent));
+        padding: 30px 20px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .admin-sidebar .sidebar-profile::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 120px;
+        height: 120px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+    }
+
+    .admin-sidebar .sidebar-profile::after {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 50%;
+    }
+
+    .admin-sidebar .sidebar-profile .avatar-circle {
+        width: 60px;
+        height: 60px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+        border: 2px solid var(--admin-gold);
+        box-shadow: 0 0 20px rgba(255,215,0,0.3);
+    }
+
+    .admin-sidebar .sidebar-profile h3 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 800;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-sidebar .sidebar-profile p {
+        margin: 4px 0 0 0;
+        font-size: 12px;
+        opacity: 0.8;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-sidebar .sidebar-nav {
+        padding: 12px 0;
+    }
+
+    .admin-sidebar .sidebar-nav .nav-section {
+        padding: 8px 20px 4px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--admin-text-muted);
+        font-weight: 700;
+    }
+
+    .admin-sidebar .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 13px 22px;
+        color: var(--admin-text);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: var(--admin-transition);
+        border-right: 3px solid transparent;
+        position: relative;
+    }
+
+    .admin-sidebar .sidebar-nav a:hover {
+        background: rgba(233,69,96,0.04);
+        color: var(--admin-danger);
+        border-right-color: var(--admin-danger);
+    }
+
+    .admin-sidebar .sidebar-nav a.active {
+        background: linear-gradient(90deg, rgba(233,69,96,0.08) 0%, rgba(233,69,96,0.02) 100%);
+        color: var(--admin-danger);
+        border-right-color: var(--admin-danger);
+        font-weight: 700;
+    }
+
+    .admin-sidebar .sidebar-nav a i {
+        width: 22px;
+        text-align: center;
+        font-size: 15px;
+        transition: var(--admin-transition);
+    }
+
+    .admin-sidebar .sidebar-nav a:hover i {
+        transform: scale(1.15);
+    }
+
+    .admin-sidebar .sidebar-nav a .badge-nav {
+        margin-right: auto;
+        background: var(--admin-danger);
+        color: white;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 700;
+    }
+
+    .admin-sidebar .sidebar-nav .nav-divider {
+        border-top: 1px solid var(--admin-border);
+        margin: 8px 20px;
+    }
+
+    .admin-sidebar .sidebar-footer {
+        padding: 15px 20px;
+        border-top: 1px solid var(--admin-border);
+        text-align: center;
+    }
+
+    .admin-sidebar .sidebar-footer a {
+        color: var(--admin-text-muted);
+        font-size: 12px;
+        text-decoration: none;
+        transition: var(--admin-transition);
+    }
+
+    .admin-sidebar .sidebar-footer a:hover {
+        color: var(--admin-danger);
+    }
+
+    /* ========== المحتوى الرئيسي ========== */
+    .admin-main {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .admin-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .admin-page-header h1 {
+        font-size: 28px;
+        font-weight: 900;
+        color: var(--admin-primary);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .admin-page-header h1 i {
+        color: var(--admin-danger);
+        margin-left: 8px;
+    }
+
+    .admin-page-header .header-date {
+        font-size: 13px;
+        color: var(--admin-text-muted);
+        display: block;
+        margin-top: 4px;
+    }
+
+    .btn-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 22px;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        transition: var(--admin-transition);
+        text-decoration: none;
+        border: none;
+        font-family: inherit;
+    }
+
+    .btn-admin-primary {
+        background: var(--admin-danger);
+        color: white;
+    }
+
+    .btn-admin-primary:hover {
+        background: #c73e54;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(233,69,96,0.3);
+    }
+
+    .btn-admin-outline {
+        background: transparent;
+        border: 2px solid var(--admin-border);
+        color: var(--admin-text);
+    }
+
+    .btn-admin-outline:hover {
+        border-color: var(--admin-danger);
+        color: var(--admin-danger);
+    }
+
+    /* ========== بطاقات الإحصائيات ========== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 18px;
+    }
+
+    .stat-card {
+        background: var(--admin-card-bg);
+        border-radius: var(--admin-radius);
+        padding: 24px;
+        box-shadow: var(--admin-shadow);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        transition: var(--admin-transition);
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        border-color: var(--admin-border);
+    }
+
+    .stat-card .stat-icon-wrap {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .stat-card .stat-icon-wrap.icon-users { background: rgba(233,69,96,0.1); color: var(--admin-danger); }
+    .stat-card .stat-icon-wrap.icon-products { background: rgba(40,167,69,0.1); color: var(--admin-success); }
+    .stat-card .stat-icon-wrap.icon-revenue { background: rgba(255,215,0,0.15); color: #b8860b; }
+    .stat-card .stat-icon-wrap.icon-stock { background: rgba(255,193,7,0.1); color: #e6a800; }
+    .stat-card .stat-icon-wrap.icon-today { background: rgba(23,162,184,0.1); color: var(--admin-info); }
+    .stat-card .stat-icon-wrap.icon-month { background: rgba(111,66,193,0.1); color: #6f42c1; }
+
+    .stat-card .stat-info .stat-value {
+        font-size: 26px;
+        font-weight: 900;
+        color: var(--admin-primary);
+        line-height: 1;
+    }
+
+    .stat-card .stat-info .stat-label {
+        font-size: 12px;
+        color: var(--admin-text-muted);
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    .stat-card .stat-trend {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .stat-card .stat-trend.up { background: rgba(40,167,69,0.1); color: var(--admin-success); }
+    .stat-card .stat-trend.down { background: rgba(233,69,96,0.1); color: var(--admin-danger); }
+
+    /* ========== اللوحات ========== */
+    .panel-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .admin-panel {
+        background: var(--admin-card-bg);
+        border-radius: var(--admin-radius);
+        padding: 28px;
+        box-shadow: var(--admin-shadow);
+        border: 1px solid var(--admin-border);
+    }
+
+    .admin-panel .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--admin-border);
+    }
+
+    .admin-panel .panel-header h3 {
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--admin-primary);
+        margin: 0;
+    }
+
+    .admin-panel .panel-header h3 i {
+        margin-left: 8px;
+    }
+
+    .admin-panel .panel-header .panel-link {
+        font-size: 12px;
+        color: var(--admin-danger);
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--admin-transition);
+    }
+
+    .admin-panel .panel-header .panel-link:hover {
+        color: #c73e54;
+        text-decoration: underline;
+    }
+
+    /* ========== جداول ========== */
+    .table-admin {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .table-admin thead th {
+        background: #f8f9fb;
+        padding: 12px 16px;
+        text-align: right;
+        font-weight: 700;
+        color: var(--admin-text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid var(--admin-border);
+    }
+
+    .table-admin tbody td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+
+    .table-admin tbody tr {
+        transition: var(--admin-transition);
+    }
+
+    .table-admin tbody tr:hover {
+        background: #fafbfc;
+    }
+
+    .badge-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-status.pending { background: #fff8e1; color: #b8860b; }
+    .badge-status.success { background: #e8f5e9; color: #2e7d32; }
+    .badge-status.danger { background: #ffebee; color: #c62828; }
+    .badge-status.info { background: #e3f2fd; color: #1565c0; }
+
+    /* ========== قائمة الأكثر مبيعاً ========== */
+    .top-list .top-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f5f5f5;
+        transition: var(--admin-transition);
+    }
+
+    .top-list .top-item:hover {
+        background: #fafbfc;
+        margin: 0 -10px;
+        padding: 12px 10px;
+        border-radius: 8px;
+    }
+
+    .top-list .top-item .rank-num {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .top-list .top-item:nth-child(1) .rank-num { background: #fff8e1; color: #b8860b; }
+    .top-list .top-item:nth-child(2) .rank-num { background: #f5f5f5; color: #666; }
+    .top-list .top-item:nth-child(3) .rank-num { background: #fdf2e9; color: #c0561a; }
+    .top-list .top-item .rank-num { background: #f8f9fb; color: #999; }
+
+    .top-list .top-item .item-info { flex: 1; }
+    .top-list .top-item .item-info strong { font-size: 13px; color: var(--admin-primary); display: block; }
+    .top-list .top-item .item-info small { font-size: 11px; color: var(--admin-text-muted); }
+
+    .top-list .top-item .item-sales {
+        background: #f8f9fb;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--admin-primary);
+    }
+
+    /* ========== أزرار سريعة ========== */
+    .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .quick-btn {
+        background: #f8f9fb;
+        border: 2px solid transparent;
+        border-radius: 14px;
+        padding: 22px 16px;
+        text-align: center;
+        text-decoration: none;
+        color: var(--admin-primary);
+        font-weight: 700;
+        font-size: 13px;
+        transition: var(--admin-transition);
+        display: block;
+        cursor: pointer;
+    }
+
+    .quick-btn:hover {
+        background: var(--admin-danger);
+        color: white;
+        border-color: var(--admin-danger);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(233,69,96,0.25);
+    }
+
+    .quick-btn i {
+        font-size: 26px;
+        margin-bottom: 10px;
+        display: block;
+        transition: var(--admin-transition);
+    }
+
+    .quick-btn:hover i {
+        transform: scale(1.2);
+    }
+
+    /* ========== تنبيه منخفض المخزون ========== */
+    .alert-admin {
+        padding: 16px 20px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .alert-warning-admin {
+        background: #fffdf5;
+        border: 1px solid #ffe082;
+        color: #8d6e00;
+    }
+
+    .alert-warning-admin i {
+        font-size: 22px;
+        color: var(--admin-warning);
+    }
+
+    /* ========== متجاوب ========== */
+    @media (max-width: 1100px) {
+        .panel-grid { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 900px) {
-        .admin-layout { grid-template-columns: 1fr; }
-        .admin-sidebar { position: static; }
+        .admin-wrapper { grid-template-columns: 1fr; }
+        .admin-sidebar { position: static; margin-bottom: 20px; }
+        .stats-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+    }
+
+    @media (max-width: 500px) {
+        .stats-grid { grid-template-columns: 1fr 1fr; }
+        .admin-panel { padding: 18px; }
+        .stat-card { padding: 16px; gap: 12px; }
+        .stat-card .stat-icon-wrap { width: 44px; height: 44px; font-size: 20px; }
+        .stat-card .stat-info .stat-value { font-size: 20px; }
     }
 </style>
 
 <div class="container">
     
-    <div style="margin-bottom: 25px;">
-        <h1 style="font-size: 26px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
-            <i class="fas fa-tachometer-alt" style="color: var(--secondary-color); margin-left: 10px;"></i>
-            لوحة التحكم
-        </h1>
-        <p style="color: var(--text-muted);">
-            <i class="fas fa-calendar"></i> <%= new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
-        </p>
+    <%# ========== رأس الصفحة ========== %>
+    <div class="admin-page-header" style="margin-bottom: 25px;">
+        <div>
+            <h1><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h1>
+            <span class="header-date">
+                <i class="fas fa-calendar-alt"></i> 
+                <%= new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                &nbsp;|&nbsp;
+                <i class="fas fa-clock"></i> آخر تحديث: <%= new Date().toLocaleTimeString('ar-SA') %>
+            </span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="/" target="_blank" class="btn-admin btn-admin-outline"><i class="fas fa-eye"></i> معاينة المتجر</a>
+            <a href="/admin/settings" class="btn-admin btn-admin-primary"><i class="fas fa-cog"></i> الإعدادات</a>
+        </div>
     </div>
     
-    <div class="admin-layout">
+    <div class="admin-wrapper">
         
-        <%# القائمة الجانبية %>
+        <%# ========== القائمة الجانبية ========== %>
         <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-user-shield" style="font-size: 40px;"></i>
+            <div class="sidebar-profile">
+                <div class="avatar-circle"><i class="fas fa-user-shield"></i></div>
                 <h3><%= user ? user.name : 'مدير النظام' %></h3>
                 <p>المدير العام</p>
             </div>
             <nav class="sidebar-nav">
+                <span class="nav-section">الرئيسية</span>
                 <a href="/admin/dashboard" class="active"><i class="fas fa-th-large"></i> لوحة المعلومات</a>
-                <a href="/admin/products"><i class="fas fa-boxes"></i> المنتجات</a>
+                
+                <span class="nav-section">الإدارة</span>
+                <a href="/admin/products"><i class="fas fa-boxes"></i> المنتجات <span class="badge-nav"><%= stats.totalProducts || 0 %></span></a>
                 <a href="/admin/categories"><i class="fas fa-folder-tree"></i> الأقسام</a>
-                <a href="/admin/orders"><i class="fas fa-receipt"></i> الطلبات</a>
+                <a href="/admin/orders"><i class="fas fa-receipt"></i> الطلبات <span class="badge-nav"><%= stats.totalOrders || 0 %></span></a>
                 <a href="/admin/customers"><i class="fas fa-users"></i> العملاء</a>
-                <div class="divider"></div>
+                
+                <span class="nav-section">أدوات</span>
                 <a href="/admin/settings"><i class="fas fa-cog"></i> الإعدادات</a>
                 <a href="/admin/chat"><i class="fas fa-comments"></i> المحادثات</a>
                 <a href="/admin/reports"><i class="fas fa-chart-bar"></i> التقارير</a>
                 <a href="/admin/activity-log"><i class="fas fa-history"></i> سجل النشاطات</a>
-                <div class="divider"></div>
-                <a href="/" target="_blank"><i class="fas fa-eye"></i> معاينة المتجر</a>
-                <a href="/auth/logout" style="color: var(--danger-color);"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+                
+                <div class="nav-divider"></div>
+                <a href="/" target="_blank"><i class="fas fa-external-link-alt"></i> معاينة المتجر</a>
+                <a href="/auth/logout" style="color: var(--admin-danger);"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
             </nav>
         </aside>
         
-        <%# المحتوى الرئيسي %>
-        <main>
+        <%# ========== المحتوى الرئيسي ========== %>
+        <main class="admin-main">
             
-            <%# بطاقات الإحصائيات %>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(233,69,96,0.1); color: var(--secondary-color);"><i class="fas fa-users"></i></div>
-                    <div class="stat-info"><div class="stat-value"><%= stats.totalUsers || 0 %></div><div class="stat-label">مشترك نشط</div></div>
+            <%# تنبيه منخفض المخزون %>
+            <% if (stats.lowStockProducts > 0) { %>
+                <div class="alert-admin alert-warning-admin">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span><strong>تنبيه:</strong> يوجد <strong><%= stats.lowStockProducts %></strong> منتجات منخفضة المخزون. <a href="/admin/products?status=low_stock" style="color: var(--admin-danger); font-weight: 700;">عرضها الآن →</a></span>
                 </div>
+            <% } %>
+            
+            <%# ========== بطاقات الإحصائيات ========== %>
+            <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(40,167,69,0.1); color: var(--success-color);"><i class="fas fa-box"></i></div>
-                    <div class="stat-info"><div class="stat-value"><%= stats.totalProducts || 0 %></div><div class="stat-label">منتج في المستودع</div></div>
+                    <div class="stat-icon-wrap icon-users"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.totalUsers || 0 %></div>
+                        <div class="stat-label">مشترك نشط</div>
+                    </div>
+                    <span class="stat-trend up">▲ نشط</span>
                 </div>
+                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(255,215,0,0.1); color: var(--gold-color);"><i class="fas fa-money-bill-wave"></i></div>
-                    <div class="stat-info"><div class="stat-value"><%= (stats.totalRevenue || 0).toFixed(0) %></div><div class="stat-label">ر.س إجمالي المبيعات</div></div>
+                    <div class="stat-icon-wrap icon-products"><i class="fas fa-box"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.totalProducts || 0 %></div>
+                        <div class="stat-label">منتج في المستودع</div>
+                    </div>
                 </div>
+                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(255,193,7,0.1); color: var(--warning-color);"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stat-info"><div class="stat-value"><%= stats.lowStockProducts || 0 %></div><div class="stat-label">منخفض المخزون</div></div>
+                    <div class="stat-icon-wrap icon-revenue"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= (stats.totalRevenue || 0).toFixed(0) %></div>
+                        <div class="stat-label">ر.س إجمالي المبيعات</div>
+                    </div>
                 </div>
+                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(23,162,184,0.1); color: var(--info-color);"><i class="fas fa-calendar-day"></i></div>
-                    <div class="stat-info"><div class="stat-value"><%= stats.todayRevenue || 0 %> ر.س</div><div class="stat-label">أرباح اليوم</div></div>
+                    <div class="stat-icon-wrap icon-today"><i class="fas fa-calendar-day"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.todayRevenue || 0 %> ر.س</div>
+                        <div class="stat-label">أرباح اليوم (<%= stats.todayOrders || 0 %> طلب)</div>
+                    </div>
                 </div>
+                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(40,167,69,0.1); color: var(--success-color);"><i class="fas fa-calendar-check"></i></div>
-                    <div class="stat-info"><div class="stat-value"><%= stats.monthRevenue || 0 %> ر.س</div><div class="stat-label">أرباح الشهر</div></div>
+                    <div class="stat-icon-wrap icon-month"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.monthRevenue || 0 %> ر.س</div>
+                        <div class="stat-label">أرباح الشهر</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon-wrap icon-stock"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-value"><%= stats.lowStockProducts || 0 %></div>
+                        <div class="stat-label">منتجات منخفضة المخزون</div>
+                    </div>
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+            <%# ========== صف اللوحات ========== %>
+            <div class="panel-grid">
                 
                 <%# أحدث الطلبات %>
-                <div class="panel">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3><i class="fas fa-shopping-cart" style="color: var(--secondary-color); margin-left: 8px;"></i> أحدث الطلبات</h3>
-                        <a href="/admin/orders" style="font-size: 12px; color: var(--secondary-color); font-weight: bold;">عرض الكل →</a>
+                <div class="admin-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-shopping-cart" style="color: var(--admin-danger);"></i> أحدث الطلبات</h3>
+                        <a href="/admin/orders" class="panel-link">عرض الكل ←</a>
                     </div>
                     <% if (recentOrders && recentOrders.length > 0) { %>
-                        <table class="recent-table">
-                            <thead><tr><th>الطلب</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+                        <table class="table-admin">
+                            <thead>
+                                <tr>
+                                    <th>الطلب</th>
+                                    <th>العميل</th>
+                                    <th>المبلغ</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <% recentOrders.forEach(function(order) { %>
                                     <tr>
-                                        <td><a href="/admin/orders/<%= order._id %>" style="font-weight: bold; color: var(--primary-color);">#<%= order.orderNumber %></a></td>
+                                        <td><a href="/admin/orders/<%= order._id %>" style="font-weight: 700; color: var(--admin-primary); text-decoration: none;">#<%= order.orderNumber %></a></td>
                                         <td><%= order.customerName %></td>
-                                        <td style="font-weight: bold;"><%= order.totalAmount %> ر.س</td>
-                                        <td><span style="background: <%= order.status === 'pending' ? 'var(--warning-bg)' : 'var(--success-bg)' %>; color: <%= order.status === 'pending' ? '#856404' : 'var(--success-color)' %>; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;"><%= order.status === 'pending' ? 'قيد المراجعة' : order.status %></span></td>
+                                        <td style="font-weight: 700;"><%= order.totalAmount %> ر.س</td>
+                                        <td><span class="badge-status <%= order.status === 'pending' ? 'pending' : order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'info' %>"><%= order.status === 'pending' ? 'قيد المراجعة' : order.status === 'delivered' ? 'تم التسليم' : order.status === 'cancelled' ? 'ملغي' : order.status %></span></td>
                                     </tr>
                                 <% }); %>
                             </tbody>
                         </table>
                     <% } else { %>
-                        <p style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد طلبات</p>
+                        <div style="text-align: center; padding: 40px; color: var(--admin-text-muted);">
+                            <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.3;"></i>
+                            لا توجد طلبات بعد
+                        </div>
                     <% } %>
                 </div>
                 
                 <%# الأكثر مبيعاً %>
-                <div class="panel">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3><i class="fas fa-fire" style="color: var(--danger-color); margin-left: 8px;"></i> الأكثر مبيعاً</h3>
-                        <a href="/admin/products" style="font-size: 12px; color: var(--secondary-color); font-weight: bold;">عرض الكل →</a>
+                <div class="admin-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-fire" style="color: #ff6b35;"></i> الأكثر مبيعاً</h3>
+                        <a href="/admin/products?sort=sales" class="panel-link">عرض الكل ←</a>
                     </div>
                     <% if (topProducts && topProducts.length > 0) { %>
-                        <% topProducts.forEach(function(product, index) { %>
-                            <div class="top-item">
-                                <span class="rank"><%= index + 1 %>.</span>
-                                <div style="flex:1;"><strong style="font-size:13px;"><%= product.name %></strong><br><small style="color:var(--text-muted);"><%= product.price %> ر.س</small></div>
-                                <span style="background:var(--bg-color);padding:5px 12px;border-radius:15px;font-size:12px;font-weight:bold;"><%= product.sales || 0 %> مبيعاً</span>
-                            </div>
-                        <% }); %>
+                        <div class="top-list">
+                            <% topProducts.forEach(function(product, index) { %>
+                                <div class="top-item">
+                                    <div class="rank-num"><%= index + 1 %></div>
+                                    <div class="item-info">
+                                        <strong><%= product.name %></strong>
+                                        <small><%= product.price %> ر.س</small>
+                                    </div>
+                                    <div class="item-sales"><%= product.sales || 0 %> مبيعاً</div>
+                                </div>
+                            <% }); %>
+                        </div>
                     <% } else { %>
-                        <p style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد مبيعات</p>
+                        <div style="text-align: center; padding: 40px; color: var(--admin-text-muted);">
+                            <i class="fas fa-chart-line" style="font-size: 40px; margin-bottom: 10px; display: block; opacity: 0.3;"></i>
+                            لا توجد مبيعات بعد
+                        </div>
                     <% } %>
                 </div>
             </div>
             
-            <%# أزرار سريعة %>
-            <div class="panel">
-                <h3><i class="fas fa-bolt" style="color: var(--gold-color); margin-left: 8px;"></i> وصول سريع</h3>
-                <div class="quick-actions">
-                    <a href="/admin/products/add" class="quick-action"><i class="fas fa-plus-circle"></i> إضافة منتج</a>
-                    <a href="/admin/categories/add" class="quick-action"><i class="fas fa-folder-plus"></i> إضافة قسم</a>
-                    <a href="/admin/orders" class="quick-action"><i class="fas fa-receipt"></i> الطلبات</a>
-                    <a href="/admin/customers" class="quick-action"><i class="fas fa-users"></i> العملاء</a>
-                    <a href="/admin/settings" class="quick-action"><i class="fas fa-cog"></i> الإعدادات</a>
-                    <a href="/admin/reports" class="quick-action"><i class="fas fa-chart-bar"></i> التقارير</a>
+            <%# ========== أزرار سريعة ========== %>
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-bolt" style="color: var(--admin-gold);"></i> وصول سريع</h3>
+                </div>
+                <div class="quick-grid">
+                    <a href="/admin/products/add" class="quick-btn"><i class="fas fa-plus-circle"></i> إضافة منتج</a>
+                    <a href="/admin/categories/add" class="quick-btn"><i class="fas fa-folder-plus"></i> إضافة قسم</a>
+                    <a href="/admin/orders" class="quick-btn"><i class="fas fa-receipt"></i> كل الطلبات</a>
+                    <a href="/admin/customers" class="quick-btn"><i class="fas fa-users"></i> العملاء</a>
+                    <a href="/admin/settings" class="quick-btn"><i class="fas fa-cog"></i> الإعدادات</a>
+                    <a href="/admin/reports" class="quick-btn"><i class="fas fa-chart-bar"></i> التقارير</a>
                 </div>
             </div>
         </main>
