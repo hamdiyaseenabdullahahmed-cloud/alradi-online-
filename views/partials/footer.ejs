@@ -6,27 +6,20 @@
     </main>
     <%# نهاية المحتوى الرئيسي %>
 
-    <%# ============================================= %>
-    <%# الفوتر                                          %>
-    <%# ============================================= %>
     <footer class="main-footer">
         <div class="container">
             <div class="footer-content">
                 
                 <%# عمود: عن المتجر %>
                 <div class="footer-section">
-                    <img src="<%= store.storeLogo || '/images/default-logo.png' %>" 
-                         alt="<%= store.storeName %>" 
-                         class="footer-logo"
-                         width="60" height="60">
+                    <span style="font-size: 50px;">🦅</span>
                     <h3><%= store.storeName || 'متجر الرعدي أون لاين' %></h3>
                     <p class="footer-description">
                         <%= currentLanguage === 'en' ? 
-                            (store.storeDescriptionEn || 'Your integrated destination for global online shopping - superior and safe shopping experience') : 
+                            (store.storeDescriptionEn || 'Your integrated destination for global online shopping') : 
                             (store.storeDescription || 'وجهتك المتكاملة للتسوق الإلكتروني العالمي - تجربة تسوق فائقة وآمنة') %>
                     </p>
                     
-                    <%# وسائل التواصل %>
                     <div class="social-links">
                         <% if (store.socialMedia && store.socialMedia.facebook) { %>
                             <a href="<%= store.socialMedia.facebook %>" class="social-link" target="_blank" title="Facebook">
@@ -43,21 +36,6 @@
                                 <i class="fab fa-instagram"></i>
                             </a>
                         <% } %>
-                        <% if (store.socialMedia && store.socialMedia.youtube) { %>
-                            <a href="<%= store.socialMedia.youtube %>" class="social-link" target="_blank" title="YouTube">
-                                <i class="fab fa-youtube"></i>
-                            </a>
-                        <% } %>
-                        <% if (store.socialMedia && store.socialMedia.tiktok) { %>
-                            <a href="<%= store.socialMedia.tiktok %>" class="social-link" target="_blank" title="TikTok">
-                                <i class="fab fa-tiktok"></i>
-                            </a>
-                        <% } %>
-                        <% if (store.socialMedia && store.socialMedia.snapchat) { %>
-                            <a href="<%= store.socialMedia.snapchat %>" class="social-link" target="_blank" title="Snapchat">
-                                <i class="fab fa-snapchat-ghost"></i>
-                            </a>
-                        <% } %>
                         <% if (store.whatsappNumber) { %>
                             <a href="https://wa.me/<%= store.whatsappNumber %>" class="social-link" target="_blank" title="WhatsApp">
                                 <i class="fab fa-whatsapp"></i>
@@ -70,12 +48,13 @@
                 <div class="footer-section">
                     <h3><%= currentLanguage === 'en' ? 'Quick Links' : 'روابط سريعة' %></h3>
                     <ul class="footer-links">
-                        <li><a href="/"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Home' : 'الرئيسية' %></a></li>
-                        <li><a href="/products"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'All Products' : 'جميع المنتجات' %></a></li>
-                        <li><a href="/offers"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Offers & Discounts' : 'العروض والتخفيضات' %></a></li>
-                        <li><a href="/about"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'About Us' : 'من نحن' %></a></li>
-                        <li><a href="/contact"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Contact Us' : 'اتصل بنا' %></a></li>
-                        <li><a href="/track-order"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Track Order' : 'تتبع الطلب' %></a></li>
+                        <li><a href="/"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                        <li><a href="/products"><i class="fas fa-chevron-left"></i> جميع المنتجات</a></li>
+                        <li><a href="/offers"><i class="fas fa-chevron-left"></i> العروض والتخفيضات</a></li>
+                        <li><a href="/about"><i class="fas fa-chevron-left"></i> من نحن</a></li>
+                        <li><a href="/contact"><i class="fas fa-chevron-left"></i> اتصل بنا</a></li>
+                        <li><a href="/track-order"><i class="fas fa-chevron-left"></i> تتبع الطلب</a></li>
+                        <li><a href="/sitemap"><i class="fas fa-chevron-left"></i> خريطة الموقع</a></li>
                     </ul>
                 </div>
                 
@@ -83,11 +62,10 @@
                 <div class="footer-section">
                     <h3><%= currentLanguage === 'en' ? 'Policies' : 'السياسات' %></h3>
                     <ul class="footer-links">
-                        <li><a href="/privacy-policy"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Privacy Policy' : 'سياسة الخصوصية' %></a></li>
-                        <li><a href="/terms"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Terms & Conditions' : 'الشروط والأحكام' %></a></li>
-                        <li><a href="/shipping-policy"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Shipping Policy' : 'سياسة الشحن والتسليم' %></a></li>
-                        <li><a href="/return-policy"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Return Policy' : 'سياسة الاستبدال والاسترجاع' %></a></li>
-                        <li><a href="/sitemap"><i class="fas fa-chevron-left"></i> <%= currentLanguage === 'en' ? 'Sitemap' : 'خريطة الموقع' %></a></li>
+                        <li><a href="/privacy-policy"><i class="fas fa-chevron-left"></i> سياسة الخصوصية</a></li>
+                        <li><a href="/terms"><i class="fas fa-chevron-left"></i> الشروط والأحكام</a></li>
+                        <li><a href="/shipping-policy"><i class="fas fa-chevron-left"></i> سياسة الشحن والتسليم</a></li>
+                        <li><a href="/return-policy"><i class="fas fa-chevron-left"></i> سياسة الاستبدال والاسترجاع</a></li>
                     </ul>
                 </div>
                 
@@ -119,127 +97,59 @@
                         <% if (store.address) { %>
                             <li>
                                 <i class="fas fa-map-marker-alt"></i> 
-                                <%= currentLanguage === 'en' ? (store.addressEn || store.address) : store.address %>
+                                <%= store.address %>
                             </li>
                         <% } %>
                     </ul>
                     
-                    <%# طرق الدفع %>
                     <div style="margin-top: 15px;">
-                        <p style="font-size: 13px; margin-bottom: 8px; color: rgba(255,255,255,0.6);">
-                            <%= currentLanguage === 'en' ? 'Payment Methods' : 'طرق الدفع' %>
-                        </p>
+                        <p style="font-size: 13px; margin-bottom: 8px; color: rgba(255,255,255,0.6);">طرق الدفع</p>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 24px;">
                             <i class="fab fa-cc-visa" style="color: #1a1f71;"></i>
                             <i class="fab fa-cc-mastercard" style="color: #eb001b;"></i>
                             <span style="background: white; color: #0066c1; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">مدى</span>
-                            <i class="fab fa-cc-paypal" style="color: #003087;"></i>
-                            <span style="color: white; font-size: 12px;">الدفع عند الاستلام</span>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <%# ============================================= %>
-            <%# حقوق الملكية                                    %>
-            <%# ============================================= %>
+            <%# حقوق الملكية %>
             <div class="footer-bottom">
                 <p>
                     <%= currentLanguage === 'en' ? 
                         (store.copyrightTextEn || 'All Rights Reserved © 2026 Al-Radi Online Luxury Stores Group - Superior and Safe Shopping Experience.') : 
                         (store.copyrightText || 'جميع الحقوق محفوظة © 2026 لمجموعة متاجر الرعدي أونلاين الفاخرة - تجربة تسوق فائقة وآمنة.') %>
                 </p>
-                <p style="margin-top: 5px; font-size: 11px;">
-                    <%= currentLanguage === 'en' ? 'Developed with' : 'تم التطوير بـ' %> 
-                    <i class="fas fa-heart" style="color: var(--secondary-color);"></i> 
-                    <%= currentLanguage === 'en' ? 'for Al-Radi Online Store' : 'لمتجر الرعدي أون لاين' %>
-                </p>
             </div>
         </div>
     </footer>
 
-    <%# ============================================= %>
-    <%# زر العودة للأعلى                                %>
-    <%# ============================================= %>
-    <button class="back-to-top" id="backToTop" title="العودة للأعلى">
+    <%# زر العودة للأعلى %>
+    <button class="back-to-top" id="backToTop" title="العودة للأعلى" onclick="window.scrollTo({top:0,behavior:'smooth'})">
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <%# ============================================= %>
-    <%# حاوية الإشعارات (Toast)                        %>
-    <%# ============================================= %>
     <div id="toast-container"></div>
 
-    <%# ============================================= %>
-    <%# أيقونة المحادثة المباشرة                       %>
-    <%# ============================================= %>
-    <% if (user) { %>
-    <button class="chat-widget-btn" id="chatWidgetBtn" title="المحادثة المباشرة">
-        <i class="fas fa-comments"></i>
-        <span class="chat-badge" id="chatBadge" style="display: none;">0</span>
-    </button>
-    
-    <div class="chat-widget-box" id="chatWidgetBox" style="display: none;">
-        <div class="chat-widget-header">
-            <h4><i class="fas fa-headset"></i> الدعم المباشر</h4>
-            <button onclick="document.getElementById('chatWidgetBox').style.display='none'">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="chat-widget-messages" id="chatWidgetMessages">
-            <div class="chat-message support-message">
-                <div class="message-bubble">
-                    <p>مرحباً بك! كيف يمكننا مساعدتك؟</p>
-                </div>
-            </div>
-        </div>
-        <form class="chat-widget-form" id="chatWidgetForm">
-            <input type="text" id="chatWidgetInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
-        </form>
-    </div>
-    <% } %>
-
-    <%# ============================================= %>
-    <%# الجافاسكربت                                    %>
-    <%# ============================================= %>
-    
-    <%# متغيرات عامة للجافاسكربت %>
     <script>
         const storeSettings = {
             voiceGreetingEnabled: <%= store.voiceGreetingEnabled ? 'true' : 'false' %>,
             voiceInteractionsEnabled: <%= store.voiceInteractionsEnabled ? 'true' : 'false' %>,
-            voiceAddToCartFile: '<%= store.voiceAddToCartFile || "/audio/add-to-cart.mp3" %>',
-            voiceSaveFile: '<%= store.voiceSaveFile || "/audio/save.mp3" %>',
-            voicePrintFile: '<%= store.voicePrintFile || "/audio/print.mp3" %>',
-            voiceSortFile: '<%= store.voiceSortFile || "/audio/sort.mp3" %>',
-            voiceNotificationFile: '<%= store.voiceNotificationFile || "/audio/notification.mp3" %>',
-            voiceSuccessFile: '<%= store.voiceSuccessFile || "/audio/success.mp3" %>',
-            voiceErrorFile: '<%= store.voiceErrorFile || "/audio/error.mp3" %>',
-            voiceGreetingFile: '<%= store.voiceGreetingFile || "/audio/welcome.mp3" %>',
-            freeShippingMin: <%= store.freeShippingMin || 300 %>,
-            currency: '<%= store.currency || "SAR" %>',
-            currencySymbol: '<%= store.currencySymbol || "ر.س" %>'
+            voiceGreetingFile: '<%= store.voiceGreetingFile || "/audio/welcome.mp3" %>'
         };
-        
         const currentUserId = '<%= user ? user._id : "" %>';
         const currentUserName = '<%= user ? user.name : "" %>';
         const currentUserRole = '<%= user ? user.role : "visitor" %>';
-        const currentLanguage = '<%= currentLanguage || "ar" %>';
     </script>
     
-    <%# Socket.io للمحادثة %>
     <script src="/socket.io/socket.io.js"></script>
-    
-    <%# الملف الرئيسي للتفاعلات %>
     <script src="/js/main.js"></script>
     
-    <%# تأثير الصوت الترحيبي %>
     <% if (store.voiceGreetingEnabled !== false) { %>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const greetingPlayed = sessionStorage.getItem('voiceGreetingPlayed');
-            if (!greetingPlayed && storeSettings.voiceGreetingEnabled) {
+            if (!greetingPlayed) {
                 setTimeout(function() {
                     try {
                         const audio = new Audio(storeSettings.voiceGreetingFile);
