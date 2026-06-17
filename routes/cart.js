@@ -10,7 +10,6 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const StoreSettings = require('../models/StoreSettings');
 const { isAuthenticated } = require('../middleware/auth');
-const PDFDocument = require('pdfkit');
 
 // =============================================
 // تهيئة السلة
@@ -41,7 +40,7 @@ const calculateCartTotals = (cart) => {
 };
 
 // =============================================
-// إضافة للسلة عبر GET مع redirect للسلة (جديد)
+// إضافة للسلة عبر GET مع redirect للسلة
 // =============================================
 
 router.get('/add', async (req, res) => {
@@ -124,7 +123,6 @@ router.get('/', async (req, res) => {
         const cart = initCart(req);
         const storeSettings = await StoreSettings.getSettings();
         
-        // تحديث بيانات المنتجات في السلة
         for (let item of cart) {
             const product = await Product.findById(item.productId);
             if (product) {
@@ -144,7 +142,6 @@ router.get('/', async (req, res) => {
         
         const { subtotal, totalItems } = calculateCartTotals(cart);
         
-        // حساب الشحن
         let shippingCost = 0;
         const freeShippingMin = storeSettings.freeShippingMin || 300;
         
@@ -378,7 +375,6 @@ router.post('/clear', (req, res) => {
     try {
         req.session.cart = [];
         req.session.coupon = null;
-        req.flash('success_msg', 'تم تفريغ السلة');
         res.json({ success: true, cartCount: 0 });
     } catch (error) {
         res.status(500).json({ success: false });
@@ -472,7 +468,6 @@ router.get('/checkout', isAuthenticated, async (req, res) => {
             return res.redirect('/cart');
         }
         
-        // تحديث بيانات المنتجات
         for (let item of cart) {
             const product = await Product.findById(item.productId);
             if (product) {
@@ -497,7 +492,6 @@ router.get('/checkout', isAuthenticated, async (req, res) => {
         const storeSettings = await StoreSettings.getSettings();
         const user = await User.findById(req.session.user._id);
         
-        // حساب الشحن
         let shippingCost = 0;
         const couponDiscount = req.session.coupon ? req.session.coupon.discount : 0;
         
@@ -551,7 +545,6 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
             shippingMethod, paymentMethod, notes
         } = req.body;
         
-        // التحقق من بيانات الشحن
         if (!shippingStreet || !shippingCity || !shippingCountry) {
             req.flash('error_msg', 'يرجى إدخال عنوان الشحن كاملاً');
             return res.redirect('/cart/checkout');
@@ -560,7 +553,6 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         const storeSettings = await StoreSettings.getSettings();
         const user = await User.findById(req.session.user._id);
         
-        // التحقق من توفر المنتجات
         const orderItems = [];
         let subtotal = 0;
         
@@ -590,10 +582,8 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
             });
         }
         
-        // حساب الخصومات
         const couponDiscount = req.session.coupon ? req.session.coupon.discount : 0;
         
-        // حساب الشحن
         let shippingCost = 0;
         const selectedShippingMethod = shippingMethod || 'internal';
         
@@ -607,7 +597,6 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         
         const totalAmount = subtotal - couponDiscount + shippingCost;
         
-        // إنشاء الطلب
         const order = new Order({
             orderNumber: await Order.generateOrderNumber(),
             user: user._id,
@@ -657,7 +646,6 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         
         await order.save();
         
-        // تقليل المخزون
         for (let item of cart) {
             const product = await Product.findById(item.productId);
             if (product) {
@@ -665,12 +653,10 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
             }
         }
         
-        // تحديث إحصائيات المستخدم
         user.totalOrders += 1;
         user.totalSpent += totalAmount;
         user.lastOrderDate = new Date();
         
-        // إضافة نقاط الولاء
         if (storeSettings.enableLoyaltyProgram) {
             const pointsEarned = Math.floor(totalAmount * (storeSettings.pointsPerRiyal || 1));
             user.loyaltyPoints += pointsEarned;
@@ -679,7 +665,6 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         
         await user.save();
         
-        // تفريغ السلة تلقائياً بعد إتمام الطلب
         req.session.cart = [];
         req.session.coupon = null;
         await req.session.save();
@@ -723,132 +708,26 @@ router.get('/order-success/:id', isAuthenticated, async (req, res) => {
 });
 
 // =============================================
-// عرض الفاتورة PDF
+// عرض الفاتورة HTML
 // =============================================
 
 router.get('/invoice/:id', isAuthenticated, async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id)
-            .populate('user', 'name email phone');
+        const order = await Order.findById(req.params.id);
         
         if (!order) {
             return res.status(404).send('الفاتورة غير موجودة');
         }
         
-        // التحقق من الصلاحية
-        const isOwner = order.user._id.toString() === req.session.user._id.toString();
-        const isAdminUser = req.session.user.role === 'admin' || req.session.user.role === 'superadmin';
-        
-        if (!isOwner && !isAdminUser) {
-            return res.status(403).send('غير مصرح');
-        }
-        
-        // إنشاء PDF
-        const doc = new PDFDocument({ size: 'A4', margin: 40 });
-        
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=invoice-${order.invoiceNumber}.pdf`);
-        
-        doc.pipe(res);
-        
-        // ترويسة الفاتورة
-        doc.fontSize(22).font('Helvetica-Bold').text('مجموعة متاجر الرعدي أونلاين الفاخرة', { align: 'center' });
-        doc.fontSize(10).font('Helvetica').text('Al-Radi Online Luxury Stores Group', { align: 'center' });
-        doc.moveDown(0.5);
-        doc.text('فاتورة ضريبية رسمية', { align: 'center' });
-        doc.moveDown();
-        
-        // معلومات الفاتورة
-        doc.fontSize(9);
-        doc.text(`رقم الفاتورة: ${order.invoiceNumber}`, { align: 'right' });
-        doc.text(`رقم الطلب: ${order.orderNumber}`, { align: 'right' });
-        doc.text(`تاريخ الإصدار: ${new Date(order.invoiceDate).toLocaleDateString('ar-SA')}`, { align: 'right' });
-        doc.text(`تاريخ التسليم المتوقع: ${order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('ar-SA') : 'يحدد لاحقاً'}`, { align: 'right' });
-        doc.moveDown();
-        
-        // بيانات العميل
-        doc.fontSize(11).font('Helvetica-Bold').text('بيانات العميل:');
-        doc.fontSize(9).font('Helvetica');
-        doc.text(`الاسم: ${order.customerName}`);
-        doc.text(`البريد الإلكتروني: ${order.customerEmail}`);
-        doc.text(`الهاتف: ${order.customerPhone}`);
-        doc.text(`العنوان: ${order.shippingAddress.fullAddress}`);
-        doc.moveDown();
-        
-        // نوع الشحن
-        doc.fontSize(10);
-        doc.text(`نوع الشحن: ${order.shippingMethod === 'international' ? 'شحن دولي خارجي' : 'شحن داخلي محلي'}`);
-        doc.moveDown();
-        
-        // جدول المنتجات
-        doc.fontSize(11).font('Helvetica-Bold').text('قائمة المشتريات:');
-        doc.moveDown(0.3);
-        
-        const tableTop = doc.y;
-        doc.fontSize(8).font('Helvetica-Bold');
-        doc.text('#', 40, tableTop);
-        doc.text('المنتج', 60, tableTop, { width: 200 });
-        doc.text('الكمية', 270, tableTop);
-        doc.text('السعر', 320, tableTop);
-        doc.text('الإجمالي', 380, tableTop);
-        
-        doc.moveDown(0.5);
-        doc.moveTo(40, doc.y).lineTo(570, doc.y).stroke();
-        doc.moveDown(0.3);
-        
-        doc.fontSize(8).font('Helvetica');
-        let yPosition = doc.y;
-        
-        order.items.forEach((item, index) => {
-            yPosition = doc.y;
-            doc.text((index + 1).toString(), 40, yPosition);
-            doc.text(item.name, 60, yPosition, { width: 200 });
-            doc.text(item.quantity.toString(), 270, yPosition);
-            doc.text(`${item.price} ر.س`, 320, yPosition);
-            doc.text(`${item.total} ر.س`, 380, yPosition);
-            doc.moveDown(0.3);
+        res.render('cart/invoice', {
+            pageTitle: 'فاتورة: ' + order.invoiceNumber,
+            order: order,
+            layout: false
         });
         
-        doc.moveTo(40, doc.y).lineTo(570, doc.y).stroke();
-        doc.moveDown(0.5);
-        
-        doc.fontSize(9);
-        doc.text(`المجموع الفرعي: ${order.subtotal} ر.س`, { align: 'right' });
-        
-        if (order.couponDiscount > 0) {
-            doc.text(`خصم الكوبون (${order.couponCode}): -${order.couponDiscount} ر.س`, { align: 'right' });
-        }
-        
-        doc.text(`رسوم الشحن: ${order.shippingCost} ر.س`, { align: 'right' });
-        
-        doc.fontSize(12).font('Helvetica-Bold');
-        doc.text(`الإجمالي النهائي: ${order.totalAmount} ر.س`, { align: 'right' });
-        doc.moveDown();
-        
-        // الشروط القانونية
-        doc.fontSize(8).font('Helvetica');
-        doc.text('الشروط والأحكام:', { align: 'right' });
-        doc.text('1. يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.', { align: 'right' });
-        doc.text('2. يحق للزبون استبدال السلعة بأخرى خلال 3 أيام فقط من تاريخ الاستلام في حال وجود خلل مصنعي واضح.', { align: 'right' });
-        doc.text('3. أي كشط أو تلف في ملصقات الضمان أو العبوات الأصلية يلغي الضمان بشكل فوري ويسقط حق الاستبدال.', { align: 'right' });
-        doc.moveDown();
-        
-        // توقيع المستلم
-        doc.text(`تاريخ الطلب: ${new Date(order.createdAt).toLocaleDateString('ar-SA')}`, { align: 'right' });
-        doc.moveDown(2);
-        doc.text('_______________________________', { align: 'left' });
-        doc.text('توقيع المستلم عند الاستلام', { align: 'left' });
-        
-        // تذييل الفاتورة
-        doc.moveDown(3);
-        doc.fontSize(7);
-        doc.text(`جميع الحقوق محفوظة © ${new Date().getFullYear()} لمجموعة متاجر الرعدي أونلاين الفاخرة - تجربة تسوق فائقة وآمنة`, { align: 'center' });
-        
-        doc.end();
-        
     } catch (error) {
-        console.error('خطأ في إنشاء الفاتورة:', error);
-        res.status(500).send('حدث خطأ في إنشاء الفاتورة');
+        console.error('خطأ في الفاتورة:', error);
+        res.status(500).send('حدث خطأ');
     }
 });
 
