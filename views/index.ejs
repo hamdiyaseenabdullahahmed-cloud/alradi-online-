@@ -43,9 +43,7 @@
                 </div>
             </div>
             <div style="flex-shrink: 0; z-index: 1;">
-                <img src="<%= store.storeLogo || '/images/default-logo.png' %>" 
-                     alt="متجر الرعدي" 
-                     style="width: 200px; height: 200px; border-radius: 50%; border: 5px solid var(--gold-color); box-shadow: 0 0 50px rgba(255,215,0,0.5); object-fit: cover;">
+                <span style="font-size: 150px;">🦅</span>
             </div>
             <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
             <div style="position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
@@ -73,7 +71,7 @@
         </div>
         <div class="products-grid cols-4" style="gap: 20px;">
             <% featuredCategories.forEach(function(category) { %>
-                <a href="/products/category/<%= category.slug || category._id %>" class="category-card" style="
+                <a href="/products?category=<%= category._id %>" class="category-card" style="
                     text-align: center;
                     padding: 30px 20px;
                     background: white;
@@ -81,7 +79,10 @@
                     box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                     transition: all 0.3s ease;
                     display: block;
-                ">
+                    text-decoration: none;
+                "
+                onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.15)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0,0,0,0.08)';">
                     <div style="
                         width: 80px;
                         height: 80px;
@@ -125,7 +126,7 @@
         </div>
         <div class="products-grid cols-4">
             <% featuredProducts.forEach(function(product) { %>
-                <%- include('partials/product-card', { product: product, currencySymbol: currencySymbol || 'ر.س' }) %>
+                <%- include('partials/product-card', { product: product, currencySymbol: 'ر.س' }) %>
             <% }); %>
         </div>
     </section>
@@ -148,7 +149,7 @@
         </div>
         <div class="products-grid cols-4">
             <% newArrivals.forEach(function(product) { %>
-                <%- include('partials/product-card', { product: product, currencySymbol: currencySymbol || 'ر.س' }) %>
+                <%- include('partials/product-card', { product: product, currencySymbol: 'ر.س' }) %>
             <% }); %>
         </div>
     </section>
@@ -171,7 +172,7 @@
         </div>
         <div class="products-grid cols-4">
             <% bestSellers.forEach(function(product) { %>
-                <%- include('partials/product-card', { product: product, currencySymbol: currencySymbol || 'ر.س' }) %>
+                <%- include('partials/product-card', { product: product, currencySymbol: 'ر.س' }) %>
             <% }); %>
         </div>
     </section>
@@ -194,7 +195,7 @@
         </div>
         <div class="products-grid cols-4">
             <% onSaleProducts.forEach(function(product) { %>
-                <%- include('partials/product-card', { product: product, currencySymbol: currencySymbol || 'ر.س' }) %>
+                <%- include('partials/product-card', { product: product, currencySymbol: 'ر.س' }) %>
             <% }); %>
         </div>
     </section>
@@ -217,14 +218,12 @@
                 text-align: center;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                 transition: transform 0.3s;
-            ">
+            " onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="font-size: 40px; color: var(--secondary-color); margin-bottom: 15px;">
                     <i class="fas fa-truck-fast"></i>
                 </div>
-                <h3><%= currentLanguage === 'en' ? 'Fast Delivery' : 'توصيل سريع' %></h3>
-                <p style="color: var(--text-muted); font-size: 14px;">
-                    <%= currentLanguage === 'en' ? 'Delivery within 2-5 business days' : 'توصيل خلال 2-5 أيام عمل' %>
-                </p>
+                <h3>توصيل سريع</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">توصيل خلال 2-5 أيام عمل</p>
             </div>
             
             <div class="feature-card" style="
@@ -233,14 +232,12 @@
                 padding: 30px;
                 text-align: center;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            ">
+            " onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="font-size: 40px; color: var(--success-color); margin-bottom: 15px;">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h3><%= currentLanguage === 'en' ? 'Secure Payment' : 'دفع آمن' %></h3>
-                <p style="color: var(--text-muted); font-size: 14px;">
-                    <%= currentLanguage === 'en' ? '100% secure payment methods' : 'طرق دفع آمنة 100%' %>
-                </p>
+                <h3>دفع آمن</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">طرق دفع آمنة 100%</p>
             </div>
             
             <div class="feature-card" style="
@@ -249,14 +246,12 @@
                 padding: 30px;
                 text-align: center;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            ">
+            " onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="font-size: 40px; color: var(--gold-color); margin-bottom: 15px;">
                     <i class="fas fa-headset"></i>
                 </div>
-                <h3><%= currentLanguage === 'en' ? '24/7 Support' : 'دعم 24/7' %></h3>
-                <p style="color: var(--text-muted); font-size: 14px;">
-                    <%= currentLanguage === 'en' ? 'Round the clock customer service' : 'خدمة عملاء على مدار الساعة' %>
-                </p>
+                <h3>دعم 24/7</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">خدمة عملاء على مدار الساعة</p>
             </div>
             
             <div class="feature-card" style="
@@ -265,14 +260,12 @@
                 padding: 30px;
                 text-align: center;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            ">
+            " onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="font-size: 40px; color: var(--info-color); margin-bottom: 15px;">
                     <i class="fas fa-undo-alt"></i>
                 </div>
-                <h3><%= currentLanguage === 'en' ? 'Easy Returns' : 'استبدال سهل' %></h3>
-                <p style="color: var(--text-muted); font-size: 14px;">
-                    <%= currentLanguage === 'en' ? '3-day exchange policy' : 'سياسة استبدال خلال 3 أيام' %>
-                </p>
+                <h3>استبدال سهل</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">سياسة استبدال خلال 3 أيام</p>
             </div>
         </div>
     </section>
@@ -289,14 +282,13 @@
             color: white;
         ">
             <h2 style="font-size: 28px; font-weight: 900; margin-bottom: 10px;">
-                🚀 <%= currentLanguage === 'en' ? 'Free Shipping on Orders Over' : 'شحن مجاني للطلبات فوق' %> <%= store.freeShippingMin || 300 %> <%= currencySymbol || 'ر.س' %>
+                🚀 شحن مجاني للطلبات فوق <%= store.freeShippingMin || 300 %> ر.س
             </h2>
             <p style="font-size: 16px; opacity: 0.9; margin-bottom: 25px;">
-                <%= currentLanguage === 'en' ? 'Don\'t miss out! Start shopping now and enjoy free delivery' : 'لا تفوت الفرصة! ابدأ التسوق الآن واستمتع بالتوصيل المجاني' %>
+                لا تفوت الفرصة! ابدأ التسوق الآن واستمتع بالتوصيل المجاني
             </p>
             <a href="/products" class="btn btn-gold btn-lg">
-                <i class="fas fa-shopping-cart"></i>
-                <%= currentLanguage === 'en' ? 'Start Shopping' : 'ابدأ التسوق' %>
+                <i class="fas fa-shopping-cart"></i> ابدأ التسوق
             </a>
         </div>
     </section>
