@@ -7,7 +7,6 @@
 
 <div class="container">
     
-    <%# Breadcrumb %>
     <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">
         <a href="/" style="color: var(--text-muted);">الرئيسية</a>
         <span style="margin: 0 8px;">/</span>
@@ -18,61 +17,55 @@
     
     <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 30px;">
         <i class="fas fa-credit-card" style="color: var(--secondary-color); margin-left: 10px;"></i>
-        <%= currentLanguage === 'en' ? 'Checkout' : 'إتمام الشراء' %>
+        إتمام الشراء
     </h1>
     
     <form action="/cart/place-order" method="POST" id="checkoutForm">
         <div style="display: grid; grid-template-columns: 1fr 380px; gap: 30px;">
             
-            <%# ============================================= %>
-            <%# القسم الأيسر: بيانات الشحن والدفع               %>
-            <%# ============================================= %>
             <div>
                 
                 <%# عنوان الشحن %>
                 <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
                     <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
                         <i class="fas fa-map-marker-alt" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                        <%= currentLanguage === 'en' ? 'Shipping Address' : 'عنوان الشحن' %>
+                        عنوان الشحن
                     </h3>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
-                            <label class="form-label"><%= currentLanguage === 'en' ? 'Street Address' : 'الشارع والعنوان' %> *</label>
+                            <label class="form-label">الشارع والعنوان *</label>
                             <input type="text" name="shippingStreet" class="form-control" 
-                                   value="<%= user && user.address ? user.address.street : '' %>"
-                                   placeholder="<%= currentLanguage === 'en' ? 'Street name, building number' : 'اسم الشارع، رقم المبنى' %>" required>
+                                   value="<%= user && user.address ? user.address.street : '' %>" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label"><%= currentLanguage === 'en' ? 'City' : 'المدينة' %> *</label>
+                            <label class="form-label">المدينة *</label>
                             <input type="text" name="shippingCity" class="form-control" 
-                                   value="<%= user && user.address ? user.address.city : '' %>"
-                                   placeholder="<%= currentLanguage === 'en' ? 'City' : 'المدينة' %>" required>
+                                   value="<%= user && user.address ? user.address.city : '' %>" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label"><%= currentLanguage === 'en' ? 'State/Region' : 'المنطقة' %></label>
+                            <label class="form-label">المنطقة</label>
                             <input type="text" name="shippingState" class="form-control" 
-                                   value="<%= user && user.address ? user.address.state : '' %>"
-                                   placeholder="<%= currentLanguage === 'en' ? 'State or region' : 'المنطقة أو الحي' %>">
+                                   value="<%= user && user.address ? user.address.state : '' %>">
                         </div>
                         <div class="form-group">
-                            <label class="form-label"><%= currentLanguage === 'en' ? 'Zip/Postal Code' : 'الرمز البريدي' %></label>
+                            <label class="form-label">الرمز البريدي</label>
                             <input type="text" name="shippingZipCode" class="form-control" 
-                                   value="<%= user && user.address ? user.address.zipCode : '' %>"
-                                   placeholder="<%= currentLanguage === 'en' ? 'Zip code' : 'الرمز البريدي' %>">
+                                   value="<%= user && user.address ? user.address.zipCode : '' %>">
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label class="form-label"><%= currentLanguage === 'en' ? 'Country' : 'الدولة' %> *</label>
+                            <label class="form-label">الدولة *</label>
                             <select name="shippingCountry" class="form-control" required>
-                                <option value="المملكة العربية السعودية" selected>المملكة العربية السعودية</option>
-                                <option value="الإمارات العربية المتحدة">الإمارات العربية المتحدة</option>
-                                <option value="الكويت">الكويت</option>
-                                <option value="قطر">قطر</option>
-                                <option value="البحرين">البحرين</option>
-                                <option value="عمان">عمان</option>
-                                <option value="مصر">مصر</option>
-                                <option value="الأردن">الأردن</option>
-                                <option value="اليمن">اليمن</option>
+                                <option value="المملكة العربية السعودية" selected>🇸🇦 المملكة العربية السعودية</option>
+                                <option value="الإمارات العربية المتحدة">🇦🇪 الإمارات العربية المتحدة</option>
+                                <option value="الكويت">🇰🇼 الكويت</option>
+                                <option value="قطر">🇶🇦 قطر</option>
+                                <option value="البحرين">🇧🇭 البحرين</option>
+                                <option value="عمان">🇴🇲 عمان</option>
+                                <option value="مصر">🇪🇬 مصر</option>
+                                <option value="الأردن">🇯🇴 الأردن</option>
+                                <option value="اليمن">🇾🇪 اليمن</option>
+                                <option value="أخرى">🌍 دولة أخرى</option>
                             </select>
                         </div>
                     </div>
@@ -82,42 +75,34 @@
                 <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
                     <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
                         <i class="fas fa-truck" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                        <%= currentLanguage === 'en' ? 'Shipping Method' : 'طريقة الشحن' %>
+                        طريقة الشحن
                     </h3>
                     
                     <label class="shipping-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid var(--secondary-color); border-radius: 10px; margin-bottom: 10px; cursor: pointer; background: rgba(233,69,96,0.05);">
                         <input type="radio" name="shippingMethod" value="internal" checked style="margin-left: 10px; accent-color: var(--secondary-color);">
                         <div style="flex: 1;">
-                            <strong><%= currentLanguage === 'en' ? 'Domestic Shipping' : 'شحن داخلي' %></strong>
-                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-                                <%= currentLanguage === 'en' ? 'Delivery within 2-5 business days' : 'توصيل خلال 2-5 أيام عمل' %>
-                            </p>
+                            <strong>🇸🇦 شحن داخلي محلي</strong>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">توصيل خلال 2-5 أيام عمل داخل المملكة</p>
                         </div>
-                        <span style="font-weight: bold;"><%= store.shippingInternal || 25 %> <%= currencySymbol %></span>
+                        <span style="font-weight: bold;" class="shipping-cost" data-cost="<%= store.shippingInternal || 25 %>"><%= store.shippingInternal || 25 %> ر.س</span>
                     </label>
                     
-                    <% if (store.enableInternationalShipping) { %>
                     <label class="shipping-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; cursor: pointer;">
                         <input type="radio" name="shippingMethod" value="international" style="margin-left: 10px; accent-color: var(--secondary-color);">
                         <div style="flex: 1;">
-                            <strong><%= currentLanguage === 'en' ? 'International Shipping' : 'شحن دولي خارجي' %></strong>
-                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-                                <%= currentLanguage === 'en' ? 'Delivery within 7-14 business days' : 'توصيل خلال 7-14 يوم عمل' %>
-                            </p>
+                            <strong>🌍 شحن دولي خارجي</strong>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">توصيل خلال 7-14 يوم عمل للدول الأخرى</p>
                         </div>
-                        <span style="font-weight: bold;"><%= store.shippingInternational || 75 %> <%= currencySymbol %></span>
+                        <span style="font-weight: bold;" class="shipping-cost" data-cost="<%= store.shippingInternational || 75 %>"><%= store.shippingInternational || 75 %> ر.س</span>
                     </label>
-                    <% } %>
                     
                     <label class="shipping-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid var(--border-color); border-radius: 10px; cursor: pointer;">
                         <input type="radio" name="shippingMethod" value="pickup" style="margin-left: 10px; accent-color: var(--secondary-color);">
                         <div style="flex: 1;">
-                            <strong><%= currentLanguage === 'en' ? 'In-Store Pickup' : 'استلام من المتجر' %></strong>
-                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-                                <%= currentLanguage === 'en' ? 'Free pickup from our store' : 'استلام مجاني من مقر المتجر' %>
-                            </p>
+                            <strong>📍 استلام من المتجر</strong>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">استلام مجاني من مقر المتجر</p>
                         </div>
-                        <span style="color: var(--success-color); font-weight: bold;"><%= currentLanguage === 'en' ? 'Free' : 'مجاناً' %></span>
+                        <span style="color: var(--success-color); font-weight: bold;" class="shipping-cost" data-cost="0">مجاناً</span>
                     </label>
                 </div>
                 
@@ -125,28 +110,24 @@
                 <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
                     <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
                         <i class="fas fa-credit-card" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                        <%= currentLanguage === 'en' ? 'Payment Method' : 'طريقة الدفع' %>
+                        طريقة الدفع
                     </h3>
                     
                     <label class="payment-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid var(--secondary-color); border-radius: 10px; margin-bottom: 10px; cursor: pointer; background: rgba(233,69,96,0.05);">
                         <input type="radio" name="paymentMethod" value="cash_on_delivery" checked style="margin-left: 10px; accent-color: var(--secondary-color);">
                         <i class="fas fa-money-bill-wave" style="font-size: 24px; margin-left: 15px; color: var(--success-color);"></i>
                         <div>
-                            <strong><%= currentLanguage === 'en' ? 'Cash on Delivery' : 'الدفع عند الاستلام' %></strong>
-                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-                                <%= currentLanguage === 'en' ? 'Pay when you receive your order' : 'ادفع عند استلام طلبك' %>
-                            </p>
+                            <strong>الدفع عند الاستلام</strong>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">ادفع عند استلام طلبك</p>
                         </div>
                     </label>
                     
-                    <label class="payment-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid var(--border-color); border-radius: 10px; margin-bottom: 10px; cursor: pointer;">
+                    <label class="payment-option" style="display: flex; align-items: center; padding: 15px; border: 2px solid var(--border-color); border-radius: 10px; cursor: pointer;">
                         <input type="radio" name="paymentMethod" value="credit_card" style="margin-left: 10px; accent-color: var(--secondary-color);">
                         <i class="far fa-credit-card" style="font-size: 24px; margin-left: 15px; color: var(--primary-color);"></i>
                         <div>
-                            <strong><%= currentLanguage === 'en' ? 'Credit/Debit Card' : 'بطاقة ائتمان / مدى' %></strong>
-                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-                                فيزا، ماستركارد، مدى
-                            </p>
+                            <strong>بطاقة ائتمان / مدى</strong>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">فيزا، ماستركارد، مدى</p>
                         </div>
                     </label>
                     
@@ -154,10 +135,8 @@
                         <input type="radio" name="paymentMethod" value="bank_transfer" style="margin-left: 10px; accent-color: var(--secondary-color);">
                         <i class="fas fa-university" style="font-size: 24px; margin-left: 15px; color: var(--info-color);"></i>
                         <div>
-                            <strong><%= currentLanguage === 'en' ? 'Bank Transfer' : 'تحويل بنكي' %></strong>
-                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-                                <%= currentLanguage === 'en' ? 'Transfer to our bank account' : 'حول إلى حسابنا البنكي' %>
-                            </p>
+                            <strong>تحويل بنكي</strong>
+                            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">حول إلى حسابنا البنكي</p>
                         </div>
                     </label>
                 </div>
@@ -166,85 +145,72 @@
                 <div style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
                     <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
                         <i class="fas fa-sticky-note" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                        <%= currentLanguage === 'en' ? 'Additional Notes' : 'ملاحظات إضافية' %>
+                        ملاحظات إضافية
                     </h3>
-                    <textarea name="notes" class="form-control" rows="3" 
-                              placeholder="<%= currentLanguage === 'en' ? 'Any special instructions or notes for your order' : 'أي تعليمات خاصة أو ملاحظات لطلبك' %>"></textarea>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="أي تعليمات خاصة أو ملاحظات لطلبك"></textarea>
                 </div>
             </div>
             
-            <%# ============================================= %>
-            <%# القسم الأيمن: ملخص الطلب                        %>
-            <%# ============================================= %>
+            <%# ملخص الطلب %>
             <div>
                 <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 100px;">
                     <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
                         <i class="fas fa-receipt" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                        <%= currentLanguage === 'en' ? 'Order Summary' : 'ملخص الطلب' %>
+                        ملخص الطلب
                     </h3>
                     
-                    <%# المنتجات %>
                     <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
                         <% cart.forEach(function(item) { %>
                             <div style="display: flex; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-light);">
                                 <img src="<%= item.image || '/images/default-product.png' %>" 
                                      alt="<%= item.name %>"
                                      style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
-                                     onerror="this.src='/images/default-product.png'">
+                                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect fill=%22%23ddd%22 width=%2250%22 height=%2250%22/><text x=%2225%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%23999%22>📦</text></svg>'">
                                 <div style="flex: 1;">
                                     <p style="font-weight: bold; font-size: 14px; margin-bottom: 3px;"><%= item.name %></p>
-                                    <small style="color: var(--text-muted);"><%= item.quantity %> × <%= item.finalPrice || item.price %> <%= currencySymbol %></small>
+                                    <small style="color: var(--text-muted);"><%= item.quantity %> × <%= item.finalPrice || item.price %> ر.س</small>
                                 </div>
-                                <span style="font-weight: bold; font-size: 14px;"><%= (item.finalPrice || item.price) * item.quantity %> <%= currencySymbol %></span>
+                                <span style="font-weight: bold; font-size: 14px;"><%= (item.finalPrice || item.price) * item.quantity %> ر.س</span>
                             </div>
                         <% }); %>
                     </div>
                     
-                    <%# الإجماليات %>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
-                        <span><%= currentLanguage === 'en' ? 'Subtotal' : 'المجموع الفرعي' %></span>
-                        <span><%= subtotal %> <%= currencySymbol %></span>
+                        <span>المجموع الفرعي</span>
+                        <span><%= subtotal %> ر.س</span>
                     </div>
                     
                     <% if (coupon && coupon.discount > 0) { %>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: var(--success-color);">
-                            <span><%= currentLanguage === 'en' ? 'Coupon Discount' : 'خصم الكوبون' %> (<%= coupon.code %>)</span>
-                            <span>-<%= couponDiscount %> <%= currencySymbol %></span>
+                            <span>خصم الكوبون (<%= coupon.code %>)</span>
+                            <span>-<%= couponDiscount %> ر.س</span>
                         </div>
                     <% } %>
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
-                        <span><%= currentLanguage === 'en' ? 'Shipping' : 'الشحن' %></span>
-                        <span id="checkout-shipping"><%= shippingCost === 0 ? (currentLanguage === 'en' ? 'Free' : 'مجاني') : shippingCost + ' ' + currencySymbol %></span>
+                        <span>الشحن</span>
+                        <span id="checkout-shipping"><%= shippingCost === 0 ? 'مجاني' : shippingCost + ' ر.س' %></span>
                     </div>
                     
                     <hr style="border: none; border-top: 2px solid var(--border-color); margin: 15px 0;">
                     
                     <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 800; color: var(--secondary-color); margin-bottom: 25px;">
-                        <span><%= currentLanguage === 'en' ? 'Total' : 'الإجمالي' %></span>
-                        <span id="checkout-total"><%= total %> <%= currencySymbol %></span>
+                        <span>الإجمالي</span>
+                        <span id="checkout-total"><%= total %> ر.س</span>
                     </div>
                     
-                    <%# زر تأكيد الطلب %>
                     <button type="submit" class="btn btn-primary btn-block btn-lg" id="placeOrderBtn">
-                        <i class="fas fa-lock"></i> <%= currentLanguage === 'en' ? 'Place Order' : 'تأكيد الطلب' %>
+                        <i class="fas fa-lock"></i> تأكيد الطلب
                     </button>
                     
                     <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-                        <i class="fas fa-shield-alt"></i> 
-                        <%= currentLanguage === 'en' ? 'Your data is secure and encrypted' : 'بياناتك آمنة ومشفرة' %>
+                        <i class="fas fa-shield-alt"></i> بياناتك آمنة ومشفرة
                     </p>
                     
-                    <%# الشروط %>
                     <div style="margin-top: 15px; font-size: 12px; color: var(--text-muted); text-align: center;">
-                        <p>
-                            <%= currentLanguage === 'en' ? 'By placing this order, you agree to our' : 'بتأكيد الطلب، أنت توافق على' %>
-                            <a href="/terms" style="color: var(--secondary-color);">الشروط والأحكام</a>
-                            <%= currentLanguage === 'en' ? 'and' : 'و' %>
-                            <a href="/return-policy" style="color: var(--secondary-color);">سياسة الاستبدال</a>
-                        </p>
-                        <p style="margin-top: 8px; font-weight: bold; color: var(--danger-color);">
-                            ⚠️ يمنع استرجاع السلع نقداً بعد الشراء. الاستبدال خلال 3 أيام فقط للعيوب المصنعية.
+                        <p>بتأكيد الطلب، أنت توافق على <a href="/terms" style="color: var(--secondary-color);">الشروط والأحكام</a></p>
+                        <p style="color: var(--danger-color); font-weight: bold; margin-top: 8px;">
+                            ⚠️ يمنع استرجاع السلع نقداً. الاستبدال خلال 3 أيام فقط للعيوب المصنعية.
                         </p>
                     </div>
                 </div>
@@ -255,33 +221,29 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const shippingRadios = document.querySelectorAll('input[name="shippingMethod"]');
-    const shippingDisplay = document.getElementById('checkout-shipping');
-    const totalDisplay = document.getElementById('checkout-total');
-    const subtotal = <%= subtotal %>;
-    const couponDiscount = <%= couponDiscount %>;
-    const internalShipping = <%= store.shippingInternal || 25 %>;
-    const internationalShipping = <%= store.shippingInternational || 75 %>;
-    const currencySymbol = '<%= currencySymbol %>';
+    var shippingRadios = document.querySelectorAll('input[name="shippingMethod"]');
+    var shippingDisplay = document.getElementById('checkout-shipping');
+    var totalDisplay = document.getElementById('checkout-total');
+    var subtotal = <%= subtotal %>;
+    var couponDiscount = <%= couponDiscount %>;
     
-    shippingRadios.forEach(radio => {
+    shippingRadios.forEach(function(radio) {
         radio.addEventListener('change', function() {
-            let shippingCost = 0;
-            if (this.value === 'internal') shippingCost = internalShipping;
-            else if (this.value === 'international') shippingCost = internationalShipping;
-            else shippingCost = 0;
+            var shippingCost = 0;
+            var option = this.closest('.shipping-option');
+            var costEl = option.querySelector('.shipping-cost');
+            shippingCost = parseInt(costEl.dataset.cost) || 0;
             
-            const total = subtotal - couponDiscount + shippingCost;
-            
-            shippingDisplay.textContent = shippingCost === 0 ? '<%= currentLanguage === "en" ? "Free" : "مجاني" %>' : shippingCost + ' ' + currencySymbol;
-            totalDisplay.textContent = total + ' ' + currencySymbol;
+            var total = subtotal - couponDiscount + shippingCost;
+            shippingDisplay.textContent = shippingCost === 0 ? 'مجاني' : shippingCost + ' ر.س';
+            totalDisplay.textContent = total + ' ر.س';
         });
     });
     
-    const shippingOptions = document.querySelectorAll('.shipping-option');
-    shippingOptions.forEach(option => {
+    var shippingOptions = document.querySelectorAll('.shipping-option');
+    shippingOptions.forEach(function(option) {
         option.addEventListener('click', function() {
-            shippingOptions.forEach(o => {
+            shippingOptions.forEach(function(o) {
                 o.style.borderColor = 'var(--border-color)';
                 o.style.background = 'white';
             });
@@ -292,10 +254,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    const paymentOptions = document.querySelectorAll('.payment-option');
-    paymentOptions.forEach(option => {
+    var paymentOptions = document.querySelectorAll('.payment-option');
+    paymentOptions.forEach(function(option) {
         option.addEventListener('click', function() {
-            paymentOptions.forEach(o => {
+            paymentOptions.forEach(function(o) {
                 o.style.borderColor = 'var(--border-color)';
                 o.style.background = 'white';
             });
@@ -303,16 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.background = 'rgba(233,69,96,0.05)';
             this.querySelector('input[type="radio"]').checked = true;
         });
-    });
-    
-    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-        const btn = document.getElementById('placeOrderBtn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء الطلب...';
-        btn.disabled = true;
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-lock"></i> <%= currentLanguage === "en" ? "Place Order" : "تأكيد الطلب" %>';
-            btn.disabled = false;
-        }, 5000);
     });
 });
 </script>
