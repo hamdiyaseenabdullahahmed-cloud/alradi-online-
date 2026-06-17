@@ -1,0 +1,289 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - إدارة الأقسام والتصنيفات      %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <%# ============================================= %>
+    <%# رأس الصفحة                                      %>
+    <%# ============================================= %>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+                <i class="fas fa-folder-tree" style="color: var(--secondary-color); margin-left: 10px;"></i>
+                إدارة الأقسام والتصنيفات
+            </h1>
+            <p style="color: var(--text-muted);">
+                إجمالي <strong><%= categories ? categories.length : 0 %></strong> قسم
+                | 
+                <a href="/admin/products" style="color: var(--secondary-color);">إدارة المنتجات</a>
+            </p>
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="showAddForm()">
+            <i class="fas fa-plus"></i> إضافة قسم جديد
+        </button>
+    </div>
+    
+    <%# ============================================= %>
+    <%# نموذج إضافة قسم جديد                             %>
+    <%# ============================================= %>
+    <div id="addCategoryForm" style="display: none; background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
+            <h3 style="font-size: 18px; font-weight: 700; margin: 0;">
+                <i class="fas fa-plus-circle" style="color: var(--success-color); margin-left: 8px;"></i>
+                إضافة قسم جديد
+            </h3>
+            <button class="btn btn-sm btn-outline" onclick="hideAddForm()" style="color: var(--danger-color); border-color: var(--danger-color);">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+        </div>
+        
+        <form action="/admin/categories/add" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                
+                <%# اسم القسم عربي %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-tag" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        اسم القسم (عربي) *
+                    </label>
+                    <input type="text" name="name" class="form-control" placeholder="مثلاً: إلكترونيات" required>
+                </div>
+                
+                <%# اسم القسم إنجليزي %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-tag" style="color: var(--info-color); margin-left: 5px;"></i>
+                        اسم القسم (إنجليزي)
+                    </label>
+                    <input type="text" name="nameEn" class="form-control" placeholder="مثلاً: Electronics">
+                </div>
+                
+                <%# الوصف %>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">
+                        <i class="fas fa-align-right" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        وصف القسم
+                    </label>
+                    <input type="text" name="description" class="form-control" placeholder="وصف مختصر للقسم (اختياري)">
+                </div>
+                
+                <%# الأيقونة %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-icons" style="color: var(--gold-color); margin-left: 5px;"></i>
+                        أيقونة Font Awesome
+                    </label>
+                    <input type="text" name="icon" class="form-control" placeholder="مثلاً: fa-laptop" value="fa-folder">
+                    <small style="color: var(--text-muted);">
+                        اختر من: <a href="https://fontawesome.com/icons" target="_blank" style="color: var(--secondary-color);">Font Awesome</a>
+                    </small>
+                </div>
+                
+                <%# صورة القسم %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-image" style="color: var(--success-color); margin-left: 5px;"></i>
+                        صورة القسم
+                    </label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                </div>
+                
+                <%# القسم الأب %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-sitemap" style="color: var(--info-color); margin-left: 5px;"></i>
+                        القسم الأب
+                    </label>
+                    <select name="parent" class="form-control">
+                        <option value="">قسم رئيسي</option>
+                        <% if (categories && categories.length > 0) { %>
+                            <% categories.forEach(function(cat) { %>
+                                <% if (!cat.parent) { %>
+                                    <option value="<%= cat._id %>"><%= cat.name %></option>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+                
+                <%# الترتيب %>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-sort-numeric-down" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        ترتيب الظهور
+                    </label>
+                    <input type="number" name="order" class="form-control" value="0" min="0">
+                </div>
+            </div>
+            
+            <%# خيارات إضافية %>
+            <div style="display: flex; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="isActive" checked style="accent-color: var(--success-color);">
+                    <span>نشط</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="isFeatured" style="accent-color: var(--gold-color);">
+                    <span>مميز (يظهر في الرئيسية)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="showInMenu" checked style="accent-color: var(--info-color);">
+                    <span>إظهار في القائمة</span>
+                </label>
+            </div>
+            
+            <%# أزرار الحفظ %>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-save"></i> حفظ القسم
+                </button>
+                <button type="button" class="btn btn-outline btn-lg" onclick="hideAddForm()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <%# ============================================= %>
+    <%# جدول الأقسام                                    %>
+    <%# ============================================= %>
+    <div style="background: white; border-radius: 15px; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto;">
+        <% if (categories && categories.length > 0) { %>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px;">
+                <thead>
+                    <tr style="background: var(--bg-color); border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 12px 15px; text-align: right; width: 40%;">القسم</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 10%;">الأيقونة</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 10%;">الترتيب</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 10%;">القسم الأب</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 10%;">الحالة</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 10%;">المنتجات</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 10%;">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% categories.forEach(function(cat) { %>
+                        <tr style="border-bottom: 1px solid var(--border-light); transition: background 0.2s;">
+                            <td style="padding: 10px 15px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <% if (cat.image) { %>
+                                        <img src="<%= cat.image %>" style="width: 35px; height: 35px; object-fit: cover; border-radius: 6px;" onerror="this.style.display='none'">
+                                    <% } %>
+                                    <div>
+                                        <strong><%= cat.name %></strong>
+                                        <% if (cat.nameEn) { %>
+                                            <br><small style="color: var(--text-muted);"><%= cat.nameEn %></small>
+                                        <% } %>
+                                        <% if (cat.description) { %>
+                                            <br><small style="color: var(--text-muted); font-size: 11px;"><%= cat.description.substring(0, 50) %>...</small>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <i class="fas <%= cat.icon || 'fa-folder' %>" style="font-size: 22px; color: var(--secondary-color);"></i>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center; font-weight: bold;"><%= cat.order || 0 %></td>
+                            <td style="padding: 10px 15px; text-align: center; font-size: 12px; color: var(--text-muted);">
+                                <%= cat.parent && cat.parent.name ? cat.parent.name : 'رئيسي' %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <% if (cat.isActive) { %>
+                                    <span style="background: var(--success-bg); color: var(--success-color); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">نشط</span>
+                                <% } else { %>
+                                    <span style="background: var(--danger-bg); color: var(--danger-color); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">غير نشط</span>
+                                <% } %>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <span style="font-weight: bold; background: var(--bg-color); padding: 5px 12px; border-radius: 15px;"><%= cat.productCount || 0 %></span>
+                            </td>
+                            <td style="padding: 10px 15px; text-align: center;">
+                                <div style="display: flex; gap: 5px; justify-content: center;">
+                                    <button onclick="deleteCategory('<%= cat._id %>', '<%= cat.name.replace(/'/g, "\\'") %>')" class="btn btn-sm btn-outline" style="color: var(--danger-color); border-color: var(--danger-color);" title="حذف">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <div style="text-align: center; padding: 80px 20px;">
+                <div style="font-size: 80px; color: var(--text-muted); margin-bottom: 15px;">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3 style="font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">لا توجد أقسام بعد</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    قم بإضافة الأقسام الرئيسية أولاً (مثل: إلكترونيات، ملابس، منزل) ثم أضف المنتجات داخل كل قسم.
+                </p>
+                <button class="btn btn-primary btn-lg" onclick="showAddForm()">
+                    <i class="fas fa-plus"></i> إضافة أول قسم
+                </button>
+            </div>
+        <% } %>
+    </div>
+    
+    <%# ============================================= %>
+    <%# إرشادات سريعة                                   %>
+    <%# ============================================= %>
+    <div style="margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <h4 style="font-weight: 700; margin-bottom: 8px;">
+                <i class="fas fa-info-circle" style="color: var(--info-color); margin-left: 5px;"></i>
+                الأقسام الرئيسية
+            </h4>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                الأقسام الرئيسية هي التي تظهر في القائمة العلوية. يمكن إضافة أقسام فرعية تحتها.
+            </p>
+        </div>
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <h4 style="font-weight: 700; margin-bottom: 8px;">
+                <i class="fas fa-star" style="color: var(--gold-color); margin-left: 5px;"></i>
+                الأقسام المميزة
+            </h4>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                الأقسام المميزة تظهر في الصفحة الرئيسية للمتجر لجذب انتباه العملاء.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAddForm() {
+    document.getElementById('addCategoryForm').style.display = 'block';
+    document.getElementById('addCategoryForm').scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideAddForm() {
+    document.getElementById('addCategoryForm').style.display = 'none';
+}
+
+function deleteCategory(catId, catName) {
+    if (confirm('هل أنت متأكد من حذف القسم: "' + catName + '"؟\n\nسيؤدي هذا إلى إزالة القسم وجميع ارتباطاته.')) {
+        fetch('/admin/categories/delete/' + catId, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('تم حذف القسم بنجاح', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast(data.message || 'حدث خطأ في حذف القسم', 'error');
+                }
+            })
+            .catch(() => showToast('حدث خطأ غير متوقع', 'error'));
+    }
+}
+
+// تأثير hover على صفوف الجدول
+document.querySelectorAll('table tbody tr').forEach(row => {
+    row.addEventListener('mouseenter', () => row.style.background = 'var(--bg-color)');
+    row.addEventListener('mouseleave', () => row.style.background = '');
+});
+</script>
+
+<%- include('../partials/footer') %>
