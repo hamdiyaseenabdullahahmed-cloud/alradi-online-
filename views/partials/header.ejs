@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# ترويسة الموقع                                  %>
+<%# ترويسة الموقع - كاملة                          %>
 <%# ============================================= %>
 
 <!DOCTYPE html>
@@ -19,7 +19,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -33,12 +33,11 @@
 </head>
 <body class="<%= currentLanguage === 'en' ? 'en' : '' %>">
 
-    <%# شريط الإعلانات الترويجي %>
     <% if (store.showPromoBanner !== false) { %>
     <div class="promo-banner" id="promoBanner">
         <span>
             <i class="fas fa-truck"></i>
-            <%= currentLanguage === 'en' ? (store.promoBannerTextEn || 'Free shipping over 300 SAR') : (store.promoBannerText || '🚀 شحن مجاني للطلبات فوق 300 ريال') %>
+            <%= currentLanguage === 'en' ? (store.promoBannerTextEn || 'Free shipping over 300 SAR') : (store.promoBannerText || '🚀 شحن مجاني للطلبات فوق 300 ريال | خصم 15% على أول طلب') %>
         </span>
         <button class="close-banner" onclick="document.getElementById('promoBanner').style.display='none'" aria-label="إغلاق">
             <i class="fas fa-times"></i>
@@ -46,7 +45,6 @@
     </div>
     <% } %>
 
-    <%# الهيدر الرئيسي %>
     <header class="main-header" id="mainHeader">
         <div class="container">
             <div class="header-content">
@@ -55,10 +53,22 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 
+                <%# الشعار والاسم %>
                 <div class="logo-container">
                     <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
-                        <span style="font-size: 40px;">🦅</span>
-                        <span class="store-name"><%= store.storeName || 'متجر الرعدي أون لاين' %></span>
+                        <span style="font-size: 40px; animation: pulse 2s infinite;">🦅</span>
+                        <span class="store-name" style="
+                            font-size: 26px;
+                            font-weight: 900;
+                            background: linear-gradient(135deg, #ffd700, #ff6b6b, #ffd700);
+                            background-size: 200% auto;
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                            background-clip: text;
+                            animation: shimmer 3s linear infinite;
+                            text-shadow: none;
+                            letter-spacing: 1px;
+                        "><%= store.storeName || 'متجر الرعدي أون لاين' %></span>
                     </a>
                 </div>
                 
@@ -75,9 +85,9 @@
                         <i class="fas fa-language"></i>
                     </a>
                     
-                    <button class="header-icon" id="dark-mode-toggle" title="الوضع الليلي">
+                    <a href="/toggle-dark-mode" class="header-icon" id="dark-mode-toggle" title="الوضع الليلي">
                         <i class="fas fa-moon"></i>
-                    </button>
+                    </a>
                     
                     <% if (user) { %>
                     <a href="/account/wishlist" class="header-icon" title="المفضلة">
@@ -112,12 +122,43 @@
                 </div>
             </div>
             
+            <%# القائمة الرئيسية مع الأقسام %>
             <nav class="main-nav" id="mainNav">
                 <ul>
-                    <li><a href="/"><i class="fas fa-home"></i> الرئيسية</a></li>
-                    <li><a href="/products"><i class="fas fa-th-large"></i> المنتجات</a></li>
-                    <li><a href="/offers"><i class="fas fa-tags" style="color: var(--gold-color);"></i> العروض</a></li>
-                    <li><a href="/contact"><i class="fas fa-envelope"></i> اتصل بنا</a></li>
+                    <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">
+                        <i class="fas fa-home"></i> الرئيسية
+                    </a></li>
+                    
+                    <%# قائمة المنتجات المنسدلة %>
+                    <li class="dropdown">
+                        <a href="/products" class="<%= currentPath.startsWith('/products') ? 'active' : '' %>">
+                            <i class="fas fa-th-large"></i> المنتجات <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="/products">📦 جميع المنتجات</a>
+                            <a href="/products?sort=newest">🆕 وصل حديثاً</a>
+                            <a href="/products?sort=sales">🔥 الأكثر مبيعاً</a>
+                            <a href="/products?featured=true">⭐ المنتجات المميزة</a>
+                            <a href="/products?onSale=true">🏷️ العروض والتخفيضات</a>
+                        </div>
+                    </li>
+                    
+                    <%# الأقسام %>
+                    <li class="dropdown">
+                        <a href="/products">
+                            <i class="fas fa-list"></i> الأقسام <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i>
+                        </a>
+                        <div class="dropdown-menu" id="categoriesMenu">
+                            <a href="/products">📂 جميع الأقسام</a>
+                        </div>
+                    </li>
+                    
+                    <li><a href="/offers" class="<%= currentPath === '/offers' ? 'active' : '' %>">
+                        <i class="fas fa-tags" style="color: var(--gold-color);"></i> العروض
+                    </a></li>
+                    <li><a href="/contact">
+                        <i class="fas fa-envelope"></i> اتصل بنا
+                    </a></li>
                 </ul>
             </nav>
         </div>
