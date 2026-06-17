@@ -1,0 +1,181 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - نموذج إضافة/تعديل قسم         %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<div class="container">
+    
+    <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 25px;">
+        <a href="/admin/dashboard" style="color: var(--text-muted);">لوحة التحكم</a>
+        <span style="margin: 0 8px;">/</span>
+        <a href="/admin/categories" style="color: var(--text-muted);">الأقسام</a>
+        <span style="margin: 0 8px;">/</span>
+        <span style="color: var(--secondary-color); font-weight: bold;"><%= isEdit ? 'تعديل القسم' : 'إضافة قسم جديد' %></span>
+    </nav>
+
+    <div style="max-width: 850px; margin: 0 auto;">
+        
+        <div style="background: white; border-radius: 20px; padding: 40px; box-shadow: 0 5px 25px rgba(0,0,0,0.1);">
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 50px; color: var(--secondary-color); margin-bottom: 10px;">
+                    <i class="fas fa-<%= isEdit ? 'edit' : 'plus-circle' %>"></i>
+                </div>
+                <h2 style="font-size: 26px; font-weight: 900; color: var(--primary-color); margin-bottom: 5px;">
+                    <%= isEdit ? 'تعديل القسم' : 'إضافة قسم جديد' %>
+                </h2>
+                <p style="color: var(--text-muted);">
+                    <%= isEdit ? 'قم بتعديل بيانات القسم أدناه' : 'املأ البيانات أدناه لإضافة قسم جديد إلى متجرك' %>
+                </p>
+            </div>
+
+            <form action="/admin/categories/<%= isEdit ? 'edit/' + category._id : 'add' %>" method="POST" enctype="multipart/form-data">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tag" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                            اسم القسم (عربي) *
+                        </label>
+                        <input type="text" name="name" class="form-control" placeholder="مثلاً: إلكترونيات" value="<%= isEdit ? category.name : '' %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tag" style="color: var(--info-color); margin-left: 5px;"></i>
+                            اسم القسم (إنجليزي)
+                        </label>
+                        <input type="text" name="nameEn" class="form-control" placeholder="مثلاً: Electronics" value="<%= isEdit && category.nameEn ? category.nameEn : '' %>">
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">
+                            <i class="fas fa-align-right" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                            وصف القسم
+                        </label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="وصف مختصر للقسم يساعد العملاء على فهم محتواه"><%= isEdit && category.description ? category.description : '' %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-icons" style="color: var(--gold-color); margin-left: 5px;"></i>
+                            أيقونة القسم (Font Awesome)
+                        </label>
+                        <input type="text" name="icon" id="iconInput" class="form-control" placeholder="مثلاً: fa-laptop" value="<%= isEdit && category.icon ? category.icon : 'fa-folder' %>" oninput="updateIconPreview()">
+                        <small style="color: var(--text-muted); display: block; margin-top: 8px;">
+                            <span style="font-size: 24px; margin-left: 8px;" id="iconPreview">
+                                <i class="fas <%= isEdit && category.icon ? category.icon : 'fa-folder' %>"></i>
+                            </span>
+                            معاينة مباشرة | 
+                            <a href="https://fontawesome.com/icons" target="_blank" style="color: var(--secondary-color); font-weight: bold;">
+                                تصفح جميع الأيقونات <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-sort-numeric-down" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                            ترتيب الظهور في القائمة
+                        </label>
+                        <input type="number" name="order" class="form-control" value="<%= isEdit ? category.order || 0 : 0 %>" min="0">
+                        <small style="color: var(--text-muted);">الأقل يظهر أولاً</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-image" style="color: var(--success-color); margin-left: 5px;"></i>
+                            صورة غلاف القسم
+                        </label>
+                        <input type="file" name="image" class="form-control" accept="image/*" onchange="previewImage(this)">
+                        <small style="color: var(--text-muted);">يفضل صورة مربعة 400×400 بكسل</small>
+                        <div id="imagePreviewContainer" style="margin-top: 10px;">
+                            <% if (isEdit && category.image) { %>
+                                <img src="<%= category.image %>" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border-color);">
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-sitemap" style="color: var(--info-color); margin-left: 5px;"></i>
+                            القسم الأب (اختياري)
+                        </label>
+                        <select name="parent" class="form-control">
+                            <option value="">قسم رئيسي (بدون أب)</option>
+                            <% if (typeof categories !== 'undefined' && categories) { %>
+                                <% categories.forEach(function(cat) { %>
+                                    <% if (isEdit && cat._id.toString() === category._id.toString()) return; %>
+                                    <option value="<%= cat._id %>" <%= isEdit && category.parent && category.parent.toString() === cat._id.toString() ? 'selected' : '' %>>
+                                        <%= cat.name %> <%= cat.nameEn ? '(' + cat.nameEn + ')' : '' %>
+                                    </option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                        <small style="color: var(--text-muted);">اختر قسماً أباً إذا كان هذا قسماً فرعياً</small>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; padding: 20px; background: var(--bg-color); border-radius: 12px;">
+                    <h4 style="font-weight: 700; margin-bottom: 15px; font-size: 15px;">
+                        <i class="fas fa-sliders-h" style="color: var(--secondary-color); margin-left: 5px;"></i>
+                        إعدادات القسم
+                    </h4>
+                    <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: bold;">
+                            <input type="checkbox" name="isActive" <%= isEdit ? (category.isActive ? 'checked' : '') : 'checked' %> style="accent-color: var(--success-color); width: 22px; height: 22px;">
+                            <span>✅ نشط (ظاهر للعملاء)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: bold;">
+                            <input type="checkbox" name="isFeatured" <%= isEdit && category.isFeatured ? 'checked' : '' %> style="accent-color: var(--gold-color); width: 22px; height: 22px;">
+                            <span>⭐ مميز (يظهر في الصفحة الرئيسية)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: bold;">
+                            <input type="checkbox" name="showInMenu" <%= isEdit ? (category.showInMenu ? 'checked' : '') : 'checked' %> style="accent-color: var(--info-color); width: 22px; height: 22px;">
+                            <span>📋 إظهار في القائمة العلوية للمتجر</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                        <i class="fas fa-save"></i> <%= isEdit ? 'تحديث القسم' : 'حفظ القسم ونشره' %>
+                    </button>
+                    <a href="/admin/categories" class="btn btn-outline btn-lg" style="flex: 1; text-align: center;">
+                        <i class="fas fa-times"></i> إلغاء والعودة للأقسام
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div style="margin-top: 25px; text-align: center;">
+            <a href="/admin/categories" style="color: var(--text-muted); font-size: 14px;">
+                <i class="fas fa-arrow-right"></i> العودة لقائمة الأقسام
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateIconPreview() {
+    const icon = document.getElementById('iconInput').value || 'fa-folder';
+    document.getElementById('iconPreview').innerHTML = '<i class="fas ' + icon + '"></i>';
+}
+
+function previewImage(input) {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            container.innerHTML = '<img src="' + e.target.result + '" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border-color);">';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+
+<%- include('../partials/footer') %>
