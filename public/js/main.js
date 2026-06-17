@@ -3,16 +3,13 @@
 // الملف الرئيسي للتفاعلات
 // =============================================
 
-// ================ المتغيرات العامة ================
 let cart = [];
 let cartCount = 0;
 let currentLanguage = 'ar';
 let isDarkMode = false;
 let currentGridView = 3;
-let currentSort = 'newest';
 let wishlistItems = [];
 
-// ================ عند تحميل الصفحة ================
 document.addEventListener('DOMContentLoaded', function() {
     initApp();
 });
@@ -45,7 +42,6 @@ function initApp() {
 
 function playSound(soundType) {
     if (!storeSettings || !storeSettings.voiceInteractionsEnabled) return;
-    
     const sounds = {
         'addToCart': storeSettings.voiceAddToCartFile || '/audio/add-to-cart.mp3',
         'save': storeSettings.voiceSaveFile || '/audio/save.mp3',
@@ -56,7 +52,6 @@ function playSound(soundType) {
         'error': storeSettings.voiceErrorFile || '/audio/error.mp3',
         'welcome': storeSettings.voiceGreetingFile || '/audio/welcome.mp3'
     };
-    
     const audioFile = sounds[soundType];
     if (audioFile) {
         try {
@@ -88,9 +83,7 @@ async function addToCart(productId, quantity = 1, options = {}) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId, quantity, options })
         });
-        
         const data = await response.json();
-        
         if (data.success) {
             cart = data.cart;
             cartCount = data.cartCount;
@@ -100,10 +93,9 @@ async function addToCart(productId, quantity = 1, options = {}) {
         } else {
             showToast(data.message || 'حدث خطأ', 'error');
         }
-        
         return data;
     } catch (error) {
-        console.error('خطأ في إضافة المنتج للسلة:', error);
+        console.error('خطأ:', error);
         showToast('حدث خطأ في إضافة المنتج', 'error');
     }
 }
@@ -115,19 +107,16 @@ async function updateCartItem(productId, quantity, optionsKey = '{}') {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId, quantity, optionsKey })
         });
-        
         const data = await response.json();
-        
         if (data.success) {
             cart = data.cart;
             cartCount = data.cartCount;
             updateCartUI();
             updateCartTotals(data.subtotal, data.shippingCost, data.total);
         }
-        
         return data;
     } catch (error) {
-        console.error('خطأ في تحديث السلة:', error);
+        console.error('خطأ:', error);
     }
 }
 
@@ -138,9 +127,7 @@ async function removeFromCart(productId, optionsKey = '{}') {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId, optionsKey })
         });
-        
         const data = await response.json();
-        
         if (data.success) {
             cart = data.cart;
             cartCount = data.cartCount;
@@ -148,10 +135,9 @@ async function removeFromCart(productId, optionsKey = '{}') {
             updateCartTotals(data.subtotal, data.shippingCost, data.total);
             showToast('تم إزالة المنتج من السلة', 'success');
         }
-        
         return data;
     } catch (error) {
-        console.error('خطأ في إزالة المنتج:', error);
+        console.error('خطأ:', error);
     }
 }
 
@@ -159,7 +145,6 @@ async function clearCart() {
     try {
         const response = await fetch('/cart/clear', { method: 'POST' });
         const data = await response.json();
-        
         if (data.success) {
             cart = [];
             cartCount = 0;
@@ -168,7 +153,7 @@ async function clearCart() {
             showToast('تم تفريغ السلة', 'success');
         }
     } catch (error) {
-        console.error('خطأ في تفريغ السلة:', error);
+        console.error('خطأ:', error);
     }
 }
 
@@ -184,7 +169,6 @@ function updateCartTotals(subtotal, shippingCost, total) {
     const subtotalEl = document.getElementById('cart-subtotal');
     const shippingEl = document.getElementById('cart-shipping');
     const totalEl = document.getElementById('cart-total');
-    
     if (subtotalEl) subtotalEl.textContent = subtotal + ' ر.س';
     if (shippingEl) shippingEl.textContent = shippingCost + ' ر.س';
     if (totalEl) totalEl.textContent = total + ' ر.س';
@@ -213,19 +197,14 @@ async function toggleWishlist(productId) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
-        
         const data = await response.json();
-        
         if (data.requireLogin) {
             window.location.href = '/auth/login';
             return;
         }
-        
         if (data.success) {
             if (data.inWishlist) {
-                if (!wishlistItems.includes(productId)) {
-                    wishlistItems.push(productId);
-                }
+                if (!wishlistItems.includes(productId)) wishlistItems.push(productId);
                 showToast('تمت إضافة المنتج إلى المفضلة ❤️', 'success');
             } else {
                 wishlistItems = wishlistItems.filter(id => id !== productId);
@@ -234,10 +213,9 @@ async function toggleWishlist(productId) {
             updateWishlistUI();
             playSound('save');
         }
-        
         return data;
     } catch (error) {
-        console.error('خطأ في تحديث المفضلة:', error);
+        console.error('خطأ:', error);
     }
 }
 
@@ -255,11 +233,8 @@ function updateWishlistUI() {
 }
 
 function loadWishlist() {
-    const wishlistBtns = document.querySelectorAll('.wishlist-btn.in-wishlist');
-    wishlistBtns.forEach(btn => {
-        if (btn.dataset.productId) {
-            wishlistItems.push(btn.dataset.productId);
-        }
+    document.querySelectorAll('.wishlist-btn.in-wishlist').forEach(btn => {
+        if (btn.dataset.productId) wishlistItems.push(btn.dataset.productId);
     });
 }
 
@@ -276,9 +251,7 @@ function initLanguage() {
             switchLanguage(newLang);
         });
     }
-    
-    const htmlLang = document.documentElement.lang || 'ar';
-    currentLanguage = htmlLang;
+    currentLanguage = document.documentElement.lang || 'ar';
 }
 
 function switchLanguage(lang) {
@@ -295,7 +268,6 @@ function initDarkMode() {
         isDarkMode = true;
         document.body.classList.add('dark-mode');
     }
-    
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', toggleDarkMode);
@@ -309,24 +281,18 @@ function toggleDarkMode() {
 }
 
 // =============================================
-// القائمة الجانبية للموبايل
+// القائمة للموبايل
 // =============================================
 
 function initMobileMenu() {
     const toggleBtn = document.querySelector('.mobile-menu-toggle');
     const mainNav = document.querySelector('.main-nav');
-    
     if (toggleBtn && mainNav) {
         toggleBtn.addEventListener('click', function() {
             mainNav.classList.toggle('open');
             const icon = toggleBtn.querySelector('i');
-            if (mainNav.classList.contains('open')) {
-                icon.className = 'fas fa-times';
-            } else {
-                icon.className = 'fas fa-bars';
-            }
+            icon.className = mainNav.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
         });
-        
         document.addEventListener('click', function(e) {
             if (!mainNav.contains(e.target) && !toggleBtn.contains(e.target)) {
                 mainNav.classList.remove('open');
@@ -346,47 +312,32 @@ function initSearchBar() {
     if (searchForm) {
         const searchInput = searchForm.querySelector('input');
         const searchBtn = searchForm.querySelector('button');
-        
-        searchBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        const doSearch = () => {
             const query = searchInput.value.trim();
-            if (query) {
-                window.location.href = `/search?q=${encodeURIComponent(query)}`;
-            }
-        });
-        
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const query = searchInput.value.trim();
-                if (query) {
-                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                }
-            }
+            if (query) window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        };
+        searchBtn.addEventListener('click', e => { e.preventDefault(); doSearch(); });
+        searchInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
         });
     }
 }
 
 // =============================================
-// أدوات التحكم بالشبكة
+// أدوات الشبكة والترتيب
 // =============================================
 
 function initGridControls() {
-    const gridBtns = document.querySelectorAll('.grid-btn');
-    const productsGrid = document.querySelector('.products-grid');
-    
-    if (gridBtns.length > 0 && productsGrid) {
-        gridBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const cols = parseInt(this.dataset.cols);
-                if (cols) {
-                    setGridView(cols);
-                    gridBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
+    document.querySelectorAll('.grid-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cols = parseInt(this.dataset.cols);
+            if (cols) {
+                setGridView(cols);
+                document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            }
         });
-    }
+    });
 }
 
 function setGridView(cols) {
@@ -399,18 +350,13 @@ function setGridView(cols) {
     localStorage.setItem('gridView', cols);
 }
 
-// =============================================
-// أدوات الترتيب
-// =============================================
-
 function initSortControls() {
     const sortSelect = document.querySelector('.sort-select');
     if (sortSelect) {
         sortSelect.addEventListener('change', function() {
-            currentSort = this.value;
             playSound('sort');
             const url = new URL(window.location);
-            url.searchParams.set('sort', currentSort);
+            url.searchParams.set('sort', this.value);
             window.location.href = url.toString();
         });
     }
@@ -425,27 +371,17 @@ function initQuantityButtons() {
         const minusBtn = selector.querySelector('.quantity-btn.minus');
         const plusBtn = selector.querySelector('.quantity-btn.plus');
         const input = selector.querySelector('.quantity-input');
-        
         if (minusBtn && plusBtn && input) {
             const min = parseInt(input.min) || 1;
             const max = parseInt(input.max) || 99;
-            
-            minusBtn.addEventListener('click', function() {
+            minusBtn.addEventListener('click', () => {
                 let value = parseInt(input.value);
-                if (value > min) {
-                    input.value = value - 1;
-                    input.dispatchEvent(new Event('change'));
-                }
+                if (value > min) { input.value = value - 1; input.dispatchEvent(new Event('change')); }
             });
-            
-            plusBtn.addEventListener('click', function() {
+            plusBtn.addEventListener('click', () => {
                 let value = parseInt(input.value);
-                if (value < max) {
-                    input.value = value + 1;
-                    input.dispatchEvent(new Event('change'));
-                }
+                if (value < max) { input.value = value + 1; input.dispatchEvent(new Event('change')); }
             });
-            
             input.addEventListener('change', function() {
                 let value = parseInt(this.value);
                 if (isNaN(value) || value < min) this.value = min;
@@ -463,43 +399,19 @@ function initAddToCartButtons() {
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.preventDefault();
-            
             const productId = this.dataset.productId;
             const quantityInput = document.querySelector(`.quantity-input[data-product-id="${productId}"]`);
             const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
-            
-            // جمع الخيارات المحددة
-            const options = {};
-            document.querySelectorAll(`.option-value.selected[data-product-id="${productId}"]`).forEach(opt => {
-                const group = opt.dataset.optionGroup;
-                const value = opt.dataset.optionValue;
-                if (!options[group]) options[group] = [];
-                options[group].push(value);
-            });
-            
-            if (!productId) {
-                showToast('المنتج غير محدد', 'error');
-                return;
-            }
-            
-            // تأثير تحميل على الزر
+            if (!productId) { showToast('المنتج غير محدد', 'error'); return; }
             const originalText = this.innerHTML;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإضافة...';
             this.disabled = true;
-            
-            const result = await addToCart(productId, quantity, options);
-            
-            // استعادة الزر
+            const result = await addToCart(productId, quantity, {});
             this.innerHTML = originalText;
             this.disabled = false;
-            
             if (result && result.success) {
-                // تأثير ارتداد للسلة
                 const cartIcon = document.querySelector('.header-icon.cart-icon');
-                if (cartIcon) {
-                    cartIcon.classList.add('animate-pulse');
-                    setTimeout(() => cartIcon.classList.remove('animate-pulse'), 1000);
-                }
+                if (cartIcon) { cartIcon.classList.add('animate-pulse'); setTimeout(() => cartIcon.classList.remove('animate-pulse'), 1000); }
             }
         });
     });
@@ -514,14 +426,9 @@ function initWishlistButtons() {
         btn.addEventListener('click', async function(e) {
             e.preventDefault();
             const productId = this.dataset.productId;
-            
             if (!productId) return;
-            
             const result = await toggleWishlist(productId);
-            
-            if (result && result.success) {
-                this.classList.toggle('in-wishlist', result.inWishlist);
-            }
+            if (result && result.success) this.classList.toggle('in-wishlist', result.inWishlist);
         });
     });
 }
@@ -533,16 +440,12 @@ function initWishlistButtons() {
 function initPromoBanner() {
     const closeBtn = document.querySelector('.promo-banner .close-banner');
     const banner = document.querySelector('.promo-banner');
-    
     if (closeBtn && banner) {
-        closeBtn.addEventListener('click', function() {
+        closeBtn.addEventListener('click', () => {
             banner.style.display = 'none';
             sessionStorage.setItem('promoBannerClosed', 'true');
         });
-        
-        if (sessionStorage.getItem('promoBannerClosed') === 'true') {
-            banner.style.display = 'none';
-        }
+        if (sessionStorage.getItem('promoBannerClosed') === 'true') banner.style.display = 'none';
     }
 }
 
@@ -563,7 +466,6 @@ function initLazyImages() {
                 }
             });
         });
-        
         lazyImages.forEach(img => imageObserver.observe(img));
     } else {
         document.querySelectorAll('img[data-src]').forEach(img => {
@@ -574,7 +476,7 @@ function initLazyImages() {
 }
 
 // =============================================
-// التمرير السلس
+// التمرير السلس وزر العودة للأعلى
 // =============================================
 
 function initSmoothScroll() {
@@ -582,67 +484,21 @@ function initSmoothScroll() {
         anchor.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
-            
             const target = document.querySelector(targetId);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+            if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         });
     });
 }
 
-// =============================================
-// زر العودة للأعلى
-// =============================================
-
 function initBackToTop() {
-    const backToTopBtn = document.createElement('button');
-    backToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    backToTopBtn.className = 'back-to-top';
-    backToTopBtn.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 30px;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background: var(--secondary-color);
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 18px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        display: none;
-        z-index: 999;
-        transition: all 0.3s ease;
-    `;
-    
-    document.body.appendChild(backToTopBtn);
-    
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 500) {
-            backToTopBtn.style.display = 'block';
-            backToTopBtn.style.animation = 'fadeIn 0.3s ease';
-        } else {
-            backToTopBtn.style.display = 'none';
-        }
-    });
-    
-    backToTopBtn.addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    
-    backToTopBtn.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px)';
-    });
-    
-    backToTopBtn.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-    });
+    const btn = document.createElement('button');
+    btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    btn.style.cssText = 'position:fixed;bottom:30px;left:30px;width:45px;height:45px;border-radius:50%;background:var(--secondary-color);color:white;border:none;cursor:pointer;font-size:18px;box-shadow:0 5px 15px rgba(0,0,0,0.3);display:none;z-index:999;transition:all 0.3s ease;';
+    document.body.appendChild(btn);
+    window.addEventListener('scroll', () => { btn.style.display = window.scrollY > 500 ? 'block' : 'none'; });
+    btn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    btn.addEventListener('mouseenter', function() { this.style.transform = 'translateY(-5px)'; });
+    btn.addEventListener('mouseleave', function() { this.style.transform = 'translateY(0)'; });
 }
 
 // =============================================
@@ -652,13 +508,7 @@ function initBackToTop() {
 function initHeaderScroll() {
     const header = document.querySelector('.main-header');
     if (header) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 100) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
+        window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 100); });
     }
 }
 
@@ -670,34 +520,16 @@ function initTooltips() {
     document.querySelectorAll('[data-tooltip]').forEach(el => {
         el.addEventListener('mouseenter', function() {
             const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
             tooltip.textContent = this.dataset.tooltip;
-            tooltip.style.cssText = `
-                position: absolute;
-                background: var(--primary-color);
-                color: white;
-                padding: 5px 12px;
-                border-radius: 5px;
-                font-size: 12px;
-                white-space: nowrap;
-                z-index: 1000;
-                pointer-events: none;
-            `;
-            
+            tooltip.style.cssText = 'position:absolute;background:var(--primary-color);color:white;padding:5px 12px;border-radius:5px;font-size:12px;white-space:nowrap;z-index:1000;pointer-events:none;';
             document.body.appendChild(tooltip);
-            
             const rect = this.getBoundingClientRect();
             tooltip.style.top = (rect.top - tooltip.offsetHeight - 5) + 'px';
             tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
-            
             this._tooltip = tooltip;
         });
-        
         el.addEventListener('mouseleave', function() {
-            if (this._tooltip) {
-                this._tooltip.remove();
-                this._tooltip = null;
-            }
+            if (this._tooltip) { this._tooltip.remove(); this._tooltip = null; }
         });
     });
 }
@@ -710,17 +542,14 @@ function initFormValidation() {
     document.querySelectorAll('form[data-validate]').forEach(form => {
         form.addEventListener('submit', function(e) {
             let isValid = true;
-            
             this.querySelectorAll('[required]').forEach(input => {
                 if (!input.value.trim()) {
                     isValid = false;
                     input.classList.add('error');
-                    
                     const errorMsg = document.createElement('span');
                     errorMsg.className = 'field-error';
                     errorMsg.textContent = 'هذا الحقل مطلوب';
                     errorMsg.style.cssText = 'color: var(--danger-color); font-size: 12px; margin-top: 5px; display: block;';
-                    
                     if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('field-error')) {
                         input.parentNode.appendChild(errorMsg);
                     }
@@ -730,8 +559,6 @@ function initFormValidation() {
                     if (errorMsg) errorMsg.remove();
                 }
             });
-            
-            // التحقق من البريد الإلكتروني
             const emailInput = this.querySelector('input[type="email"]');
             if (emailInput && emailInput.value.trim()) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -741,42 +568,41 @@ function initFormValidation() {
                     showToast('يرجى إدخال بريد إلكتروني صحيح', 'error');
                 }
             }
-            
-            if (!isValid) {
-                e.preventDefault();
-                showToast('يرجى تصحيح الأخطاء في النموذج', 'error');
-            }
+            if (!isValid) { e.preventDefault(); showToast('يرجى تصحيح الأخطاء في النموذج', 'error'); }
         });
     });
 }
 
 // =============================================
-// الإشعارات (Toast)
+// الإشعارات
 // =============================================
 
 function showToast(message, type = 'info', duration = 3000) {
     const toastContainer = document.getElementById('toast-container') || createToastContainer();
-    
+    const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8'
+    };
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-times-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
-        <span class="toast-icon">
-            ${type === 'success' ? '<i class="fas fa-check-circle"></i>' : 
-              type === 'error' ? '<i class="fas fa-times-circle"></i>' : 
-              type === 'warning' ? '<i class="fas fa-exclamation-triangle"></i>' : 
-              '<i class="fas fa-info-circle"></i>'}
-        </span>
+        <span class="toast-icon"><i class="fas ${icons[type]}"></i></span>
         <span class="toast-message">${message}</span>
         <button class="toast-close">&times;</button>
     `;
-    
     toast.style.cssText = `
         display: flex;
         align-items: center;
         gap: 10px;
-        background: ${type === 'success' ? 'var(--success-color)' : 
-                      type === 'error' ? 'var(--danger-color)' : 
-                      type === 'warning' ? 'var(--warning-color)' : 'var(--info-color)'};
+        background: ${colors[type]};
         color: white;
         padding: 12px 20px;
         border-radius: 10px;
@@ -787,14 +613,11 @@ function showToast(message, type = 'info', duration = 3000) {
         min-width: 280px;
         max-width: 450px;
     `;
-    
     toast.querySelector('.toast-close').addEventListener('click', () => {
         toast.style.animation = 'slideInLeft 0.3s ease reverse';
         setTimeout(() => toast.remove(), 300);
     });
-    
     toastContainer.appendChild(toast);
-    
     setTimeout(() => {
         if (toast.parentNode) {
             toast.style.animation = 'slideInLeft 0.3s ease reverse';
@@ -806,15 +629,7 @@ function showToast(message, type = 'info', duration = 3000) {
 function createToastContainer() {
     const container = document.createElement('div');
     container.id = 'toast-container';
-    container.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    `;
+    container.style.cssText = 'position:fixed;top:20px;left:20px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;';
     document.body.appendChild(container);
     return container;
 }
@@ -841,7 +656,6 @@ function getCookie(name) {
 
 function initChat(conversationId) {
     const socket = io();
-    
     socket.on('connect', () => {
         socket.emit('user-join', {
             userId: currentUserId || 'visitor',
@@ -849,28 +663,18 @@ function initChat(conversationId) {
             role: currentUserRole || 'customer'
         });
     });
-    
     socket.on('new-message', (message) => {
-        if (message.conversationId === conversationId) {
-            appendMessage(message);
-        }
+        if (message.conversationId === conversationId) appendMessage(message);
         playSound('notification');
     });
-    
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
-    
     if (chatForm && chatInput) {
         chatForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const content = chatInput.value.trim();
-            
             if (content) {
-                socket.emit('send-message', {
-                    content,
-                    conversationId,
-                    recipientSocketId: null
-                });
+                socket.emit('send-message', { content, conversationId, recipientSocketId: null });
                 chatInput.value = '';
             }
         });
@@ -880,7 +684,6 @@ function initChat(conversationId) {
 function appendMessage(message) {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
-    
     const isOwn = message.senderId === (currentUserId || 'visitor');
     const messageEl = document.createElement('div');
     messageEl.className = `chat-message ${isOwn ? 'own-message' : ''}`;
@@ -891,7 +694,6 @@ function appendMessage(message) {
             <div class="message-time">${new Date(message.timestamp || Date.now()).toLocaleTimeString('ar-SA')}</div>
         </div>
     `;
-    
     chatMessages.appendChild(messageEl);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
