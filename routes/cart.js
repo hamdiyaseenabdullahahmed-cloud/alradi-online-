@@ -41,6 +41,81 @@ const calculateCartTotals = (cart) => {
 };
 
 // =============================================
+// إضافة للسلة عبر GET مع redirect للسلة (جديد)
+// =============================================
+
+router.get('/add', async (req, res) => {
+    try {
+        const productId = req.query.productId;
+        const quantity = parseInt(req.query.quantity) || 1;
+        
+        if (!productId) {
+            req.flash('error_msg', 'المنتج غير محدد');
+            return res.redirect('/products');
+        }
+        
+        const product = await Product.findById(productId);
+        
+        if (!product || !product.isActive || product.isHidden) {
+            req.flash('error_msg', 'المنتج غير متوفر');
+            return res.redirect('/products');
+        }
+        
+        if (!product.isAvailable(quantity)) {
+            req.flash('error_msg', product.stockStatus === 'out_of_stock' ? 'نفد المنتج من المخزون' : 'الكمية المطلوبة غير متوفرة');
+            return res.redirect('/products');
+        }
+        
+        const cart = initCart(req);
+        const qty = parseInt(quantity);
+        
+        const existingIndex = cart.findIndex(item => item.productId === productId && item.optionsKey === '{}');
+        
+        if (existingIndex > -1) {
+            const newQuantity = cart[existingIndex].quantity + qty;
+            
+            if (newQuantity > product.maxOrderQuantity) {
+                req.flash('error_msg', `الحد الأقصى للطلب هو ${product.maxOrderQuantity} قطع`);
+                return res.redirect('/products');
+            }
+            
+            if (!product.isUnlimited && newQuantity > product.stock) {
+                req.flash('error_msg', 'الكمية المطلوبة غير متوفرة في المخزون');
+                return res.redirect('/products');
+            }
+            
+            cart[existingIndex].quantity = newQuantity;
+        } else {
+            cart.push({
+                productId: product._id.toString(),
+                name: product.name,
+                image: product.getMainImage(),
+                price: product.price,
+                finalPrice: product.getFinalPrice(),
+                quantity: qty,
+                options: {},
+                optionsKey: '{}',
+                maxOrderQuantity: product.maxOrderQuantity,
+                isUnlimited: product.isUnlimited,
+                slug: product.slug
+            });
+        }
+        
+        await product.addToCart();
+        req.session.cart = cart;
+        await req.session.save();
+        
+        req.flash('success_msg', 'تمت إضافة المنتج إلى السلة بنجاح');
+        return res.redirect('/cart');
+        
+    } catch (error) {
+        console.error('خطأ في إضافة المنتج للسلة:', error);
+        req.flash('error_msg', 'حدث خطأ في إضافة المنتج');
+        res.redirect('/products');
+    }
+});
+
+// =============================================
 // صفحة السلة
 // =============================================
 
@@ -87,8 +162,8 @@ router.get('/', async (req, res) => {
             freeShippingMin,
             total,
             totalItems,
+            coupon: req.session.coupon || null,
             currency: storeSettings.currency || 'SAR',
-            currencySymbol: storeSettings.currencySymbol || 'ر.س',
             storeSettings,
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
@@ -102,7 +177,7 @@ router.get('/', async (req, res) => {
 });
 
 // =============================================
-// إضافة منتج إلى السلة
+// إضافة منتج إلى السلة (POST - API)
 // =============================================
 
 router.post('/add', async (req, res) => {
@@ -119,7 +194,6 @@ router.post('/add', async (req, res) => {
             return res.json({ success: false, message: 'المنتج غير متوفر' });
         }
         
-        // التحقق من توفر المنتج
         if (!product.isAvailable(parseInt(quantity))) {
             return res.json({ 
                 success: false, 
@@ -130,16 +204,13 @@ router.post('/add', async (req, res) => {
         const cart = initCart(req);
         const qty = parseInt(quantity);
         
-        // إنشاء مفتاح فريد للخيارات
         const optionsKey = JSON.stringify(options);
         
-        // البحث عن المنتج في السلة
         const existingIndex = cart.findIndex(item => 
             item.productId === productId && item.optionsKey === optionsKey
         );
         
         if (existingIndex > -1) {
-            // تحديث الكمية إذا كان موجوداً
             const newQuantity = cart[existingIndex].quantity + qty;
             
             if (newQuantity > product.maxOrderQuantity) {
@@ -158,7 +229,6 @@ router.post('/add', async (req, res) => {
             
             cart[existingIndex].quantity = newQuantity;
         } else {
-            // إضافة منتج جديد
             cart.push({
                 productId: product._id.toString(),
                 name: product.name,
@@ -174,9 +244,8 @@ router.post('/add', async (req, res) => {
             });
         }
         
-        // تسجيل إضافة للسلة
         await product.addToCart();
-        
+        req.session.cart = cart;
         await req.session.save();
         
         const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -214,7 +283,6 @@ router.post('/update', async (req, res) => {
         const newQuantity = parseInt(quantity);
         
         if (newQuantity < 1) {
-            // إزالة المنتج إذا كانت الكمية 0
             cart.splice(itemIndex, 1);
         } else {
             const product = await Product.findById(productId);
@@ -236,6 +304,7 @@ router.post('/update', async (req, res) => {
             cart[itemIndex].quantity = newQuantity;
         }
         
+        req.session.cart = cart;
         await req.session.save();
         
         const { subtotal, totalItems } = calculateCartTotals(cart);
@@ -276,6 +345,7 @@ router.post('/remove', async (req, res) => {
             cart.splice(itemIndex, 1);
         }
         
+        req.session.cart = cart;
         await req.session.save();
         
         const { subtotal, totalItems } = calculateCartTotals(cart);
@@ -308,7 +378,6 @@ router.post('/clear', (req, res) => {
     try {
         req.session.cart = [];
         req.session.coupon = null;
-        
         req.flash('success_msg', 'تم تفريغ السلة');
         res.json({ success: true, cartCount: 0 });
     } catch (error) {
@@ -330,8 +399,6 @@ router.post('/apply-coupon', async (req, res) => {
             return res.json({ success: false, message: 'يرجى إدخال كود الكوبون' });
         }
         
-        // TODO: نظام كوبونات متكامل
-        // حالياً: كوبونات تجريبية
         const validCoupons = {
             'WELCOME15': { type: 'percentage', value: 15, minOrder: 100, maxDiscount: 200 },
             'RADI50': { type: 'fixed', value: 50, minOrder: 300 },
@@ -453,8 +520,7 @@ router.get('/checkout', isAuthenticated, async (req, res) => {
             totalItems,
             user,
             storeSettings,
-            currency: storeSettings.currency || 'SAR',
-            currencySymbol: storeSettings.currencySymbol || 'ر.س',
+            currencySymbol: 'ر.س',
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
@@ -613,9 +679,7 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         
         await user.save();
         
-        // =============================================
-        // تفريغ السلة تلقائياً بعد إتمام الطلب ✅
-        // =============================================
+        // تفريغ السلة تلقائياً بعد إتمام الطلب
         req.session.cart = [];
         req.session.coupon = null;
         await req.session.save();
@@ -720,7 +784,6 @@ router.get('/invoice/:id', isAuthenticated, async (req, res) => {
         doc.fontSize(11).font('Helvetica-Bold').text('قائمة المشتريات:');
         doc.moveDown(0.3);
         
-        // رأس الجدول
         const tableTop = doc.y;
         doc.fontSize(8).font('Helvetica-Bold');
         doc.text('#', 40, tableTop);
@@ -730,12 +793,9 @@ router.get('/invoice/:id', isAuthenticated, async (req, res) => {
         doc.text('الإجمالي', 380, tableTop);
         
         doc.moveDown(0.5);
-        
-        // خط فاصل
         doc.moveTo(40, doc.y).lineTo(570, doc.y).stroke();
         doc.moveDown(0.3);
         
-        // المنتجات
         doc.fontSize(8).font('Helvetica');
         let yPosition = doc.y;
         
@@ -749,11 +809,9 @@ router.get('/invoice/:id', isAuthenticated, async (req, res) => {
             doc.moveDown(0.3);
         });
         
-        // خط فاصل
         doc.moveTo(40, doc.y).lineTo(570, doc.y).stroke();
         doc.moveDown(0.5);
         
-        // المجاميع
         doc.fontSize(9);
         doc.text(`المجموع الفرعي: ${order.subtotal} ر.س`, { align: 'right' });
         
