@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>فاتورة <%= order.invoiceNumber %> - متجر الرعدي أون لاين</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', 'Segoe UI', sans-serif; direction: rtl; padding: 30px; color: #333; background: #f9f9f9; }
+        .invoice-box { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 3px solid #1a1a2e; padding-bottom: 20px; margin-bottom: 25px; }
+        .header .logo { font-size: 50px; }
+        .header h1 { color: #1a1a2e; margin: 5px 0; font-size: 24px; }
+        .header h3 { color: #e94560; margin: 3px 0; font-size: 14px; }
+        .header .invoice-title { background: #1a1a2e; color: white; display: inline-block; padding: 5px 20px; border-radius: 5px; margin-top: 10px; font-size: 13px; letter-spacing: 2px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .info-box { flex: 1; min-width: 200px; }
+        .info-box h4 { background: #f0f0f0; padding: 8px 12px; border-radius: 5px; margin-bottom: 8px; font-size: 13px; color: #1a1a2e; }
+        .info-box p { font-size: 13px; line-height: 1.8; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #1a1a2e; color: white; padding: 10px 12px; font-size: 12px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .summary { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .summary-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+        .summary-total { font-size: 22px; font-weight: 900; color: #e94560; border-top: 2px solid #ddd; margin-top: 10px; padding-top: 10px; }
+        .terms { background: #fff3cd; border-right: 4px solid #ffc107; padding: 12px 15px; border-radius: 5px; margin: 20px 0; font-size: 12px; color: #856404; line-height: 2; }
+        .signature { margin-top: 50px; }
+        .signature .line { border-bottom: 1px solid #333; width: 200px; margin-bottom: 5px; }
+        .signature p { font-size: 12px; color: #666; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 11px; color: #999; }
+        @media print {
+            body { background: white; padding: 0; }
+            .invoice-box { box-shadow: none; border-radius: 0; padding: 20px; }
+            .no-print { display: none; }
+        }
+        .no-print { text-align: center; margin-bottom: 20px; }
+        .no-print button { padding: 12px 30px; background: #e94560; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
+        .no-print button:hover { background: #c73e54; }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <button onclick="window.print()">🖨️ طباعة الفاتورة</button>
+        <button onclick="window.location.href='/account/orders'" style="background: #1a1a2e; margin-right: 10px;">📋 طلباتي</button>
+    </div>
+
+    <div class="invoice-box">
+        
+        <%# ترويسة الفاتورة %>
+        <div class="header">
+            <div class="logo">🦅</div>
+            <h1>مجموعة متاجر الرعدي أونلاين الفاخرة</h1>
+            <h3>Al-Radi Online Luxury Stores Group</h3>
+            <div class="invoice-title">فاتورة ضريبية رسمية</div>
+        </div>
+
+        <%# معلومات الفاتورة والعميل %>
+        <div class="info-row">
+            <div class="info-box">
+                <h4>📋 معلومات الفاتورة</h4>
+                <p><strong>رقم الفاتورة:</strong> <%= order.invoiceNumber %></p>
+                <p><strong>رقم الطلب:</strong> #<%= order.orderNumber %></p>
+                <p><strong>تاريخ الإصدار:</strong> <%= new Date(order.createdAt).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                <p><strong>وقت الإصدار:</strong> <%= new Date(order.createdAt).toLocaleTimeString('ar-SA') %></p>
+                <p><strong>تاريخ التسليم المتوقع:</strong> <%= order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'يحدد لاحقاً' %></p>
+            </div>
+            <div class="info-box">
+                <h4>👤 بيانات العميل</h4>
+                <p><strong>الاسم:</strong> <%= order.customerName %></p>
+                <p><strong>البريد الإلكتروني:</strong> <%= order.customerEmail %></p>
+                <p><strong>رقم الهاتف:</strong> <%= order.customerPhone %></p>
+            </div>
+        </div>
+
+        <%# عنوان الشحن ونوعه %>
+        <div class="info-row">
+            <div class="info-box">
+                <h4>📍 عنوان الشحن</h4>
+                <p><%= order.shippingAddress.fullAddress %></p>
+            </div>
+            <div class="info-box">
+                <h4>🚚 تفاصيل الشحن</h4>
+                <p><strong>نوع الشحن:</strong> 
+                    <% if (order.shippingMethod === 'international') { %>
+                        🌍 شحن دولي خارجي
+                    <% } else if (order.shippingMethod === 'pickup') { %>
+                        📍 استلام من المتجر
+                    <% } else { %>
+                        🇸🇦 شحن داخلي محلي
+                    <% } %>
+                </p>
+                <p><strong>طريقة الدفع:</strong> 
+                    <%= order.paymentMethod === 'cash_on_delivery' ? '💵 الدفع عند الاستلام' : 
+                        order.paymentMethod === 'credit_card' ? '💳 بطاقة ائتمان' : 
+                        order.paymentMethod === 'bank_transfer' ? '🏦 تحويل بنكي' : order.paymentMethod %>
+                </p>
+                <p><strong>حالة الطلب:</strong> 
+                    <span style="color: <%= order.status === 'delivered' ? '#28a745' : order.status === 'cancelled' ? '#dc3545' : '#17a2b8' %>; font-weight: bold;">
+                        <%= order.status === 'pending' ? 'قيد المراجعة' : 
+                            order.status === 'processing' ? 'قيد التجهيز' :
+                            order.status === 'shipped' ? 'تم الشحن' :
+                            order.status === 'delivered' ? 'تم التسليم' :
+                            order.status === 'cancelled' ? 'ملغي' : order.status %>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <%# قائمة المشتريات %>
+        <h3 style="margin-bottom: 10px; color: #1a1a2e;">📦 قائمة المشتريات:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>المنتج</th>
+                    <th class="text-center">الكمية</th>
+                    <th class="text-center">السعر (ر.س)</th>
+                    <th class="text-center">الإجمالي (ر.س)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% order.items.forEach(function(item, index) { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= item.name %></td>
+                        <td class="text-center"><%= item.quantity %></td>
+                        <td class="text-center"><%= item.price %></td>
+                        <td class="text-center"><strong><%= item.total %></strong></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <%# ملخص الفاتورة %>
+        <div class="summary">
+            <div class="summary-row">
+                <span>المجموع الفرعي:</span>
+                <span><%= order.subtotal %> ر.س</span>
+            </div>
+            <% if (order.couponDiscount > 0) { %>
+                <div class="summary-row" style="color: #28a745;">
+                    <span>خصم الكوبون (<%= order.couponCode %>):</span>
+                    <span>-<%= order.couponDiscount %> ر.س</span>
+                </div>
+            <% } %>
+            <div class="summary-row">
+                <span>رسوم الشحن (<%= order.shippingMethod === 'international' ? 'دولي' : 'داخلي' %>):</span>
+                <span><%= order.shippingCost === 0 ? 'مجاني' : order.shippingCost + ' ر.س' %></span>
+            </div>
+            <div class="summary-row summary-total">
+                <span>الإجمالي النهائي:</span>
+                <span><%= order.totalAmount %> ر.س</span>
+            </div>
+        </div>
+
+        <%# الشروط القانونية %>
+        <div class="terms">
+            <strong>⚠️ الشروط والأحكام القانونية:</strong>
+            <ol style="margin-right: 15px; margin-top: 5px;">
+                <li>يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.</li>
+                <li>يحق للزبون استبدال السلعة بأخرى خلال 3 أيام فقط من تاريخ الاستلام في حال وجود خلل مصنعي واضح، بشرط ألا يكون الخلل ناتجاً عن سوء الاستخدام.</li>
+                <li>أي كشط أو تلف في ملصقات الضمان أو العبوات الأصلية يلغي الضمان بشكل فوري ويسقط حق الاستبدال.</li>
+                <li>تثبيت "تاريخ الطلب" و"تاريخ التسليم الفعلي" كمرجع قانوني لحساب مدة الضمان والاستبدال الثلاثية.</li>
+            </ol>
+        </div>
+
+        <%# توقيع المستلم %>
+        <div class="signature">
+            <p><strong>تاريخ الطلب:</strong> <%= new Date(order.createdAt).toLocaleDateString('ar-SA') %></p>
+            <% if (order.actualDeliveryDate) { %>
+                <p><strong>تاريخ التسليم الفعلي:</strong> <%= new Date(order.actualDeliveryDate).toLocaleDateString('ar-SA') %></p>
+            <% } %>
+            <div style="margin-top: 40px;">
+                <div class="line"></div>
+                <p>توقيع المستلم عند الاستلام</p>
+            </div>
+        </div>
+
+        <%# تذييل الفاتورة %>
+        <div class="footer">
+            <p>🦅 جميع الحقوق محفوظة © <%= new Date().getFullYear() %> لمجموعة متاجر الرعدي أونلاين الفاخرة</p>
+            <p>تجربة تسوق فائقة وآمنة | شحن داخلي ودولي | دعم فني 24/7</p>
+        </div>
+
+    </div>
+</body>
+</html>
