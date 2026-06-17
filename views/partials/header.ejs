@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# ترويسة الموقع - كاملة                          %>
+<%# ترويسة الموقع - كاملة مع الشعار                  %>
 <%# ============================================= %>
 
 <!DOCTYPE html>
@@ -13,7 +13,11 @@
     <meta name="author" content="متجر الرعدي أون لاين">
     <meta name="theme-color" content="#1a1a2e">
     
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+    <% if (store.storeLogo && store.storeLogo !== '/images/default-logo.png') { %>
+        <link rel="icon" href="<%= store.storeLogo %>">
+    <% } else { %>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
+    <% } %>
     
     <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : '' %><%= store.storeName || 'متجر الرعدي أون لاين' %></title>
     
@@ -56,7 +60,12 @@
                 <%# الشعار والاسم %>
                 <div class="logo-container">
                     <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
-                        <span style="font-size: 40px; animation: pulse 2s infinite;">🦅</span>
+                        <% if (store.storeLogo && store.storeLogo !== '/images/default-logo.png') { %>
+                            <img src="<%= store.storeLogo %>" alt="الشعار" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--gold-color); box-shadow: 0 0 15px rgba(255,215,0,0.4);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                            <span style="font-size: 40px; animation: pulse 2s infinite; display: none;">🦅</span>
+                        <% } else { %>
+                            <span style="font-size: 40px; animation: pulse 2s infinite;">🦅</span>
+                        <% } %>
                         <span class="store-name" style="
                             font-size: 26px;
                             font-weight: 900;
@@ -129,7 +138,6 @@
                         <i class="fas fa-home"></i> الرئيسية
                     </a></li>
                     
-                    <%# قائمة المنتجات المنسدلة %>
                     <li class="dropdown">
                         <a href="/products" class="<%= currentPath.startsWith('/products') ? 'active' : '' %>">
                             <i class="fas fa-th-large"></i> المنتجات <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i>
@@ -143,7 +151,6 @@
                         </div>
                     </li>
                     
-                    <%# الأقسام %>
                     <li class="dropdown">
                         <a href="/products">
                             <i class="fas fa-list"></i> الأقسام <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i>
