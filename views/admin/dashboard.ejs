@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# لوحة تحكم المدير - الرئيسية - تصميم منظم         %>
+<%# لوحة تحكم المدير - تصميم احترافي                %>
 <%# ============================================= %>
 
 <%- include('../partials/header') %>
@@ -24,9 +24,21 @@
     .stat-info .stat-value { font-size: 24px; font-weight: 900; color: var(--primary-color); }
     .stat-info .stat-label { font-size: 12px; color: var(--text-muted); }
     
+    .panel { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .panel h3 { font-size: 16px; font-weight: 700; margin: 0 0 18px 0; }
+    
     .recent-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .recent-table th { background: var(--bg-color); padding: 12px 15px; text-align: right; border-bottom: 2px solid var(--border-color); font-weight: 700; }
     .recent-table td { padding: 10px 15px; border-bottom: 1px solid var(--border-light); }
+    .recent-table tr:hover { background: var(--bg-color); }
+    
+    .top-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+    .top-item .rank { font-weight: 900; color: var(--text-muted); min-width: 30px; font-size: 16px; }
+    
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+    .quick-action { background: var(--bg-color); border-radius: 10px; padding: 18px 12px; text-align: center; text-decoration: none; color: var(--primary-color); font-weight: 600; font-size: 13px; transition: all 0.2s; display: block; }
+    .quick-action:hover { background: var(--secondary-color); color: white; transform: translateY(-2px); }
+    .quick-action i { font-size: 22px; margin-bottom: 8px; display: block; }
     
     @media (max-width: 900px) {
         .admin-layout { grid-template-columns: 1fr; }
@@ -41,12 +53,14 @@
             <i class="fas fa-tachometer-alt" style="color: var(--secondary-color); margin-left: 10px;"></i>
             لوحة التحكم
         </h1>
-        <p style="color: var(--text-muted);">مرحباً بك، <strong><%= user ? user.name : 'مدير النظام' %></strong></p>
+        <p style="color: var(--text-muted);">
+            <i class="fas fa-calendar"></i> <%= new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+        </p>
     </div>
     
     <div class="admin-layout">
         
-        <%# ================ القائمة الجانبية ================ %>
+        <%# القائمة الجانبية %>
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-user-shield" style="font-size: 40px;"></i>
@@ -54,181 +68,110 @@
                 <p>المدير العام</p>
             </div>
             <nav class="sidebar-nav">
-                <a href="/admin/dashboard" class="active">
-                    <i class="fas fa-th-large"></i> لوحة المعلومات
-                </a>
-                <a href="/admin/products">
-                    <i class="fas fa-boxes"></i> المنتجات
-                </a>
-                <a href="/admin/categories">
-                    <i class="fas fa-folder-tree"></i> الأقسام
-                </a>
-                <a href="/admin/orders">
-                    <i class="fas fa-receipt"></i> الطلبات
-                </a>
-                <a href="/admin/customers">
-                    <i class="fas fa-users"></i> العملاء
-                </a>
+                <a href="/admin/dashboard" class="active"><i class="fas fa-th-large"></i> لوحة المعلومات</a>
+                <a href="/admin/products"><i class="fas fa-boxes"></i> المنتجات</a>
+                <a href="/admin/categories"><i class="fas fa-folder-tree"></i> الأقسام</a>
+                <a href="/admin/orders"><i class="fas fa-receipt"></i> الطلبات</a>
+                <a href="/admin/customers"><i class="fas fa-users"></i> العملاء</a>
                 <div class="divider"></div>
-                <a href="/admin/settings">
-                    <i class="fas fa-cog"></i> الإعدادات
-                </a>
-                <a href="/admin/chat">
-                    <i class="fas fa-comments"></i> المحادثات
-                </a>
-                <a href="/admin/reports">
-                    <i class="fas fa-chart-bar"></i> التقارير
-                </a>
-                <a href="/admin/activity-log">
-                    <i class="fas fa-history"></i> سجل النشاطات
-                </a>
+                <a href="/admin/settings"><i class="fas fa-cog"></i> الإعدادات</a>
+                <a href="/admin/chat"><i class="fas fa-comments"></i> المحادثات</a>
+                <a href="/admin/reports"><i class="fas fa-chart-bar"></i> التقارير</a>
+                <a href="/admin/activity-log"><i class="fas fa-history"></i> سجل النشاطات</a>
                 <div class="divider"></div>
-                <a href="/" target="_blank" style="color: var(--info-color);">
-                    <i class="fas fa-eye"></i> معاينة المتجر
-                </a>
-                <a href="/auth/logout" style="color: var(--danger-color);">
-                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-                </a>
+                <a href="/" target="_blank"><i class="fas fa-eye"></i> معاينة المتجر</a>
+                <a href="/auth/logout" style="color: var(--danger-color);"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
             </nav>
         </aside>
         
-        <%# ================ المحتوى الرئيسي ================ %>
+        <%# المحتوى الرئيسي %>
         <main>
             
             <%# بطاقات الإحصائيات %>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(233,69,96,0.1); color: var(--secondary-color);">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= stats.totalUsers || 0 %></div>
-                        <div class="stat-label">مشترك نشط</div>
-                    </div>
+                    <div class="stat-icon" style="background: rgba(233,69,96,0.1); color: var(--secondary-color);"><i class="fas fa-users"></i></div>
+                    <div class="stat-info"><div class="stat-value"><%= stats.totalUsers || 0 %></div><div class="stat-label">مشترك نشط</div></div>
                 </div>
-                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(40,167,69,0.1); color: var(--success-color);">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= stats.totalProducts || 0 %></div>
-                        <div class="stat-label">منتج في المستودع</div>
-                    </div>
+                    <div class="stat-icon" style="background: rgba(40,167,69,0.1); color: var(--success-color);"><i class="fas fa-box"></i></div>
+                    <div class="stat-info"><div class="stat-value"><%= stats.totalProducts || 0 %></div><div class="stat-label">منتج في المستودع</div></div>
                 </div>
-                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(255,215,0,0.1); color: var(--gold-color);">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= (stats.totalRevenue || 0).toFixed(0) %></div>
-                        <div class="stat-label">ر.س إجمالي المبيعات</div>
-                    </div>
+                    <div class="stat-icon" style="background: rgba(255,215,0,0.1); color: var(--gold-color);"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-info"><div class="stat-value"><%= (stats.totalRevenue || 0).toFixed(0) %></div><div class="stat-label">ر.س إجمالي المبيعات</div></div>
                 </div>
-                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(255,193,7,0.1); color: var(--warning-color);">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= stats.lowStockProducts || 0 %></div>
-                        <div class="stat-label">منخفض المخزون</div>
-                    </div>
+                    <div class="stat-icon" style="background: rgba(255,193,7,0.1); color: var(--warning-color);"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-info"><div class="stat-value"><%= stats.lowStockProducts || 0 %></div><div class="stat-label">منخفض المخزون</div></div>
                 </div>
-                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(23,162,184,0.1); color: var(--info-color);">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= stats.todayRevenue || 0 %> ر.س</div>
-                        <div class="stat-label">أرباح اليوم</div>
-                    </div>
+                    <div class="stat-icon" style="background: rgba(23,162,184,0.1); color: var(--info-color);"><i class="fas fa-calendar-day"></i></div>
+                    <div class="stat-info"><div class="stat-value"><%= stats.todayRevenue || 0 %> ر.س</div><div class="stat-label">أرباح اليوم</div></div>
                 </div>
-                
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(40,167,69,0.1); color: var(--success-color);">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= stats.monthRevenue || 0 %> ر.س</div>
-                        <div class="stat-label">أرباح الشهر</div>
-                    </div>
+                    <div class="stat-icon" style="background: rgba(40,167,69,0.1); color: var(--success-color);"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-info"><div class="stat-value"><%= stats.monthRevenue || 0 %> ر.س</div><div class="stat-label">أرباح الشهر</div></div>
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
                 
                 <%# أحدث الطلبات %>
-                <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-                        <h3 style="font-size: 16px; font-weight: 700; margin: 0;">
-                            <i class="fas fa-shopping-cart" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                            أحدث الطلبات
-                        </h3>
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3><i class="fas fa-shopping-cart" style="color: var(--secondary-color); margin-left: 8px;"></i> أحدث الطلبات</h3>
                         <a href="/admin/orders" style="font-size: 12px; color: var(--secondary-color); font-weight: bold;">عرض الكل →</a>
                     </div>
-                    
                     <% if (recentOrders && recentOrders.length > 0) { %>
                         <table class="recent-table">
-                            <thead>
-                                <tr>
-                                    <th>الطلب</th>
-                                    <th>العميل</th>
-                                    <th>المبلغ</th>
-                                    <th>الحالة</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>الطلب</th><th>العميل</th><th>المبلغ</th><th>الحالة</th></tr></thead>
                             <tbody>
                                 <% recentOrders.forEach(function(order) { %>
                                     <tr>
                                         <td><a href="/admin/orders/<%= order._id %>" style="font-weight: bold; color: var(--primary-color);">#<%= order.orderNumber %></a></td>
                                         <td><%= order.customerName %></td>
                                         <td style="font-weight: bold;"><%= order.totalAmount %> ر.س</td>
-                                        <td>
-                                            <span style="background: <%= order.status === 'pending' ? 'var(--warning-bg)' : 'var(--success-bg)' %>; 
-                                                         color: <%= order.status === 'pending' ? '#856404' : 'var(--success-color)' %>; 
-                                                         padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-                                                <%= order.status === 'pending' ? 'قيد المراجعة' : order.status %>
-                                            </span>
-                                        </td>
+                                        <td><span style="background: <%= order.status === 'pending' ? 'var(--warning-bg)' : 'var(--success-bg)' %>; color: <%= order.status === 'pending' ? '#856404' : 'var(--success-color)' %>; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;"><%= order.status === 'pending' ? 'قيد المراجعة' : order.status %></span></td>
                                     </tr>
                                 <% }); %>
                             </tbody>
                         </table>
                     <% } else { %>
-                        <p style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد طلبات بعد</p>
+                        <p style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد طلبات</p>
                     <% } %>
                 </div>
                 
                 <%# الأكثر مبيعاً %>
-                <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-                        <h3 style="font-size: 16px; font-weight: 700; margin: 0;">
-                            <i class="fas fa-fire" style="color: var(--danger-color); margin-left: 8px;"></i>
-                            الأكثر مبيعاً
-                        </h3>
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3><i class="fas fa-fire" style="color: var(--danger-color); margin-left: 8px;"></i> الأكثر مبيعاً</h3>
                         <a href="/admin/products" style="font-size: 12px; color: var(--secondary-color); font-weight: bold;">عرض الكل →</a>
                     </div>
-                    
                     <% if (topProducts && topProducts.length > 0) { %>
                         <% topProducts.forEach(function(product, index) { %>
-                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light);">
-                                <span style="font-weight: 900; color: var(--text-muted); min-width: 25px;">#<%= index + 1 %></span>
-                                <div style="flex: 1;">
-                                    <strong style="font-size: 13px;"><%= product.name %></strong>
-                                    <br><small style="color: var(--text-muted);"><%= product.price %> ر.س</small>
-                                </div>
-                                <span style="background: var(--bg-color); padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
-                                    <%= product.sales || 0 %> مبيعاً
-                                </span>
+                            <div class="top-item">
+                                <span class="rank"><%= index + 1 %>.</span>
+                                <div style="flex:1;"><strong style="font-size:13px;"><%= product.name %></strong><br><small style="color:var(--text-muted);"><%= product.price %> ر.س</small></div>
+                                <span style="background:var(--bg-color);padding:5px 12px;border-radius:15px;font-size:12px;font-weight:bold;"><%= product.sales || 0 %> مبيعاً</span>
                             </div>
                         <% }); %>
                     <% } else { %>
-                        <p style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد مبيعات بعد</p>
+                        <p style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد مبيعات</p>
                     <% } %>
+                </div>
+            </div>
+            
+            <%# أزرار سريعة %>
+            <div class="panel">
+                <h3><i class="fas fa-bolt" style="color: var(--gold-color); margin-left: 8px;"></i> وصول سريع</h3>
+                <div class="quick-actions">
+                    <a href="/admin/products/add" class="quick-action"><i class="fas fa-plus-circle"></i> إضافة منتج</a>
+                    <a href="/admin/categories/add" class="quick-action"><i class="fas fa-folder-plus"></i> إضافة قسم</a>
+                    <a href="/admin/orders" class="quick-action"><i class="fas fa-receipt"></i> الطلبات</a>
+                    <a href="/admin/customers" class="quick-action"><i class="fas fa-users"></i> العملاء</a>
+                    <a href="/admin/settings" class="quick-action"><i class="fas fa-cog"></i> الإعدادات</a>
+                    <a href="/admin/reports" class="quick-action"><i class="fas fa-chart-bar"></i> التقارير</a>
                 </div>
             </div>
         </main>
