@@ -1,9 +1,14 @@
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# صفحة 404 - الصفحة غير موجودة                    %>
+<%# ============================================= %>
+
 <%- include('partials/header') %>
 
 <div class="container">
     <div style="text-align: center; padding: 80px 20px; max-width: 500px; margin: 0 auto;">
         
-        <div style="font-size: 120px; font-weight: 900; color: var(--text-muted); margin-bottom: 10px; opacity: 0.5;">
+        <div style="font-size: 120px; font-weight: 900; color: var(--text-muted); opacity: 0.3; line-height: 1;">
             404
         </div>
         
@@ -12,19 +17,19 @@
         </div>
         
         <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 15px;">
-            الصفحة غير موجودة
+            <%= currentLanguage === 'en' ? 'Page Not Found' : 'الصفحة غير موجودة' %>
         </h1>
         
         <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 30px; line-height: 1.8;">
-            نعتذر، الصفحة التي تبحث عنها غير موجودة أو تم نقلها أو حذفها.
+            <%= currentLanguage === 'en' ? 'Sorry, the page you are looking for does not exist or has been moved.' : 'نعتذر، الصفحة التي تبحث عنها غير موجودة أو تم نقلها أو حذفها.' %>
         </p>
         
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
             <a href="/" class="btn btn-primary btn-lg">
-                <i class="fas fa-home"></i> العودة للرئيسية
+                <i class="fas fa-home"></i> <%= currentLanguage === 'en' ? 'Go Home' : 'العودة للرئيسية' %>
             </a>
             <a href="/products" class="btn btn-outline btn-lg">
-                <i class="fas fa-shopping-bag"></i> تصفح المنتجات
+                <i class="fas fa-shopping-bag"></i> <%= currentLanguage === 'en' ? 'Browse Products' : 'تصفح المنتجات' %>
             </a>
         </div>
     </div>
