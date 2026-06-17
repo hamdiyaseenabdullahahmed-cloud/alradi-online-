@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <div style="max-width: 600px; margin: 40px auto;">
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-envelope" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            اتصل بنا
+        </h1>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">نحن هنا لخدمتك. تواصل معنا عبر النموذج أدناه وسنرد عليك في أقرب وقت.</p>
+        
+        <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 25px rgba(0,0,0,0.1);">
+            <form action="/contact" method="POST">
+                <div class="form-group">
+                    <label class="form-label">الاسم *</label>
+                    <input type="text" name="name" class="form-control" placeholder="أدخل اسمك الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني *</label>
+                    <input type="email" name="email" class="form-control" placeholder="example@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="05xxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الموضوع *</label>
+                    <input type="text" name="subject" class="form-control" placeholder="عنوان رسالتك" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الرسالة *</label>
+                    <textarea name="message" class="form-control" rows="5" placeholder="اكتب رسالتك هنا..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-paper-plane"></i> إرسال الرسالة
+                </button>
+            </form>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 25px;">
+            <div style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <i class="fas fa-phone" style="font-size: 24px; color: var(--secondary-color); margin-bottom: 8px; display: block;"></i>
+                <p style="font-weight: bold; margin: 0; font-size: 14px;"><%= store.phoneNumber || '966500000000' %></p>
+            </div>
+            <div style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <i class="fas fa-envelope" style="font-size: 24px; color: var(--secondary-color); margin-bottom: 8px; display: block;"></i>
+                <p style="font-weight: bold; margin: 0; font-size: 14px;"><%= store.contactEmail || 'alradi@gmil.com' %></p>
+            </div>
+            <div style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <i class="fas fa-map-marker-alt" style="font-size: 24px; color: var(--secondary-color); margin-bottom: 8px; display: block;"></i>
+                <p style="font-weight: bold; margin: 0; font-size: 14px;"><%= store.address || 'المملكة العربية السعودية' %></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
