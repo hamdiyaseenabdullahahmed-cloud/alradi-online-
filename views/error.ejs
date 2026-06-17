@@ -13,21 +13,35 @@
         </div>
         
         <h1 style="font-size: 32px; font-weight: 900; color: var(--primary-color); margin-bottom: 15px;">
-            <%= typeof statusCode !== 'undefined' ? statusCode : '500' %> - حدث خطأ
+            <%= typeof statusCode !== 'undefined' ? statusCode : '500' %> - 
+            <%= currentLanguage === 'en' ? 'Error' : 'حدث خطأ' %>
         </h1>
         
-        <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 30px;">
-            <%= typeof error !== 'undefined' && error.message ? error.message : 'نعتذر، حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.' %>
+        <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 30px; line-height: 1.8;">
+            <% if (typeof error !== 'undefined' && error.message) { %>
+                <%= error.message %>
+            <% } else { %>
+                <%= currentLanguage === 'en' ? 'An unexpected error occurred. Please try again later.' : 'نعتذر، حدث خطأ غير متوقع أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.' %>
+            <% } %>
         </p>
         
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
             <a href="/" class="btn btn-primary btn-lg">
-                <i class="fas fa-home"></i> العودة للرئيسية
+                <i class="fas fa-home"></i> <%= currentLanguage === 'en' ? 'Go Home' : 'العودة للرئيسية' %>
             </a>
             <a href="javascript:location.reload()" class="btn btn-outline btn-lg">
-                <i class="fas fa-redo"></i> تحديث الصفحة
+                <i class="fas fa-redo"></i> <%= currentLanguage === 'en' ? 'Try Again' : 'تحديث الصفحة' %>
+            </a>
+            <a href="/contact" class="btn btn-outline btn-lg">
+                <i class="fas fa-envelope"></i> <%= currentLanguage === 'en' ? 'Contact Us' : 'اتصل بنا' %>
             </a>
         </div>
+        
+        <% if (typeof error !== 'undefined' && error.stack) { %>
+            <div style="margin-top: 40px; text-align: left; background: var(--bg-color); padding: 20px; border-radius: 10px; overflow-x: auto; display: none;">
+                <pre style="font-size: 11px; color: var(--text-muted); white-space: pre-wrap; word-break: break-all;"><%= error.stack %></pre>
+            </div>
+        <% } %>
     </div>
 </div>
 
