@@ -26,6 +26,9 @@ require('dotenv').config();
 
 const app = express();
 
+// ⭐ هذا هو السطر الجديد اللي أضفناه
+app.set('trust proxy', 1);
+
 // =============================================
 // إعدادات الحماية المتقدمة
 // =============================================
@@ -92,7 +95,6 @@ mongoose.connect(MONGODB_URI)
             const User = require('./models/User');
             const StoreSettings = require('./models/StoreSettings');
             
-            // إنشاء إعدادات المتجر الافتراضية
             let settings = await StoreSettings.findOne();
             if (!settings) {
                 settings = new StoreSettings({
@@ -112,7 +114,6 @@ mongoose.connect(MONGODB_URI)
                 console.log('✅ تم إنشاء إعدادات المتجر الافتراضية');
             }
             
-            // إنشاء حساب المدير الافتراضي
             const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmil.com';
             const adminExists = await User.findOne({ email: adminEmail });
             
@@ -251,15 +252,6 @@ io.on('connection', (socket) => {
                 role: userData.role || 'customer',
                 socketId: socket.id
             });
-            
-            const admins = Array.from(connectedUsers.values()).filter(u => u.role === 'admin');
-            admins.forEach(admin => {
-                io.to(admin.socketId).emit('new-visitor', {
-                    userId: userData.userId,
-                    name: userData.name || 'زائر',
-                    socketId: socket.id
-                });
-            });
         }
     });
     
@@ -285,35 +277,10 @@ io.on('connection', (socket) => {
                 });
                 io.to(socket.id).emit('new-message', message);
             }
-            
-            try {
-                const Message = require('./models/Message');
-                const newMessage = new Message({
-                    senderId: sender.userId,
-                    senderName: sender.name,
-                    senderRole: sender.role,
-                    content: messageData.content,
-                    recipientSocketId: messageData.recipientSocketId || null,
-                    conversationId: [sender.userId, 'admin'].sort().join('_')
-                });
-                newMessage.save().catch(() => {});
-            } catch (error) {
-                console.error('خطأ في حفظ الرسالة:', error.message);
-            }
         }
     });
     
     socket.on('disconnect', () => {
-        const user = connectedUsers.get(socket.id);
-        if (user) {
-            const admins = Array.from(connectedUsers.values()).filter(u => u.role === 'admin');
-            admins.forEach(admin => {
-                io.to(admin.socketId).emit('user-disconnected', {
-                    userId: user.userId,
-                    socketId: socket.id
-                });
-            });
-        }
         connectedUsers.delete(socket.id);
         console.log('🔌 مستخدم قطع الاتصال:', socket.id);
     });
@@ -339,22 +306,6 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
     console.error('❌ خطأ:', err.message);
-    
-    try {
-        const ErrorLog = require('./models/ErrorLog');
-        const errorLog = new ErrorLog({
-            message: err.message,
-            stack: err.stack || '',
-            url: req.url,
-            method: req.method,
-            userAgent: req.headers['user-agent'] || '',
-            ip: req.ip || '',
-            userId: req.session && req.session.user ? req.session.user._id : null
-        });
-        errorLog.save().catch(() => {});
-    } catch (logError) {
-        console.error('خطأ في تسجيل الخطأ:', logError.message);
-    }
     
     res.status(err.statusCode || 500).render('error', {
         pageTitle: 'خطأ في الخادم',
