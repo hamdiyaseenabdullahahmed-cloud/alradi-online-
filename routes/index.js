@@ -9,6 +9,7 @@ const Product = require('../models/Product');
 const Category = require('../models/Category');
 const StoreSettings = require('../models/StoreSettings');
 const Order = require('../models/Order');
+const User = require('../models/User');
 
 // =============================================
 // الصفحة الرئيسية
@@ -120,6 +121,27 @@ router.get('/search', async (req, res) => {
         console.error('خطأ في البحث:', error);
         req.flash('error_msg', 'حدث خطأ في البحث');
         res.redirect('/');
+    }
+});
+
+// =============================================
+// رابط الأقسام من الصفحة الرئيسية
+// =============================================
+
+router.get('/products/category/:slug', async (req, res) => {
+    try {
+        const category = await Category.findOne({
+            $or: [
+                { slug: req.params.slug },
+                ...(req.params.slug.match(/^[0-9a-fA-F]{24}$/) ? [{ _id: req.params.slug }] : [])
+            ]
+        });
+        if (!category) {
+            return res.redirect('/products');
+        }
+        return res.redirect('/products?category=' + category._id);
+    } catch (error) {
+        return res.redirect('/products');
     }
 });
 
