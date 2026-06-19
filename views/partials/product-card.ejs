@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# بطاقة المنتج الموحدة - مع مميزات جديدة           %>
+<%# بطاقة المنتج الموحدة - تصميم احترافي             %>
 <%# ============================================= %>
 
 <div class="product-card animate-fadeIn">
@@ -46,11 +46,6 @@
             <a href="/products/<%= product.slug || product._id %>" class="action-btn quick-view-btn" title="عرض التفاصيل">
                 <i class="fas fa-eye"></i>
             </a>
-            <% if (product.stockStatus !== 'out_of_stock') { %>
-                <a href="/cart/add?productId=<%= product._id %>&quantity=1&redirect=cart" class="action-btn add-to-cart-quick-btn" title="أضف للسلة">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-            <% } %>
         </div>
     </div>
     
