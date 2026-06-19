@@ -1,6 +1,6 @@
 // =============================================
 // متجر الرعدي أون لاين - alradi-online
-// الملف الرئيسي للسيرفر
+// الملف الرئيسي للسيرفر - النسخة الكاملة
 // =============================================
 
 const express = require('express');
@@ -10,13 +10,9 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const path = require('path');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
-const hpp = require('hpp');
-const cors = require('cors');
 const compression = require('compression');
-const morgan = require('morgan');
 const http = require('http');
 const socketIo = require('socket.io');
 const cron = require('node-cron');
@@ -26,7 +22,7 @@ require('dotenv').config();
 
 const app = express();
 
-// ⭐ مهم لـ Render
+// ⭐ مهم جداً لـ Render - يثق بالبروكسي
 app.set('trust proxy', 1);
 
 // =============================================
@@ -48,27 +44,9 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-app.use(cors({ origin: '*', credentials: true }));
-
-const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: 'عدد الطلبات كبير جداً، الرجاء المحاولة لاحقاً'
-});
-app.use('/api', globalLimiter);
-
-const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    message: 'محاولات تسجيل دخول كثيرة جداً'
-});
-app.use('/auth/login', loginLimiter);
-
 app.use(mongoSanitize());
 app.use(xss());
-app.use(hpp());
 app.use(compression());
-app.use(morgan('dev'));
 
 // =============================================
 // إعدادات قاعدة البيانات
@@ -84,6 +62,7 @@ mongoose.connect(MONGODB_URI)
             const User = require('./models/User');
             const StoreSettings = require('./models/StoreSettings');
             
+            // إنشاء إعدادات المتجر الافتراضية
             let settings = await StoreSettings.findOne();
             if (!settings) {
                 settings = new StoreSettings({
@@ -103,6 +82,7 @@ mongoose.connect(MONGODB_URI)
                 console.log('✅ تم إنشاء إعدادات المتجر الافتراضية');
             }
             
+            // إنشاء حساب المدير الافتراضي
             const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmil.com';
             const adminExists = await User.findOne({ email: adminEmail });
             
@@ -137,14 +117,16 @@ mongoose.connect(MONGODB_URI)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// ⭐ الملفات الثابتة - مهم جداً للصور المرفوعة
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
+// استقبال البيانات
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET || 'alradi-cookie-secret'));
 
-// ⭐ إعدادات الجلسة - معدلة للعمل مع Render
+// ⭐ إعدادات الجلسة - محسنة لـ Render
 app.use(session({
     secret: process.env.SESSION_SECRET || 'alradi-session-secret',
     resave: true,
@@ -180,11 +162,13 @@ app.use(async (req, res, next) => {
             };
         }
         
+        // حساب عدد عناصر السلة
         let cartCount = 0;
-        if (req.session.cart) {
-            cartCount = req.session.cart.reduce((total, item) => total + item.quantity, 0);
+        if (req.session && req.session.cart) {
+            cartCount = req.session.cart.reduce((total, item) => total + (item.quantity || 0), 0);
         }
         
+        // تمرير المتغيرات لجميع القوالب
         res.locals.store = storeSettings;
         res.locals.user = req.session.user || null;
         res.locals.cartCount = cartCount;
@@ -246,7 +230,8 @@ io.on('connection', (socket) => {
                 senderName: sender.name,
                 senderRole: sender.role,
                 content: messageData.content,
-                timestamp: new Date()
+                timestamp: new Date(),
+                socketId: socket.id
             };
             
             if (sender.role === 'admin' && messageData.recipientSocketId) {
@@ -254,9 +239,7 @@ io.on('connection', (socket) => {
                 io.to(socket.id).emit('new-message', message);
             } else {
                 const admins = Array.from(connectedUsers.values()).filter(u => u.role === 'admin');
-                admins.forEach(admin => {
-                    io.to(admin.socketId).emit('new-message', message);
-                });
+                admins.forEach(admin => io.to(admin.socketId).emit('new-message', message));
                 io.to(socket.id).emit('new-message', message);
             }
         }
@@ -272,7 +255,7 @@ app.set('io', io);
 app.set('connectedUsers', connectedUsers);
 
 // =============================================
-// صفحة 404
+// صفحة 404 - الصفحة غير موجودة
 // =============================================
 
 app.use((req, res) => {
@@ -289,6 +272,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     console.error('❌ خطأ:', err.message);
     
+    // تسجيل الخطأ في قاعدة البيانات
     try {
         const ErrorLog = require('./models/ErrorLog');
         const errorLog = new ErrorLog({
@@ -301,7 +285,9 @@ app.use((err, req, res, next) => {
             userId: req.session && req.session.user ? req.session.user._id : null
         });
         errorLog.save().catch(() => {});
-    } catch (logError) {}
+    } catch (logError) {
+        console.error('خطأ في تسجيل الخطأ:', logError.message);
+    }
     
     res.status(err.statusCode || 500).render('error', {
         pageTitle: 'خطأ في الخادم',
@@ -342,6 +328,7 @@ cron.schedule(backupSchedule, async () => {
         await archive.finalize();
         console.log('✅ تم إنشاء النسخة الاحتياطية:', backupFile);
         
+        // حذف النسخ القديمة
         const files = fs.readdirSync(backupDir);
         const retentionDays = parseInt(process.env.BACKUP_RETENTION_DAYS) || 30;
         const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
