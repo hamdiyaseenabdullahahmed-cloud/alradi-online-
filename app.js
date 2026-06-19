@@ -1,193 +1,127 @@
 // =============================================
-// متجر الرعدي أون لاين - alradi-online
-// الملف الرئيسي للسيرفر - النسخة الكاملة
+// متجر الرعدي أون لاين - Al-Radi Online
+// السيرفر الرئيسي - إصدار Premium Masterpiece
 // =============================================
 
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const path = require('path');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const compression = require('compression');
-const http = require('http');
-const socketIo = require('socket.io');
-const cron = require('node-cron');
-const archiver = require('archiver');
-const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
-
-// ⭐ مهم جداً لـ Render - يثق بالبروكسي
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // ثقة بروكسي Render
 
 // =============================================
-// إعدادات الحماية المتقدمة
+// 1. إعدادات الحماية المتقدمة (Security Layer)
 // =============================================
-
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-            imgSrc: ["'self'", "data:", "blob:", "https:"],
-            mediaSrc: ["'self'", "data:", "blob:"],
-            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-            connectSrc: ["'self'", "ws:", "wss:"]
-        }
-    },
-    crossOriginEmbedderPolicy: false
-}));
-
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(mongoSanitize());
 app.use(xss());
 app.use(compression());
 
 // =============================================
-// إعدادات قاعدة البيانات
+// 2. ربط قاعدة البيانات وخلق البيانات الأولية
 // =============================================
-
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/alradi_online';
 
-mongoose.connect(MONGODB_URI)
-    .then(async () => {
-        console.log('✅ تم الاتصال بقاعدة البيانات بنجاح');
-        
-        try {
-            const User = require('./models/User');
-            const StoreSettings = require('./models/StoreSettings');
-            
-            // إنشاء إعدادات المتجر الافتراضية
-            let settings = await StoreSettings.findOne();
-            if (!settings) {
-                settings = new StoreSettings({
-                    storeName: process.env.STORE_NAME_AR || 'متجر الرعدي أون لاين',
-                    storeNameEn: process.env.STORE_NAME_EN || 'Al-Radi Online Store',
-                    storeLogo: '/images/default-logo.png',
-                    storeDescription: 'متجر إلكتروني متكامل للتسوق العالمي',
-                    contactEmail: process.env.ADMIN_EMAIL || 'alradi@gmil.com',
-                    phoneNumber: '966500000000',
-                    currency: process.env.STORE_CURRENCY || 'SAR',
-                    shippingInternal: 25,
-                    shippingInternational: 75,
-                    voiceGreetingEnabled: true,
-                    voiceInteractionsEnabled: true
-                });
-                await settings.save();
-                console.log('✅ تم إنشاء إعدادات المتجر الافتراضية');
-            }
-            
-            // إنشاء حساب المدير الافتراضي
-            const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmil.com';
-            const adminExists = await User.findOne({ email: adminEmail });
-            
-            if (!adminExists) {
-                const admin = new User({
-                    name: 'مدير النظام',
-                    username: process.env.ADMIN_USERNAME || 'AlRadiAdmin',
-                    email: adminEmail,
-                    password: process.env.ADMIN_PASSWORD || 'admin123',
-                    role: 'admin',
-                    isActive: true
-                });
-                await admin.save();
-                console.log('✅ تم إنشاء حساب المدير الافتراضي');
-                console.log('📧 البريد الإلكتروني: ' + adminEmail);
-                console.log('🔑 كلمة المرور: ' + (process.env.ADMIN_PASSWORD || 'admin123'));
-            } else {
-                console.log('✅ حساب المدير موجود مسبقاً');
-            }
-        } catch (err) {
-            console.error('❌ خطأ في إنشاء البيانات الافتراضية:', err.message);
+mongoose.connect(MONGODB_URI).then(async () => {
+    console.log('✅ MongoDB متصل');
+    try {
+        const User = require('./models/User');
+        const StoreSettings = require('./models/StoreSettings');
+        if (!await StoreSettings.findOne()) {
+            await new StoreSettings({ storeName: 'متجر الرعدي أون لاين', shippingInternal: 25, shippingInternational: 75, freeShippingMin: 300 }).save();
+            console.log('⚙️ تم إنشاء إعدادات المتجر');
         }
-    })
-    .catch(err => {
-        console.error('❌ خطأ في الاتصال بقاعدة البيانات:', err.message);
-    });
+        const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmil.com';
+        if (!await User.findOne({ email: adminEmail })) {
+            await new User({ name: 'مدير النظام', username: 'AlRadiAdmin', email: adminEmail, password: process.env.ADMIN_PASSWORD || 'admin123', role: 'admin', isActive: true }).save();
+            console.log('👑 تم إنشاء حساب المدير');
+        }
+    } catch (err) { console.error('خطأ في التهيئة:', err.message); }
+}).catch(err => console.error('❌ فشل اتصال MongoDB:', err.message));
 
 // =============================================
-// إعدادات المحرك والمسارات
+// 3. إعدادات المحرك والملفات الثابتة
 // =============================================
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// ⭐ الملفات الثابتة - مهم جداً للصور المرفوعة
+// ⭐ حل سحري لمشكلة الصور: دعم المسارات المحلية والخارجية
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+// دعم الصور الخارجية (Cloudinary) عبر البروكسي لمنع أخطاء CORS
+app.use('/proxy-image', async (req, res) => {
+    try {
+        const imageUrl = req.query.url;
+        if (!imageUrl) return res.status(400).send('No URL');
+        const fetch = require('node-fetch');
+        const response = await fetch(imageUrl);
+        if (response.ok) {
+            res.setHeader('Content-Type', response.headers.get('content-type'));
+            response.body.pipe(res);
+        } else res.status(404).send('Image not found');
+    } catch (e) { res.status(500).send('Error'); }
+});
 
-// استقبال البيانات
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET || 'alradi-cookie-secret'));
 
-// ⭐ إعدادات الجلسة - محسنة لـ Render
+// =============================================
+// 4. الجلسات الخالدة (Persistent Sessions via MongoDB)
+// =============================================
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'alradi-session-secret',
-    resave: true,
-    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET || 'alradi-thunder-secret',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: MONGODB_URI,
+        collectionName: 'sessions',
+        ttl: 30 * 24 * 60 * 60 // 30 يوماً
+    }),
     cookie: {
-        secure: false,
+        secure: false, // false لأن Render يستخدم HTTP
         httpOnly: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: 'lax'
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 يوماً
     }
 }));
 
 app.use(flash());
 
 // =============================================
-// المتغيرات العامة لجميع القوالب
+// 5. المتغيرات العامة لجميع القوالب
 // =============================================
-
 app.use(async (req, res, next) => {
     try {
         const StoreSettings = require('./models/StoreSettings');
-        let storeSettings = await StoreSettings.findOne();
-        
-        if (!storeSettings) {
-            storeSettings = {
-                storeName: 'متجر الرعدي أون لاين',
-                storeNameEn: 'Al-Radi Online Store',
-                storeLogo: '/images/default-logo.png',
-                storeDescription: 'متجر إلكتروني متكامل',
-                currency: 'SAR',
-                voiceGreetingEnabled: true,
-                voiceInteractionsEnabled: true
-            };
-        }
-        
-        // حساب عدد عناصر السلة
+        let store = await StoreSettings.findOne() || { storeName: 'متجر الرعدي أون لاين', currency: 'SAR' };
         let cartCount = 0;
         if (req.session && req.session.cart) {
             cartCount = req.session.cart.reduce((total, item) => total + (item.quantity || 0), 0);
         }
-        
-        // تمرير المتغيرات لجميع القوالب
-        res.locals.store = storeSettings;
+        res.locals.store = store;
         res.locals.user = req.session.user || null;
         res.locals.cartCount = cartCount;
         res.locals.currentLanguage = req.session.language || 'ar';
         res.locals.currentPath = req.path;
         res.locals.success_msg = req.flash('success_msg');
         res.locals.error_msg = req.flash('error_msg');
-        res.locals.info_msg = req.flash('info_msg');
-        
         next();
-    } catch (error) {
-        next();
-    }
+    } catch (error) { next(); }
 });
 
 // =============================================
-// المسارات الرئيسية
+// 6. المسارات الرئيسية
 // =============================================
-
 app.use('/', require('./routes/index'));
 app.use('/products', require('./routes/products'));
 app.use('/cart', require('./routes/cart'));
@@ -197,169 +131,13 @@ app.use('/admin', require('./routes/admin'));
 app.use('/chat', require('./routes/chat'));
 app.use('/api', require('./routes/api'));
 
-// =============================================
-// نظام المحادثات المباشرة Socket.io
-// =============================================
-
-const server = http.createServer(app);
-const io = socketIo(server, {
-    cors: { origin: "*", methods: ["GET", "POST"] }
-});
-
-const connectedUsers = new Map();
-
-io.on('connection', (socket) => {
-    console.log('🔌 مستخدم جديد متصل:', socket.id);
-    
-    socket.on('user-join', (userData) => {
-        if (userData && userData.userId) {
-            connectedUsers.set(socket.id, {
-                userId: userData.userId,
-                name: userData.name || 'زائر',
-                role: userData.role || 'customer',
-                socketId: socket.id
-            });
-        }
-    });
-    
-    socket.on('send-message', (messageData) => {
-        const sender = connectedUsers.get(socket.id);
-        if (sender && messageData) {
-            const message = {
-                senderId: sender.userId,
-                senderName: sender.name,
-                senderRole: sender.role,
-                content: messageData.content,
-                timestamp: new Date(),
-                socketId: socket.id
-            };
-            
-            if (sender.role === 'admin' && messageData.recipientSocketId) {
-                io.to(messageData.recipientSocketId).emit('new-message', message);
-                io.to(socket.id).emit('new-message', message);
-            } else {
-                const admins = Array.from(connectedUsers.values()).filter(u => u.role === 'admin');
-                admins.forEach(admin => io.to(admin.socketId).emit('new-message', message));
-                io.to(socket.id).emit('new-message', message);
-            }
-        }
-    });
-    
-    socket.on('disconnect', () => {
-        connectedUsers.delete(socket.id);
-        console.log('🔌 مستخدم قطع الاتصال:', socket.id);
-    });
-});
-
-app.set('io', io);
-app.set('connectedUsers', connectedUsers);
-
-// =============================================
-// صفحة 404 - الصفحة غير موجودة
-// =============================================
-
-app.use((req, res) => {
-    res.status(404).render('404', {
-        pageTitle: 'الصفحة غير موجودة',
-        path: req.url
-    });
-});
-
-// =============================================
-// معالج الأخطاء العام
-// =============================================
-
+// 404 والأخطاء
+app.use((req, res) => res.status(404).render('404', { pageTitle: 'الصفحة غير موجودة' }));
 app.use((err, req, res, next) => {
     console.error('❌ خطأ:', err.message);
-    
-    // تسجيل الخطأ في قاعدة البيانات
-    try {
-        const ErrorLog = require('./models/ErrorLog');
-        const errorLog = new ErrorLog({
-            message: err.message,
-            stack: err.stack || '',
-            url: req.url,
-            method: req.method,
-            userAgent: req.headers['user-agent'] || '',
-            ip: req.ip || '',
-            userId: req.session && req.session.user ? req.session.user._id : null
-        });
-        errorLog.save().catch(() => {});
-    } catch (logError) {
-        console.error('خطأ في تسجيل الخطأ:', logError.message);
-    }
-    
-    res.status(err.statusCode || 500).render('error', {
-        pageTitle: 'خطأ في الخادم',
-        error: { message: err.message || 'حدث خطأ غير متوقع' },
-        statusCode: err.statusCode || 500
-    });
+    res.status(500).render('error', { pageTitle: 'خطأ', error: { message: 'حدث خطأ غير متوقع' } });
 });
-
-// =============================================
-// نظام النسخ الاحتياطي التلقائي
-// =============================================
-
-const backupSchedule = process.env.BACKUP_SCHEDULE || '0 2 * * *';
-
-cron.schedule(backupSchedule, async () => {
-    console.log('🔄 بدء النسخ الاحتياطي التلقائي...');
-    
-    try {
-        const backupDir = path.join(__dirname, 'backups');
-        if (!fs.existsSync(backupDir)) {
-            fs.mkdirSync(backupDir, { recursive: true });
-        }
-        
-        const timestamp = new Date().toISOString().replace(/:/g, '-');
-        const backupFile = path.join(backupDir, `backup-${timestamp}.zip`);
-        
-        const output = fs.createWriteStream(backupFile);
-        const archive = archiver('zip', { zlib: { level: 9 } });
-        
-        archive.pipe(output);
-        
-        const collections = await mongoose.connection.db.listCollections().toArray();
-        for (const collection of collections) {
-            const data = await mongoose.connection.db.collection(collection.name).find({}).toArray();
-            archive.append(JSON.stringify(data, null, 2), { name: `${collection.name}.json` });
-        }
-        
-        await archive.finalize();
-        console.log('✅ تم إنشاء النسخة الاحتياطية:', backupFile);
-        
-        // حذف النسخ القديمة
-        const files = fs.readdirSync(backupDir);
-        const retentionDays = parseInt(process.env.BACKUP_RETENTION_DAYS) || 30;
-        const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-        
-        for (const file of files) {
-            const filePath = path.join(backupDir, file);
-            const stats = fs.statSync(filePath);
-            if (stats.mtime < cutoffDate) {
-                fs.unlinkSync(filePath);
-                console.log('🗑️ تم حذف النسخة القديمة:', file);
-            }
-        }
-    } catch (error) {
-        console.error('❌ خطأ في النسخ الاحتياطي:', error.message);
-    }
-});
-
-// =============================================
-// تشغيل السيرفر
-// =============================================
 
 const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, () => {
-    console.log('═══════════════════════════════════════════');
-    console.log('🦅 متجر الرعدي أون لاين');
-    console.log('📡 يعمل على المنفذ:', PORT);
-    console.log('🌐 الرابط: http://localhost:' + PORT);
-    console.log('📧 بريد المدير:', process.env.ADMIN_EMAIL || 'alradi@gmil.com');
-    console.log('🔑 كلمة مرور المدير:', process.env.ADMIN_PASSWORD || 'admin123');
-    console.log('═══════════════════════════════════════════');
-});
-
+app.listen(PORT, () => console.log(`🦅 متجر الرعدي يعمل على المنفذ ${PORT}`));
 module.exports = app;
