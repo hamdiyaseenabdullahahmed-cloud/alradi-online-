@@ -11,7 +11,7 @@
     <meta name="description" content="<%= store.storeDescription || 'متجر إلكتروني متكامل للتسوق العالمي' %>">
     <meta name="theme-color" content="#1a1a2e">
     
-    <% if (store.storeLogo && store.storeLogo.length > 5) { %>
+    <% if (store.storeLogo && store.storeLogo.length > 10) { %>
         <link rel="icon" href="<%= store.storeLogo %>">
     <% } else { %>
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
@@ -57,8 +57,8 @@
                 
                 <div class="logo-container">
                     <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
-                        <% if (store.storeLogo && store.storeLogo.length > 5) { %>
-                            <img src="<%= store.storeLogo %>" alt="الشعار" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--gold-color); box-shadow: 0 0 15px rgba(255,215,0,0.4);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                        <% if (store.storeLogo && store.storeLogo.length > 10) { %>
+                            <img src="<%= store.storeLogo %>" alt="الشعار" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--gold-color); box-shadow: 0 0 20px rgba(255,215,0,0.5);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
                             <span style="font-size: 40px; animation: pulse 2s infinite; display: none;">🦅</span>
                         <% } else { %>
                             <span style="font-size: 40px; animation: pulse 2s infinite;">🦅</span>
