@@ -1,5 +1,6 @@
 <%# ============================================= %>
-<%# بطاقة المنتج - Glassmorphism + Shine Flare + AJAX %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# بطاقة المنتج - النسخة الذهبية النهائية            %>
 <%# ============================================= %>
 
 <div class="product-card glass-card" style="
@@ -53,10 +54,18 @@
                 <span style="font-size:20px; font-weight:900; color:#1a1a2e;"><%= product.price %> ر.س</span>
             <% } %>
         </div>
+        
+        <%# تم تصحيح هذا القسم بالكامل لتجنب أخطاء EJS %>
         <div style="font-size:12px; margin-bottom:12px;">
-            <% if (product.stock > 5) { %><span style="color:#28a745;"><i class="fas fa-check-circle"></i> متوفر</span><% } %>
-            <% else if (product.stock > 0) { %><span style="color:#ff6b35;"><i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> فقط</span><% } %>
-            <% else { %><span style="color:#dc3545;"><i class="fas fa-times-circle"></i> نفد</span><% } %>
+            <% if (product.stock > 5) { %>
+                <span style="color:#28a745;"><i class="fas fa-check-circle"></i> متوفر</span>
+            <% } %>
+            <% if (product.stock > 0 && product.stock <= 5) { %>
+                <span style="color:#ff6b35;"><i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> فقط</span>
+            <% } %>
+            <% if (product.stock <= 0) { %>
+                <span style="color:#dc3545;"><i class="fas fa-times-circle"></i> نفد</span>
+            <% } %>
         </div>
 
         <% if (product.stock > 0) { %>
