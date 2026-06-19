@@ -1,9 +1,21 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# صفحة جميع المنتجات                             %>
+<%# صفحة جميع المنتجات المطورة هندسياً             %>
 <%# ============================================= %>
 
 <%- include('../partials/header') %>
+
+<% 
+  // تجهيز متغيرات آمنة لعدم تكرار typeof في كل مكان وتأمين الواجهة بالكامل
+  var lang = (typeof currentLanguage !== 'undefined') ? currentLanguage : 'ar';
+  var hasCategory = (typeof currentCategory !== 'undefined' && currentCategory);
+  var safeProducts = (typeof products !== 'undefined' && products) ? products : [];
+  var safeFilters = (typeof filters !== 'undefined' && filters) ? filters : {};
+  var safePagination = (typeof pagination !== 'undefined' && pagination) ? pagination : null;
+  var isShowAll = (typeof showAll !== 'undefined') ? showAll : false;
+  var gridCols = (typeof gridColumns !== 'undefined') ? gridColumns : 3;
+  var currency = (typeof currencySymbol !== 'undefined') ? currencySymbol : 'ر.س';
+%>
 
 <div class="container">
     
@@ -12,35 +24,35 @@
     <%# ============================================= %>
     <div style="margin-bottom: 25px;">
         <nav style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
-            <a href="/" style="color: var(--text-muted);">الرئيسية</a>
+            <a href="/" style="color: var(--text-muted);"><%= lang === 'en' ? 'Home' : 'الرئيسية' %></a>
             <span style="margin: 0 8px;">/</span>
-            <% if (currentCategory) { %>
-                <a href="/products" style="color: var(--text-muted);">المنتجات</a>
+            <% if (hasCategory) { %>
+                <a href="/products" style="color: var(--text-muted);"><%= lang === 'en' ? 'Products' : 'المنتجات' %></a>
                 <span style="margin: 0 8px;">/</span>
                 <span style="color: var(--secondary-color); font-weight: bold;"><%= currentCategory.name %></span>
             <% } else { %>
-                <span style="color: var(--secondary-color); font-weight: bold;">جميع المنتجات</span>
+                <span style="color: var(--secondary-color); font-weight: bold;"><%= lang === 'en' ? 'All Products' : 'جميع المنتجات' %></span>
             <% } %>
         </nav>
         
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <h1 style="font-size: 28px; font-weight: 800; color: var(--primary-color);">
-                <% if (currentCategory) { %>
+                <% if (hasCategory) { %>
                     <i class="<%= currentCategory.icon || 'fas fa-th-large' %>" style="color: var(--secondary-color); margin-left: 10px;"></i>
                     <%= currentCategory.name %>
                 <% } else { %>
                     <i class="fas fa-th-large" style="color: var(--secondary-color); margin-left: 10px;"></i>
-                    <%= currentLanguage === 'en' ? 'All Products' : 'جميع المنتجات' %>
+                    <%= lang === 'en' ? 'All Products' : 'جميع المنتجات' %>
                 <% } %>
             </h1>
             <span style="font-size: 14px; color: var(--text-muted);">
-                <%= currentLanguage === 'en' ? 'Showing' : 'عرض' %> 
-                <strong><%= totalProducts || products.length %></strong> 
-                <%= currentLanguage === 'en' ? 'products' : 'منتج' %>
+                <%= lang === 'en' ? 'Showing' : 'عرض' %> 
+                <strong><%= (typeof totalProducts !== 'undefined') ? totalProducts : safeProducts.length %></strong> 
+                <%= lang === 'en' ? 'products' : 'منتج' %>
             </span>
         </div>
         
-        <% if (currentCategory && currentCategory.description) { %>
+        <% if (hasCategory && currentCategory.description) { %>
             <p style="color: var(--text-light); margin-top: 10px; line-height: 1.8;"><%= currentCategory.description %></p>
         <% } %>
     </div>
@@ -56,35 +68,34 @@
         <aside class="filters-sidebar">
             <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color);">
                 <i class="fas fa-filter" style="color: var(--secondary-color); margin-left: 8px;"></i>
-                <%= currentLanguage === 'en' ? 'Filters' : 'تصفية النتائج' %>
+                <%= lang === 'en' ? 'Filters' : 'تصفية النتائج' %>
             </h3>
             
             <form action="/products" method="GET" id="filtersForm">
-                <%# حقل البحث %>
-                <% if (typeof filters !== 'undefined' && filters.search) { %>
-                    <input type="hidden" name="q" value="<%= filters.search %>">
+                <% if (safeFilters.search) { %>
+                    <input type="hidden" name="q" value="<%= safeFilters.search %>">
                 <% } %>
                 
                 <%# الأقسام %>
                 <div class="filter-group">
                     <h4 class="filter-title">
                         <i class="fas fa-list"></i> 
-                        <%= currentLanguage === 'en' ? 'Categories' : 'الأقسام' %>
+                        <%= lang === 'en' ? 'Categories' : 'الأقسام' %>
                     </h4>
                     <div style="max-height: 250px; overflow-y: auto;">
                         <label class="filter-option">
                             <input type="radio" name="category" value="" 
-                                   <%= !filters || !filters.category ? 'checked' : '' %>
+                                   <%= !safeFilters.category ? 'checked' : '' %>
                                    onchange="this.form.submit()">
-                            <span><%= currentLanguage === 'en' ? 'All Categories' : 'جميع الأقسام' %></span>
+                            <span><%= lang === 'en' ? 'All Categories' : 'جميع الأقسام' %></span>
                         </label>
-                        <% if (categories && categories.length > 0) { %>
+                        <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
                             <% categories.forEach(function(cat) { %>
                                 <label class="filter-option">
                                     <input type="radio" name="category" value="<%= cat._id %>" 
-                                           <%= filters && filters.category === cat._id.toString() ? 'checked' : '' %>
+                                           <%= safeFilters.category === cat._id.toString() ? 'checked' : '' %>
                                            onchange="this.form.submit()">
-                                    <span><%= currentLanguage === 'en' ? (cat.nameEn || cat.name) : cat.name %></span>
+                                    <span><%= lang === 'en' ? (cat.nameEn || cat.name) : cat.name %></span>
                                 </label>
                             <% }); %>
                         <% } %>
@@ -95,19 +106,19 @@
                 <div class="filter-group">
                     <h4 class="filter-title">
                         <i class="fas fa-money-bill"></i> 
-                        <%= currentLanguage === 'en' ? 'Price Range' : 'نطاق السعر' %>
+                        <%= lang === 'en' ? 'Price Range' : 'نطاق السعر' %>
                     </h4>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="number" name="minPrice" value="<%= filters && filters.minPrice ? filters.minPrice : '' %>" 
-                               placeholder="<%= currentLanguage === 'en' ? 'Min' : 'من' %>"
+                        <input type="number" name="minPrice" value="<%= safeFilters.minPrice || '' %>" 
+                               placeholder="<%= lang === 'en' ? 'Min' : 'من' %>"
                                class="form-control" style="padding: 8px 10px; font-size: 13px;">
                         <span>-</span>
-                        <input type="number" name="maxPrice" value="<%= filters && filters.maxPrice ? filters.maxPrice : '' %>" 
-                               placeholder="<%= currentLanguage === 'en' ? 'Max' : 'إلى' %>"
+                        <input type="number" name="maxPrice" value="<%= safeFilters.maxPrice || '' %>" 
+                               placeholder="<%= lang === 'en' ? 'Max' : 'إلى' %>"
                                class="form-control" style="padding: 8px 10px; font-size: 13px;">
                     </div>
                     <button type="submit" class="btn btn-sm btn-primary" style="width: 100%; margin-top: 10px;">
-                        <i class="fas fa-check"></i> <%= currentLanguage === 'en' ? 'Apply' : 'تطبيق' %>
+                        <i class="fas fa-check"></i> <%= lang === 'en' ? 'Apply' : 'تطبيق' %>
                     </button>
                 </div>
                 
@@ -115,52 +126,25 @@
                 <div class="filter-group">
                     <h4 class="filter-title">
                         <i class="fas fa-sliders-h"></i> 
-                        <%= currentLanguage === 'en' ? 'Options' : 'خيارات' %>
+                        <%= lang === 'en' ? 'Options' : 'خيارات' %>
                     </h4>
                     <label class="filter-option">
-                        <input type="checkbox" name="inStock" value="true" 
-                               <%= filters && filters.inStock ? 'checked' : '' %>
-                               onchange="this.form.submit()">
-                        <span><%= currentLanguage === 'en' ? 'In Stock Only' : 'المتوفر فقط' %></span>
+                        <input type="checkbox" name="inStock" value="true" <%= safeFilters.inStock ? 'checked' : '' %> onchange="this.form.submit()">
+                        <span><%= lang === 'en' ? 'In Stock Only' : 'المتوفر فقط' %></span>
                     </label>
                     <label class="filter-option">
-                        <input type="checkbox" name="onSale" value="true" 
-                               <%= filters && filters.onSale ? 'checked' : '' %>
-                               onchange="this.form.submit()">
-                        <span><i class="fas fa-tag" style="color: var(--secondary-color);"></i> <%= currentLanguage === 'en' ? 'On Sale' : 'المخفض فقط' %></span>
+                        <input type="checkbox" name="onSale" value="true" <%= safeFilters.onSale ? 'checked' : '' %> onchange="this.form.submit()">
+                        <span>🏷️ <%= lang === 'en' ? 'On Sale' : 'المخفض فقط' %></span>
                     </label>
                     <label class="filter-option">
-                        <input type="checkbox" name="featured" value="true" 
-                               <%= filters && filters.featured ? 'checked' : '' %>
-                               onchange="this.form.submit()">
-                        <span><i class="fas fa-star" style="color: var(--gold-color);"></i> <%= currentLanguage === 'en' ? 'Featured Only' : 'المميز فقط' %></span>
+                        <input type="checkbox" name="featured" value="true" <%= safeFilters.featured ? 'checked' : '' %> onchange="this.form.submit()">
+                        <span>⭐ <%= lang === 'en' ? 'Featured Only' : 'المميز فقط' %></span>
                     </label>
                 </div>
                 
-                <%# التقييم %>
-                <div class="filter-group">
-                    <h4 class="filter-title">
-                        <i class="fas fa-star"></i> 
-                        <%= currentLanguage === 'en' ? 'Minimum Rating' : 'الحد الأدنى للتقييم' %>
-                    </h4>
-                    <% for (var r = 4; r >= 1; r--) { %>
-                        <label class="filter-option">
-                            <input type="radio" name="rating" value="<%= r %>" 
-                                   <%= filters && filters.rating == r ? 'checked' : '' %>
-                                   onchange="this.form.submit()">
-                            <span>
-                                <% for (var s = 1; s <= 5; s++) { %>
-                                    <i class="fas fa-star" style="color: <%= s <= r ? 'var(--gold-color)' : '#ddd' %>; font-size: 11px;"></i>
-                                <% } %>
-                                <%= currentLanguage === 'en' ? '& Up' : 'وأكثر' %>
-                            </span>
-                        </label>
-                    <% } %>
-                </div>
-                
-                <%# إعادة تعيين الفلاتر %>
+                <%# إعادة تعيين %>
                 <a href="/products" class="btn btn-outline btn-sm" style="width: 100%;">
-                    <i class="fas fa-redo"></i> <%= currentLanguage === 'en' ? 'Reset Filters' : 'إعادة تعيين' %>
+                    <i class="fas fa-redo"></i> <%= lang === 'en' ? 'Reset Filters' : 'إعادة تعيين' %>
                 </a>
             </form>
         </aside>
@@ -170,33 +154,21 @@
         <%# ============================================= %>
         <div>
             
-            <%# شريط الأدوات: شبكة + ترتيب %>
+            <%# شريط الأدوات %>
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                 
                 <%# التحكم بالشبكة %>
                 <div class="grid-controls">
-                    <span style="font-size: 13px; color: var(--text-muted); margin-left: 10px;">
-                        <i class="fas fa-th"></i> <%= currentLanguage === 'en' ? 'View' : 'عرض' %>:
-                    </span>
-                    <% var gridCols = typeof gridColumns !== 'undefined' ? gridColumns : 3; %>
-                    <button class="grid-btn <%= gridCols === 1 ? 'active' : '' %>" data-cols="1" onclick="setGridView(1)" title="عمود واحد">
-                        <i class="fas fa-square"></i>
-                    </button>
-                    <button class="grid-btn <%= gridCols === 2 ? 'active' : '' %>" data-cols="2" onclick="setGridView(2)" title="عمودين">
-                        <i class="fas fa-th-large"></i>
-                    </button>
-                    <button class="grid-btn <%= gridCols === 3 ? 'active' : '' %>" data-cols="3" onclick="setGridView(3)" title="3 أعمدة">
-                        <i class="fas fa-th"></i>
-                    </button>
-                    <button class="grid-btn <%= gridCols === 4 ? 'active' : '' %>" data-cols="4" onclick="setGridView(4)" title="4 أعمدة">
-                        <i class="fas fa-th-list"></i>
-                    </button>
-                    <button class="grid-btn <%= gridCols === 5 ? 'active' : '' %>" data-cols="5" onclick="setGridView(5)" title="5 أعمدة">
-                        <i class="fas fa-grip-horizontal"></i>
-                    </button>
-                    <% if (!showAll) { %>
-                        <a href="?<%= Object.entries(Object.assign({}, filters || {}, {showAll: 'true', sort: sort})).map(([k,v]) => k + '=' + v).join('&') %>" 
-                           class="grid-btn" title="عرض الكل">
+                    <span style="font-size: 13px; color: var(--text-muted); margin-left: 10px;"><%= lang === 'en' ? 'View:' : 'عرض:' %></span>
+                    <button class="grid-btn <%= gridCols === 1 ? 'active' : '' %>" onclick="setGridView(1)"><i class="fas fa-square"></i></button>
+                    <button class="grid-btn <%= gridCols === 2 ? 'active' : '' %>" onclick="setGridView(2)"><i class="fas fa-th-large"></i></button>
+                    <button class="grid-btn <%= gridCols === 3 ? 'active' : '' %>" onclick="setGridView(3)"><i class="fas fa-th"></i></button>
+                    <button class="grid-btn <%= gridCols === 4 ? 'active' : '' %>" onclick="setGridView(4)"><i class="fas fa-th-list"></i></button>
+                    <button class="grid-btn <%= gridCols === 5 ? 'active' : '' %>" onclick="setGridView(5)"><i class="fas fa-grip-horizontal"></i></button>
+                    
+                    <% if (!isShowAll) { %>
+                        <a href="?<%= Object.entries(Object.assign({}, safeFilters, {showAll: 'true'})).map(([k,v]) => k + '=' + v).join('&') %>" 
+                           class="grid-btn" title="<%= lang === 'en' ? 'Show All' : 'عرض الكل الملكي' %>">
                             <i class="fas fa-infinity"></i>
                         </a>
                     <% } %>
@@ -204,46 +176,37 @@
                 
                 <%# الترتيب %>
                 <div class="sort-controls">
-                    <span style="font-size: 13px; color: var(--text-muted); margin-left: 10px;">
-                        <i class="fas fa-sort-amount-down"></i> <%= currentLanguage === 'en' ? 'Sort by' : 'ترتيب حسب' %>:
-                    </span>
-                    <select class="sort-select" name="sort" onchange="window.location.href=updateQueryString('sort', this.value)">
-                        <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>><%= currentLanguage === 'en' ? 'Newest' : 'الأحدث' %></option>
-                        <option value="sales" <%= sort === 'sales' ? 'selected' : '' %>><%= currentLanguage === 'en' ? 'Best Sellers' : 'الأكثر مبيعاً' %></option>
-                        <option value="rating" <%= sort === 'rating' ? 'selected' : '' %>><%= currentLanguage === 'en' ? 'Highest Rated' : 'الأعلى تقييماً' %></option>
-                        <option value="price-asc" <%= sort === 'price-asc' ? 'selected' : '' %>><%= currentLanguage === 'en' ? 'Price: Low to High' : 'الأقل سعراً' %></option>
-                        <option value="price-desc" <%= sort === 'price-desc' ? 'selected' : '' %>><%= currentLanguage === 'en' ? 'Price: High to Low' : 'الأعلى سعراً' %></option>
-                        <option value="name" <%= sort === 'name' ? 'selected' : '' %>><%= currentLanguage === 'en' ? 'Name: A-Z' : 'الاسم: أ-ي' %></option>
+                    <span style="font-size: 13px; color: var(--text-muted); margin-left: 10px;"><%= lang === 'en' ? 'Sort by:' : 'ترتيب حسب:' %></span>
+                    <% var currentSort = (typeof sort !== 'undefined') ? sort : 'newest'; %>
+                    <select class="sort-select" onchange="window.location.href=updateQueryString('sort', this.value)">
+                        <option value="newest" <%= currentSort === 'newest' ? 'selected' : '' %>><%= lang === 'en' ? 'Newest' : 'الأحدث' %></option>
+                        <option value="sales" <%= currentSort === 'sales' ? 'selected' : '' %>><%= lang === 'en' ? 'Best Sellers' : 'الأكثر مبيعاً' %></option>
+                        <option value="rating" <%= currentSort === 'rating' ? 'selected' : '' %>><%= lang === 'en' ? 'Highest Rated' : 'الأعلى تقييماً' %></option>
+                        <option value="price-asc" <%= currentSort === 'price-asc' ? 'selected' : '' %>><%= lang === 'en' ? 'Price: Low to High' : 'الأقل سعراً' %></option>
+                        <option value="price-desc" <%= currentSort === 'price-desc' ? 'selected' : '' %>><%= lang === 'en' ? 'Price: High to Low' : 'الأعلى سعراً' %></option>
+                        <option value="name" <%= currentSort === 'name' ? 'selected' : '' %>><%= lang === 'en' ? 'Name: A-Z' : 'الاسم: أ-ي' %></option>
                     </select>
                 </div>
             </div>
             
-            <%# ============================================= %>
-            <%# شبكة المنتجات                                    %>
-            <%# ============================================= %>
-            <% if (products && products.length > 0) { %>
-                <div class="products-grid cols-<%= gridCols || 3 %>">
-                    <% products.forEach(function(product) { %>
-                        <%- include('../partials/product-card', { product: product, currencySymbol: currencySymbol || 'ر.س' }) %>
+            <%# شبكة المنتجات %>
+            <% if (safeProducts.length > 0) { %>
+                <div class="products-grid cols-<%= gridCols %>">
+                    <% safeProducts.forEach(function(product) { %>
+                        <%- include('../partials/product-card', { product: product, currencySymbol: currency }) %>
                     <% }); %>
                 </div>
                 
-                <%# ============================================= %>
-                <%# Pagination                                       %>
-                <%# ============================================= %>
-                <% if (pagination && pagination.pages > 1 && !showAll) { %>
+                <%# الترقيم الاحترافي المطور (Pagination) %>
+                <% if (safePagination && safePagination.pages > 1 && !isShowAll) { %>
                     <div class="pagination">
-                        <% if (pagination.page > 1) { %>
-                            <a href="?<%= updatePageQuery(pagination.page - 1) %>" title="السابق">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        <% } else { %>
-                            <span class="disabled"><i class="fas fa-chevron-right"></i></span>
+                        <% if (safePagination.page > 1) { %>
+                            <a href="?<%= updatePageQuery(safePagination.page - 1) %>"><i class="fas fa-chevron-right"></i></a>
                         <% } %>
                         
                         <% 
-                            var startPage = Math.max(1, pagination.page - 2);
-                            var endPage = Math.min(pagination.pages, pagination.page + 2);
+                            var startPage = Math.max(1, safePagination.page - 2);
+                            var endPage = Math.min(safePagination.pages, safePagination.page + 2);
                         %>
                         
                         <% if (startPage > 1) { %>
@@ -252,48 +215,32 @@
                         <% } %>
                         
                         <% for (var p = startPage; p <= endPage; p++) { %>
-                            <a href="?<%= updatePageQuery(p) %>" class="<%= p === pagination.page ? 'active' : '' %>"><%= p %></a>
+                            <a href="?<%= updatePageQuery(p) %>" class="<%= p === safePagination.page ? 'active' : '' %>"><%= p %></a>
                         <% } %>
                         
-                        <% if (endPage < pagination.pages) { %>
-                            <% if (endPage < pagination.pages - 1) { %><span>...</span><% } %>
-                            <a href="?<%= updatePageQuery(pagination.pages) %>"><%= pagination.pages %></a>
+                        <% if (endPage < safePagination.pages) { %>
+                            <% if (endPage < safePagination.pages - 1) { %><span>...</span><% } %>
+                            <a href="?<%= updatePageQuery(safePagination.pages) %>"><%= safePagination.pages %></a>
                         <% } %>
                         
-                        <% if (pagination.page < pagination.pages) { %>
-                            <a href="?<%= updatePageQuery(pagination.page + 1) %>" title="التالي">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        <% } else { %>
-                            <span class="disabled"><i class="fas fa-chevron-left"></i></span>
+                        <% if (safePagination.page < safePagination.pages) { %>
+                            <a href="?<%= updatePageQuery(safePagination.page + 1) %>"><i class="fas fa-chevron-left"></i></a>
                         <% } %>
                     </div>
                 <% } %>
                 
             <% } else { %>
-                <%# لا توجد منتجات %>
                 <div style="text-align: center; padding: 80px 20px; background: white; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                    <div style="font-size: 80px; color: var(--text-muted); margin-bottom: 20px;">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h3 style="font-size: 22px; font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">
-                        <%= currentLanguage === 'en' ? 'No Products Found' : 'لا توجد منتجات' %>
-                    </h3>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">
-                        <%= currentLanguage === 'en' ? 'Try adjusting your filters or search criteria' : 'جرب تعديل خيارات البحث أو الفلاتر' %>
-                    </p>
-                    <a href="/products" class="btn btn-primary">
-                        <i class="fas fa-redo"></i> <%= currentLanguage === 'en' ? 'Reset Filters' : 'إعادة تعيين الفلاتر' %>
-                    </a>
+                    <div style="font-size: 80px; color: var(--text-muted); margin-bottom: 20px;"><i class="fas fa-search"></i></div>
+                    <h3 style="font-size: 22px; font-weight: 700; color: var(--primary-color); margin-bottom: 10px;"><%= lang === 'en' ? 'No Products Found' : 'لا توجد منتجات' %></h3>
+                    <p style="color: var(--text-muted); margin-bottom: 25px;"><%= lang === 'en' ? 'Try modifying your search or filters' : 'جرب تعديل خيارات البحث أو الفلاتر' %></p>
+                    <a href="/products" class="btn btn-primary"><i class="fas fa-redo"></i> <%= lang === 'en' ? 'Reset Filters' : 'إعادة تعيين الفلاتر' %></a>
                 </div>
             <% } %>
         </div>
     </div>
 </div>
 
-<%# ============================================= %>
-<%# دوال مساعدة للـ Query String                     %>
-<%# ============================================= %>
 <script>
 function updateQueryString(key, value) {
     const url = new URL(window.location);
@@ -305,6 +252,10 @@ function updatePageQuery(page) {
     const url = new URL(window.location);
     url.searchParams.set('page', page);
     return url.searchParams.toString();
+}
+
+function setGridView(cols) {
+    window.location.href = updateQueryString('gridCols', cols);
 }
 </script>
 
