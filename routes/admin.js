@@ -1,6 +1,6 @@
 // =============================================
 // متجر الرعدي أون لاين - alradi-online
-// مسارات لوحة تحكم المدير - نسخة مستقرة
+// مسارات لوحة تحكم المدير
 // =============================================
 
 const express = require('express');
@@ -65,7 +65,7 @@ router.get('/dashboard', async (req, res) => {
 });
 
 // =============================================
-// إدارة المنتجات
+// المنتجات
 // =============================================
 
 router.get('/products', async (req, res) => {
@@ -191,7 +191,7 @@ router.delete('/products/delete/:id', async (req, res) => {
 });
 
 // =============================================
-// إدارة الأقسام
+// الأقسام
 // =============================================
 
 router.get('/categories', async (req, res) => {
@@ -233,7 +233,7 @@ router.delete('/categories/delete/:id', async (req, res) => {
 });
 
 // =============================================
-// إدارة الطلبات
+// الطلبات
 // =============================================
 
 router.get('/orders', async (req, res) => {
@@ -271,7 +271,7 @@ router.post('/orders/update-status/:id', async (req, res) => {
 });
 
 // =============================================
-// إدارة العملاء
+// العملاء
 // =============================================
 
 router.get('/customers', async (req, res) => {
@@ -303,68 +303,78 @@ router.get('/customers/:id', async (req, res) => {
 });
 
 // =============================================
-// إعدادات المتجر
+// الإعدادات - معدلة بالكامل
 // =============================================
 
 router.get('/settings', async (req, res) => {
-    const settings = await StoreSettings.getSettings();
-    res.render('admin/settings', {
-        pageTitle: 'إعدادات المتجر', settings,
-        success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg')
-    });
+    try {
+        const settings = await StoreSettings.getSettings();
+        res.render('admin/settings', {
+            pageTitle: 'إعدادات المتجر', settings,
+            success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg')
+        });
+    } catch (error) {
+        const settings = await StoreSettings.findOne();
+        res.render('admin/settings', {
+            pageTitle: 'إعدادات المتجر', settings: settings || {},
+            success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg')
+        });
+    }
 });
 
 router.post('/settings', async (req, res) => {
     try {
-        const updateData = {
-            storeName: req.body.storeName,
-            storeNameEn: req.body.storeNameEn || '',
-            contactEmail: req.body.contactEmail || '',
-            whatsappNumber: req.body.whatsappNumber || '',
-            shippingInternal: parseFloat(req.body.shippingInternal) || 25,
-            shippingInternational: parseFloat(req.body.shippingInternational) || 75,
-            freeShippingMin: parseFloat(req.body.freeShippingMin) || 300,
-            voiceGreetingEnabled: req.body.voiceGreetingEnabled === 'on',
-            voiceInteractionsEnabled: req.body.voiceInteractionsEnabled === 'on',
-            returnPolicy: req.body.returnPolicy || '',
-            copyrightText: req.body.copyrightText || ''
+        // جلب الإعدادات الحالية أو إنشاء جديدة
+        let settings = await StoreSettings.findOne();
+        if (!settings) {
+            settings = new StoreSettings();
+        }
+        
+        // تحديث الحقول النصية - كلها اختيارية
+        if (req.body.storeName !== undefined) settings.storeName = req.body.storeName || 'متجر الرعدي أون لاين';
+        if (req.body.storeNameEn !== undefined) settings.storeNameEn = req.body.storeNameEn || '';
+        if (req.body.contactEmail !== undefined) settings.contactEmail = req.body.contactEmail || '';
+        if (req.body.whatsappNumber !== undefined) settings.whatsappNumber = req.body.whatsappNumber || '';
+        if (req.body.shippingInternal !== undefined) settings.shippingInternal = parseFloat(req.body.shippingInternal) || 25;
+        if (req.body.shippingInternational !== undefined) settings.shippingInternational = parseFloat(req.body.shippingInternational) || 75;
+        if (req.body.freeShippingMin !== undefined) settings.freeShippingMin = parseFloat(req.body.freeShippingMin) || 300;
+        if (req.body.returnPolicy !== undefined) settings.returnPolicy = req.body.returnPolicy || '';
+        if (req.body.copyrightText !== undefined) settings.copyrightText = req.body.copyrightText || '';
+        
+        // حفظ checkbox
+        settings.voiceGreetingEnabled = req.body.voiceGreetingEnabled === 'on';
+        settings.voiceInteractionsEnabled = req.body.voiceInteractionsEnabled === 'on';
+        
+        // حفظ الروابط المباشرة - أي حقل فيه رابط نحفظه
+        if (req.body.storeLogoUrl && req.body.storeLogoUrl.trim() !== '') {
+            settings.storeLogo = req.body.storeLogoUrl.trim();
+        }
+        
+        // روابط الصوتيات
+        const audioFields = {
+            'voiceGreetingUrl': 'voiceGreetingFile',
+            'voiceAddToCartUrl': 'voiceAddToCartFile',
+            'voiceSaveUrl': 'voiceSaveFile',
+            'voicePrintUrl': 'voicePrintFile',
+            'voiceNotificationUrl': 'voiceNotificationFile',
+            'voiceSuccessUrl': 'voiceSuccessFile',
+            'voiceErrorUrl': 'voiceErrorFile'
         };
         
-        // حفظ الروابط المباشرة
-        if (req.body.storeLogoUrl && req.body.storeLogoUrl.trim()) {
-            updateData.storeLogo = req.body.storeLogoUrl.trim();
-        }
-        if (req.body.voiceGreetingUrl && req.body.voiceGreetingUrl.trim()) {
-            updateData.voiceGreetingFile = req.body.voiceGreetingUrl.trim();
-        }
-        if (req.body.voiceAddToCartUrl && req.body.voiceAddToCartUrl.trim()) {
-            updateData.voiceAddToCartFile = req.body.voiceAddToCartUrl.trim();
-        }
-        if (req.body.voiceSaveUrl && req.body.voiceSaveUrl.trim()) {
-            updateData.voiceSaveFile = req.body.voiceSaveUrl.trim();
-        }
-        if (req.body.voicePrintUrl && req.body.voicePrintUrl.trim()) {
-            updateData.voicePrintFile = req.body.voicePrintUrl.trim();
-        }
-        if (req.body.voiceNotificationUrl && req.body.voiceNotificationUrl.trim()) {
-            updateData.voiceNotificationFile = req.body.voiceNotificationUrl.trim();
-        }
-        if (req.body.voiceSuccessUrl && req.body.voiceSuccessUrl.trim()) {
-            updateData.voiceSuccessFile = req.body.voiceSuccessUrl.trim();
-        }
-        if (req.body.voiceErrorUrl && req.body.voiceErrorUrl.trim()) {
-            updateData.voiceErrorFile = req.body.voiceErrorUrl.trim();
-        }
+        Object.keys(audioFields).forEach(urlField => {
+            const dbField = audioFields[urlField];
+            if (req.body[urlField] && req.body[urlField].trim() !== '') {
+                settings[dbField] = req.body[urlField].trim();
+            }
+        });
         
-        console.log('📁 حفظ الإعدادات...');
-        await StoreSettings.updateSettings(updateData);
-        console.log('✅ تم الحفظ بنجاح');
-        
+        await settings.save();
+        console.log('✅ تم حفظ الإعدادات بنجاح');
         req.flash('success_msg', 'تم حفظ الإعدادات بنجاح ✅');
         res.redirect('/admin/settings');
         
     } catch (error) {
-        console.error('❌ خطأ:', error.message);
+        console.error('❌ خطأ في الحفظ:', error.message);
         req.flash('error_msg', 'خطأ في الحفظ: ' + error.message);
         res.redirect('/admin/settings');
     }
