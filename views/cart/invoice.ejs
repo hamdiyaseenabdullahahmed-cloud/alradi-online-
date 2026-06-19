@@ -2,188 +2,502 @@
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>فاتورة <%= order.invoiceNumber %> - متجر الرعدي أون لاين</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة <%= order.invoiceNumber %> - <%= store.storeName || 'متجر الرعدي أون لاين' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Cairo', 'Segoe UI', sans-serif; direction: rtl; padding: 30px; color: #333; background: #f9f9f9; }
-        .invoice-box { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
-        .header { text-align: center; border-bottom: 3px solid #1a1a2e; padding-bottom: 20px; margin-bottom: 25px; }
-        .header .logo { font-size: 50px; }
-        .header h1 { color: #1a1a2e; margin: 5px 0; font-size: 24px; }
-        .header h3 { color: #e94560; margin: 3px 0; font-size: 14px; }
-        .header .invoice-title { background: #1a1a2e; color: white; display: inline-block; padding: 5px 20px; border-radius: 5px; margin-top: 10px; font-size: 13px; letter-spacing: 2px; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .info-box { flex: 1; min-width: 200px; }
-        .info-box h4 { background: #f0f0f0; padding: 8px 12px; border-radius: 5px; margin-bottom: 8px; font-size: 13px; color: #1a1a2e; }
-        .info-box p { font-size: 13px; line-height: 1.8; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: #1a1a2e; color: white; padding: 10px 12px; font-size: 12px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .summary { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .summary-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
-        .summary-total { font-size: 22px; font-weight: 900; color: #e94560; border-top: 2px solid #ddd; margin-top: 10px; padding-top: 10px; }
-        .terms { background: #fff3cd; border-right: 4px solid #ffc107; padding: 12px 15px; border-radius: 5px; margin: 20px 0; font-size: 12px; color: #856404; line-height: 2; }
-        .signature { margin-top: 50px; }
-        .signature .line { border-bottom: 1px solid #333; width: 200px; margin-bottom: 5px; }
-        .signature p { font-size: 12px; color: #666; }
-        .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 11px; color: #999; }
-        @media print {
-            body { background: white; padding: 0; }
-            .invoice-box { box-shadow: none; border-radius: 0; padding: 20px; }
-            .no-print { display: none; }
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            direction: rtl;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
         }
-        .no-print { text-align: center; margin-bottom: 20px; }
-        .no-print button { padding: 12px 30px; background: #e94560; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
-        .no-print button:hover { background: #c73e54; }
+        .invoice-container {
+            max-width: 850px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,175,55,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .invoice-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #1a1a2e, #d4af37, #0f3460);
+        }
+        .invoice-paper {
+            position: relative;
+            z-index: 1;
+            padding: 50px;
+        }
+        .header-section {
+            text-align: center;
+            border-bottom: 2px dashed #ede8e0;
+            padding-bottom: 30px;
+            margin-bottom: 35px;
+            position: relative;
+        }
+        .header-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #d4af37;
+            box-shadow: 0 8px 30px rgba(212,175,55,0.4);
+            margin-bottom: 15px;
+            background: #fff;
+            padding: 4px;
+        }
+        .header-fallback {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #d4af37;
+            line-height: 100px;
+            font-size: 54px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 8px 30px rgba(26,26,46,0.3);
+            margin-bottom: 15px;
+        }
+        .store-name {
+            font-size: 32px;
+            font-weight: 900;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .store-subtitle {
+            font-size: 14px;
+            color: #8a7b6b;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .invoice-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #d4af37;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 18px;
+            border: 1px solid rgba(212,175,55,0.5);
+            box-shadow: 0 4px 15px rgba(26,26,46,0.15);
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 650px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .invoice-paper { padding: 30px 20px; }
+        }
+        .info-card {
+            background: #fbfbfa;
+            border-radius: 20px;
+            padding: 22px;
+            border: 1px solid #ede8e0;
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            border-color: #d4af37;
+            background: #fffdf9;
+        }
+        .info-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px dashed #ede8e0;
+            padding-bottom: 10px;
+        }
+        .info-card h4 i { color: #d4af37; font-size: 18px; }
+        .info-card p {
+            font-size: 13px;
+            color: #444;
+            line-height: 2.2;
+        }
+        .info-card p strong { color: #1a1a2e; font-weight: 700; }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #ede8e0;
+        }
+        .items-table thead th {
+            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            color: #d4af37;
+            padding: 16px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: right;
+        }
+        .items-table tbody td {
+            padding: 16px;
+            border-bottom: 1px solid #f2eee9;
+            font-size: 14px;
+            color: #333;
+        }
+        .items-table tbody tr:last-child td { border-bottom: none; }
+        .items-table tbody tr:hover td { background: #fffdf6; }
+        .text-center { text-align: center !important; }
+        .text-left { text-align: left !important; }
+        
+        .summary-wrapper {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+            align-items: center;
+            margin: 30px 0;
+        }
+        @media (max-width: 650px) {
+            .summary-wrapper { grid-template-columns: 1fr; }
+        }
+
+        .qr-card {
+            background: #fff;
+            border: 1px dashed #d4af37;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-code {
+            width: 130px;
+            height: 130px;
+            margin-bottom: 10px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #fdfbf7, #f7f3eb);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #e8e0d5;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .summary-total {
+            font-size: 24px;
+            font-weight: 900;
+            color: #1a1a2e;
+            border-top: 2px solid #d4af37;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+        .summary-total span:last-child { color: #e94560; }
+
+        .terms-box {
+            background: #fffdf9;
+            border-right: 5px solid #d4af37;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 30px 0;
+            font-size: 13px;
+            color: #61553d;
+            line-height: 2.2;
+            border-left: 1px solid #ede8e0;
+            border-top: 1px solid #ede8e0;
+            border-bottom: 1px solid #ede8e0;
+        }
+        .terms-box strong { color: #1a1a2e; font-size: 14px; display: block; margin-bottom: 8px;}
+        .terms-box ol { margin-right: 20px; }
+        .terms-box li strong { display: inline; color: #e94560; }
+
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 10px;
+        }
+        .signature-line {
+            border-bottom: 2px dashed #1a1a2e;
+            width: 180px;
+            margin-bottom: 8px;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 45px;
+            padding-top: 25px;
+            border-top: 1px solid #ede8e0;
+            font-size: 12px;
+            color: #999;
+            line-height: 1.8;
+        }
+        .watermark {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 160px;
+            color: rgba(212,175,55,0.03);
+            font-weight: 900;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            letter-spacing: 25px;
+        }
+        
+        .no-print {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 850px;
+        }
+        .btn-action {
+            background: linear-gradient(135deg, #ffd700, #b89700);
+            color: #111;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(212,175,55,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+        }
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212,175,55,0.5);
+        }
+        .btn-pdf {
+            background: linear-gradient(135deg, #e94560, #951227);
+            color: white;
+            box-shadow: 0 5px 20px rgba(233,69,96,0.3);
+        }
+        .btn-pdf:hover { box-shadow: 0 8px 25px rgba(233,69,96,0.5); }
+        
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            box-shadow: 0 5px 20px rgba(37,211,102,0.3);
+        }
+        .btn-whatsapp:hover { box-shadow: 0 8px 25px rgba(37,211,102,0.5); }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: none;
+        }
+        .btn-secondary:hover { background: white; color: #1a1a2e; }
+
+        @media print {
+            body { background: #fff !important; padding: 0; }
+            .invoice-container { box-shadow: none; border-radius: 0; border: none; }
+            .no-print { display: none !important; }
+            .invoice-container::before { display: none; }
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
     <div class="no-print">
-        <button onclick="window.print()">🖨️ طباعة الفاتورة</button>
-        <button onclick="window.location.href='/account/orders'" style="background: #1a1a2e; margin-right: 10px;">📋 طلباتي</button>
+        <button class="btn-action btn-pdf" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> حفظ كـ PDF</button>
+        <button class="btn-action btn-whatsapp" onclick="shareInvoiceWhatsApp()"><i class="fab fa-whatsapp"></i> مشاركة واتساب</button>
+        <button class="btn-action" onclick="window.print()"><i class="fas fa-print"></i> طباعة فورية</button>
+        <button class="btn-action btn-secondary" onclick="window.location.href='/account/orders'"><i class="fas fa-list"></i> قائمة طلباتي</button>
     </div>
 
-    <div class="invoice-box">
-        
-        <%# ترويسة الفاتورة %>
-        <div class="header">
-            <div class="logo">🦅</div>
-            <h1>مجموعة متاجر الرعدي أونلاين الفاخرة</h1>
-            <h3>Al-Radi Online Luxury Stores Group</h3>
-            <div class="invoice-title">فاتورة ضريبية رسمية</div>
-        </div>
+    <div class="invoice-container" id="invoiceCard">
+        <div class="watermark">ALRADI</div>
+        <div class="invoice-paper">
+            
+            <%# ========== الترويسة الفاخرة ========== %>
+            <div class="header-section">
+                <% if (store.storeLogo && store.storeLogo.length > 10) { %>
+                    <img src="<%= store.storeLogo %>" alt="شعار المتجر" class="header-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <div class="header-fallback" style="display: none;">🦅</div>
+                <% } else { %>
+                    <div class="header-fallback">🦅</div>
+                <% } %>
+                <div class="store-name"><%= store.storeName || 'مجموعة متاجر الرعدي أونلاين الفاخرة' %></div>
+                <div class="store-subtitle">AL-RADI ONLINE LUXURY STORES GROUP</div>
+                <div class="invoice-badge">✦ الفاتورة الرقمية الضريبية المعتمدة ✦</div>
+            </div>
 
-        <%# معلومات الفاتورة والعميل %>
-        <div class="info-row">
-            <div class="info-box">
-                <h4>📋 معلومات الفاتورة</h4>
-                <p><strong>رقم الفاتورة:</strong> <%= order.invoiceNumber %></p>
-                <p><strong>رقم الطلب:</strong> #<%= order.orderNumber %></p>
-                <p><strong>تاريخ الإصدار:</strong> <%= new Date(order.createdAt).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-                <p><strong>وقت الإصدار:</strong> <%= new Date(order.createdAt).toLocaleTimeString('ar-SA') %></p>
-                <p><strong>تاريخ التسليم المتوقع:</strong> <%= order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'يحدد لاحقاً' %></p>
-            </div>
-            <div class="info-box">
-                <h4>👤 بيانات العميل</h4>
-                <p><strong>الاسم:</strong> <%= order.customerName %></p>
-                <p><strong>البريد الإلكتروني:</strong> <%= order.customerEmail %></p>
-                <p><strong>رقم الهاتف:</strong> <%= order.customerPhone %></p>
-            </div>
-        </div>
-
-        <%# عنوان الشحن ونوعه %>
-        <div class="info-row">
-            <div class="info-box">
-                <h4>📍 عنوان الشحن</h4>
-                <p><%= order.shippingAddress.fullAddress %></p>
-            </div>
-            <div class="info-box">
-                <h4>🚚 تفاصيل الشحن</h4>
-                <p><strong>نوع الشحن:</strong> 
-                    <% if (order.shippingMethod === 'international') { %>
-                        🌍 شحن دولي خارجي
-                    <% } else if (order.shippingMethod === 'pickup') { %>
-                        📍 استلام من المتجر
-                    <% } else { %>
-                        🇸🇦 شحن داخلي محلي
-                    <% } %>
-                </p>
-                <p><strong>طريقة الدفع:</strong> 
-                    <%= order.paymentMethod === 'cash_on_delivery' ? '💵 الدفع عند الاستلام' : 
-                        order.paymentMethod === 'credit_card' ? '💳 بطاقة ائتمان' : 
-                        order.paymentMethod === 'bank_transfer' ? '🏦 تحويل بنكي' : order.paymentMethod %>
-                </p>
-                <p><strong>حالة الطلب:</strong> 
-                    <span style="color: <%= order.status === 'delivered' ? '#28a745' : order.status === 'cancelled' ? '#dc3545' : '#17a2b8' %>; font-weight: bold;">
-                        <%= order.status === 'pending' ? 'قيد المراجعة' : 
-                            order.status === 'processing' ? 'قيد التجهيز' :
-                            order.status === 'shipped' ? 'تم الشحن' :
-                            order.status === 'delivered' ? 'تم التسليم' :
-                            order.status === 'cancelled' ? 'ملغي' : order.status %>
-                    </span>
-                </p>
-            </div>
-        </div>
-
-        <%# قائمة المشتريات %>
-        <h3 style="margin-bottom: 10px; color: #1a1a2e;">📦 قائمة المشتريات:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>المنتج</th>
-                    <th class="text-center">الكمية</th>
-                    <th class="text-center">السعر (ر.س)</th>
-                    <th class="text-center">الإجمالي (ر.س)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% order.items.forEach(function(item, index) { %>
-                    <tr>
-                        <td><%= index + 1 %></td>
-                        <td><%= item.name %></td>
-                        <td class="text-center"><%= item.quantity %></td>
-                        <td class="text-center"><%= item.price %></td>
-                        <td class="text-center"><strong><%= item.total %></strong></td>
-                    </tr>
-                <% }); %>
-            </tbody>
-        </table>
-
-        <%# ملخص الفاتورة %>
-        <div class="summary">
-            <div class="summary-row">
-                <span>المجموع الفرعي:</span>
-                <span><%= order.subtotal %> ر.س</span>
-            </div>
-            <% if (order.couponDiscount > 0) { %>
-                <div class="summary-row" style="color: #28a745;">
-                    <span>خصم الكوبون (<%= order.couponCode %>):</span>
-                    <span>-<%= order.couponDiscount %> ر.س</span>
+            <%# ========== شبكة البيانات الذكية ========== %>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4><i class="fas fa-receipt"></i> تفاصيل الفاتورة</h4>
+                    <p><strong>رقم الفاتورة:</strong> <%= order.invoiceNumber %></p>
+                    <p><strong>رقم الطلب:</strong> #<%= order.orderNumber %></p>
+                    <p><strong>تاريخ الإصدار:</strong> <%= new Date(order.createdAt).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                    <p><strong>وقت الإصدار:</strong> <%= new Date(order.createdAt).toLocaleTimeString('ar-SA') %></p>
+                    <p><strong>التسليم المتوقع:</strong> <span style="color:#0f3460; font-weight:700;"><%= order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toLocaleDateString('ar-SA') : 'جاري التجهيز' %></span></p>
                 </div>
-            <% } %>
-            <div class="summary-row">
-                <span>رسوم الشحن (<%= order.shippingMethod === 'international' ? 'دولي' : 'داخلي' %>):</span>
-                <span><%= order.shippingCost === 0 ? 'مجاني' : order.shippingCost + ' ر.س' %></span>
+                <div class="info-card">
+                    <h4><i class="fas fa-id-card"></i> بيانات العميل</h4>
+                    <p><strong>الاسم:</strong> <%= order.customerName %></p>
+                    <p><strong>البريد:</strong> <%= order.customerEmail %></p>
+                    <p><strong>الهاتف:</strong> <%= order.customerPhone %></p>
+                    <p><strong>طريقة الدفع:</strong> <%= order.paymentMethod === 'cash_on_delivery' ? '💵 الدفع عند الاستلام' : order.paymentMethod %></p>
+                    <p><strong>حالة الطلب:</strong> 
+                        <span style="color: <%= order.status === 'delivered' ? '#27ae60' : order.status === 'cancelled' ? '#e74c3c' : '#2980b9' %>; font-weight: 700;">
+                            <%= order.status === 'pending' ? '⏳ قيد المراجعة' : 
+                                order.status === 'processing' ? '⚙️ جاري التجهيز' :
+                                order.status === 'shipped' ? '🚀 تم الشحن' :
+                                order.status === 'delivered' ? '✅ تم التسليم' :
+                                order.status === 'cancelled' ? '❌ ملغي' : order.status %>
+                        </span>
+                    </p>
+                </div>
             </div>
-            <div class="summary-row summary-total">
-                <span>الإجمالي النهائي:</span>
-                <span><%= order.totalAmount %> ر.س</span>
+
+            <%# ========== عنوان الشحن ========== %>
+            <div class="info-card" style="margin-bottom: 30px;">
+                <h4><i class="fas fa-map-marked-alt"></i> عنوان الشحن</h4>
+                <p><%= order.shippingAddress.fullAddress || order.shippingAddress.street + '، ' + order.shippingAddress.city + '، ' + order.shippingAddress.country %></p>
+                <p style="margin-top:8px;"><strong>نوع الشحن:</strong> <%= order.shippingMethod === 'international' ? '🌍 شحن دولي خارجي' : order.shippingMethod === 'pickup' ? '📍 استلام من المتجر' : '🇸🇦 شحن داخلي محلي' %></p>
             </div>
-        </div>
 
-        <%# الشروط القانونية %>
-        <div class="terms">
-            <strong>⚠️ الشروط والأحكام القانونية:</strong>
-            <ol style="margin-right: 15px; margin-top: 5px;">
-                <li>يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.</li>
-                <li>يحق للزبون استبدال السلعة بأخرى خلال 3 أيام فقط من تاريخ الاستلام في حال وجود خلل مصنعي واضح، بشرط ألا يكون الخلل ناتجاً عن سوء الاستخدام.</li>
-                <li>أي كشط أو تلف في ملصقات الضمان أو العبوات الأصلية يلغي الضمان بشكل فوري ويسقط حق الاستبدال.</li>
-                <li>تثبيت "تاريخ الطلب" و"تاريخ التسليم الفعلي" كمرجع قانوني لحساب مدة الضمان والاستبدال الثلاثية.</li>
-            </ol>
-        </div>
+            <%# ========== جدول المنتجات ========== %>
+            <h3 style="color:#1a1a2e; margin-bottom:12px; font-weight:700;"><i class="fas fa-cubes" style="color:#d4af37; margin-left:8px;"></i> المنتجات المدرجة</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 50px;">#</th>
+                        <th>المنتج</th>
+                        <th class="text-center">الكمية</th>
+                        <th class="text-center">السعر</th>
+                        <th class="text-left">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.items.forEach(function(item, index) { %>
+                        <tr>
+                            <td class="text-center" style="color:#999;"><%= index + 1 %></td>
+                            <td><strong><%= item.name %></strong></td>
+                            <td class="text-center"><%= item.quantity %></td>
+                            <td class="text-center"><%= item.price %> ر.س</td>
+                            <td class="text-left" style="font-weight:700;"><%= item.total %> ر.س</td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
 
-        <%# توقيع المستلم %>
-        <div class="signature">
-            <p><strong>تاريخ الطلب:</strong> <%= new Date(order.createdAt).toLocaleDateString('ar-SA') %></p>
-            <% if (order.actualDeliveryDate) { %>
-                <p><strong>تاريخ التسليم الفعلي:</strong> <%= new Date(order.actualDeliveryDate).toLocaleDateString('ar-SA') %></p>
-            <% } %>
-            <div style="margin-top: 40px;">
-                <div class="line"></div>
-                <p>توقيع المستلم عند الاستلام</p>
+            <%# ========== ملخص + QR ========== %>
+            <div class="summary-wrapper">
+                <div class="qr-card">
+                    <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://alradi-online-app.onrender.com/account/orders/<%= order._id %>&color=1a1a2e" alt="QR Code">
+                    <p style="font-size:11px; color:#777;"><i class="fas fa-qrcode"></i> امسح للتحقق</p>
+                </div>
+
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>المجموع الفرعي</span>
+                        <span><%= order.subtotal %> ر.س</span>
+                    </div>
+                    <% if (order.couponDiscount > 0) { %>
+                        <div class="summary-row" style="color:#27ae60;">
+                            <span>🎫 خصم الكوبون (<%= order.couponCode %>)</span>
+                            <span>-<%= order.couponDiscount %> ر.س</span>
+                        </div>
+                    <% } %>
+                    <div class="summary-row">
+                        <span>🚚 رسوم الشحن</span>
+                        <span><%= order.shippingCost === 0 ? 'مجاني 🎉' : order.shippingCost + ' ر.س' %></span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span>💰 الإجمالي النهائي</span>
+                        <span><%= order.totalAmount %> ر.س</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <%# تذييل الفاتورة %>
-        <div class="footer">
-            <p>🦅 جميع الحقوق محفوظة © <%= new Date().getFullYear() %> لمجموعة متاجر الرعدي أونلاين الفاخرة</p>
-            <p>تجربة تسوق فائقة وآمنة | شحن داخلي ودولي | دعم فني 24/7</p>
-        </div>
+            <%# ========== الشروط ========== %>
+            <div class="terms-box">
+                <strong><i class="fas fa-gavel" style="color:#e94560;"></i> الشروط القانونية</strong>
+                <ol>
+                    <li>يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء.</li>
+                    <li>الاستبدال خلال <strong>3 أيام</strong> للعيوب المصنعية فقط.</li>
+                    <li>هذه الفاتورة <strong>سند رسمي معتمد</strong>.</li>
+                </ol>
+            </div>
 
+            <%# ========== توقيع ========== %>
+            <div class="signature-section">
+                <div>
+                    <p style="font-weight:700;"><i class="fas fa-calendar-check" style="color:#d4af37;"></i> تاريخ الطلب:</p>
+                    <p style="color:#555;"><%= new Date(order.createdAt).toLocaleDateString('ar-SA') %></p>
+                </div>
+                <div style="text-align:left;">
+                    <div class="signature-line"></div>
+                    <p style="font-size:12px; color:#777;">توقيع المستلم</p>
+                </div>
+            </div>
+
+            <%# ========== تذييل ========== %>
+            <div class="footer-note">
+                <p>🦅 جميع الحقوق محفوظة © <%= new Date().getFullYear() %> لـ <%= store.storeName || 'مجموعة متاجر الرعدي أونلاين الفاخرة' %></p>
+                <p style="margin-top:4px;">تجربة تسوق فائقة وآمنة | دعم فني 24/7</p>
+            </div>
+
+        </div>
     </div>
+
+    <script>
+        function downloadPDF() {
+            const element = document.getElementById('invoiceCard');
+            const invoiceNumber = "<%= order.invoiceNumber %>";
+            const options = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Invoice-${invoiceNumber}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(options).from(element).save();
+        }
+
+        function shareInvoiceWhatsApp() {
+            const storeName = "<%= store.storeName || 'متجر الرعدي أون لاين' %>";
+            const invoiceNum = "<%= order.invoiceNumber %>";
+            const totalAmount = "<%= order.totalAmount %>";
+            const customerName = "<%= order.customerName %>";
+            const message = `مرحباً ${customerName}،\n\nفاتورتك من ${storeName}\n🧾 رقم: ${invoiceNum}\n💰 الإجمالي: ${totalAmount} ر.س\n\n🔗 تتبع طلبك:\nhttps://alradi-online-app.onrender.com/account/orders`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
 </body>
 </html>
