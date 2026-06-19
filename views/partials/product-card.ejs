@@ -1,21 +1,24 @@
-<%# ============================================= %>
-<%# متجر الرعدي أون لاين - alradi-online          %>
-<%# بطاقة المنتج الموحدة والمهندسة - خالية من التكرار %>
-<%# ============================================= %>
+<%# ================================================================== %>
+<%# متجر الرعدي أون لاين - النسخة الذهبية                             %>
+<%# بطاقة المنتج الموحدة - تصميم خارق وأداء أسطوري                   %>
+<%# ================================================================== %>
 
-<div class="product-card complex-card animate-fadeIn" data-product-id="<%= product._id %>" style="
+<div class="product-card" style="
     background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 15px;
+    border: 1px solid #e8eaed;
+    border-radius: 20px;
     overflow: hidden;
     position: relative;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-">
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(0,0,0,0.1)';" 
+   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 15px rgba(0,0,0,0.05)';">
     
-    <div class="product-image-container" style="position: relative; overflow: hidden; background: #f9f9f9;">
+    <div class="product-image-container" style="position: relative; overflow: hidden; background: #f8f9fb; height: 250px;">
         <a href="/products/<%= product.slug || product._id %>">
-            <%# معالجة ذكية لمسار الصورة لمنع خطأ الـ 404 وتأمين الرفع %>
             <% 
                 var imageUrl = '/images/default-product.png';
                 if (product.images && product.images.length > 0) {
@@ -25,38 +28,32 @@
             <img src="<%= imageUrl %>" 
                  alt="<%= product.name %>"
                  loading="lazy"
-                 style="width: 100%; height: 250px; object-fit: cover; transition: transform 0.5s ease;"
-                 onerror="this.src='/images/default-product.png';">
+                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;"
+                 onerror="this.onerror=null; this.src='/images/default-product.png';">
         </a>
         
-        <div class="product-badges" style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 2;">
-            <% if (product.isOnSale) { %><span class="badge badge-sale" style="background: #e94560; color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px;"><i class="fas fa-tag"></i> تخفيض</span><% } %>
-            <% if (product.isNewArrival) { %><span class="badge badge-new" style="background: #0f3460; color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px;"><i class="fas fa-bolt"></i> جديد</span><% } %>
-            <% if (product.isFeatured) { %><span class="badge badge-featured" style="background: #ffd700; color: #111; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px;"><i class="fas fa-star"></i> مميز</span><% } %>
-            <% if (product.stockStatus === 'out_of_stock' || product.stock <= 0) { %><span class="badge badge-out-of-stock" style="background: #6c757d; color: white; padding: 4px 8px; font-size: 11px; font-weight: bold; border-radius: 4px;"><i class="fas fa-times-circle"></i> نفد</span><% } %>
-        </div>
-        
-        <div class="product-actions">
-            <button class="action-btn wishlist-btn" data-product-id="<%= product._id %>" onclick="if(typeof toggleWishlist === 'function') toggleWishlist('<%= product._id %>'); else alert('تمت الإضافة للمفضلة')" title="أضف للمفضلة">
-                <i class="far fa-heart"></i>
-            </button>
+        <div class="product-badges" style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2;">
+            <% if (product.isOnSale) { %><span class="badge" style="background: #e94560; color: white; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 20px;"><i class="fas fa-fire"></i> خصم <%= Math.round((1 - product.price / product.comparePrice) * 100) %>%</span><% } %>
+            <% if (product.isNewArrival) { %><span class="badge" style="background: #0f3460; color: white; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 20px;"><i class="fas fa-bolt"></i> جديد</span><% } %>
+            <% if (product.isFeatured) { %><span class="badge" style="background: #ffd700; color: #111; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 20px;"><i class="fas fa-crown"></i> مميز</span><% } %>
+            <% if (product.stockStatus === 'out_of_stock' || product.stock <= 0) { %><span class="badge" style="background: #6c757d; color: white; padding: 6px 12px; font-size: 11px; font-weight: bold; border-radius: 20px;"><i class="fas fa-times-circle"></i> نفد</span><% } %>
         </div>
     </div>
     
-    <div class="product-info" style="padding: 15px; direction: rtl; text-align: right;">
+    <div class="product-info" style="padding: 20px; flex: 1; display: flex; flex-direction: column; direction: rtl; text-align: right;">
         <% if (product.category && product.category.name) { %>
-            <span class="product-category" style="font-size: 12px; color: #888; display: block; margin-bottom: 5px;">
-                <i class="fas fa-folder" style="color: #ffd700;"></i> <%= product.category.name %>
+            <span class="product-category" style="font-size: 11px; color: #888; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">
+                <i class="fas fa-tag" style="color: #ffd700;"></i> <%= product.category.name %>
             </span>
         <% } %>
         
-        <h3 class="product-name" style="font-size: 16px; font-weight: 700; margin: 0 0 10px 0; line-height: 1.4;">
-            <a href="/products/<%= product.slug || product._id %>" style="color: #1a1a2e; text-decoration: none; transition: color 0.2s;"><%= product.name %></a>
+        <h3 class="product-name" style="font-size: 16px; font-weight: 700; margin: 0 0 12px 0; line-height: 1.4; flex: 1;">
+            <a href="/products/<%= product.slug || product._id %>" style="color: #1a1a2e; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#e94560';" onmouseout="this.style.color='#1a1a2e';"><%= product.name %></a>
         </h3>
         
-        <div class="product-rating" style="margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+        <div class="product-rating" style="margin-bottom: 12px; display: flex; align-items: center; gap: 5px;">
             <% if (product.rating && product.rating.average > 0) { %>
-                <div class="stars">
+                <div class="stars" style="display: flex; gap: 2px;">
                     <% for (var i = 1; i <= 5; i++) { %>
                         <i class="fas fa-star" style="color: <%= i <= product.rating.average ? '#ffd700' : '#ddd' %>; font-size: 12px;"></i>
                     <% } %>
@@ -65,35 +62,37 @@
             <% } %>
         </div>
         
-        <div class="product-price-container" style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+        <div class="product-price-container" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <% if (product.isOnSale && product.comparePrice) { %>
-                <span class="current-price" style="font-size: 18px; font-weight: 800; color: #0f3460;"><%= product.price %> <%= typeof currencySymbol !== 'undefined' ? currencySymbol : 'ر.س' %></span>
-                <span class="old-price" style="font-size: 14px; color: #999; text-decoration: line-through;"><%= product.comparePrice %> ر.س</span>
+                <span class="current-price" style="font-size: 22px; font-weight: 800; color: #e94560;"><%= product.price %> <small style="font-size: 14px;">ر.س</small></span>
+                <span class="old-price" style="font-size: 14px; color: #bbb; text-decoration: line-through;"><%= product.comparePrice %> ر.س</span>
             <% } else { %>
-                <span class="current-price" style="font-size: 18px; font-weight: 800; color: #0f3460;"><%= product.price %> <%= typeof currencySymbol !== 'undefined' ? currencySymbol : 'ر.س' %></span>
+                <span class="current-price" style="font-size: 22px; font-weight: 800; color: #0f3460;"><%= product.price %> <small style="font-size: 14px;">ر.س</small></span>
             <% } %>
         </div>
         
         <div class="stock-status" style="font-size: 13px; margin-bottom: 15px;">
-            <% if (product.stockStatus === 'in_stock' && product.stock > 0) { %>
-                <span style="color: #28a745;"><i class="fas fa-check-circle"></i> متوفر في المخزون</span>
-            <% } else if (product.stockStatus === 'low_stock' || (product.stock > 0 && product.stock <= 3)) { %>
-                <span style="color: #ffc107;"><i class="fas fa-exclamation-circle"></i> متبقي <%= product.stock %> قطع فقط!</span>
+            <% if (product.stockStatus === 'in_stock' && product.stock > 5) { %>
+                <span style="color: #28a745; font-weight: bold;"><i class="fas fa-check-circle"></i> متوفر بكثرة</span>
+            <% } else if (product.stock > 0 && product.stock <= 5) { %>
+                <span style="color: #ffc107; font-weight: bold;"><i class="fas fa-running"></i> تبقت <%= product.stock %> قطع فقط! اسرع</span>
+                <div style="width: 100%; height: 5px; background: #eee; border-radius: 3px; margin-top: 5px;">
+                    <div style="width: <%= (product.stock / 5) * 100 %>%; height: 5px; background: #ffc107; border-radius: 3px;"></div>
+                </div>
             <% } else { %>
-                <span style="color: #dc3545;"><i class="fas fa-times-circle"></i> غير متوفر حالياً</span>
+                <span style="color: #dc3545; font-weight: bold;"><i class="fas fa-times-circle"></i> غير متوفر حالياً</span>
             <% } %>
         </div>
         
         <% if (product.stock > 0 && product.stockStatus !== 'out_of_stock') { %>
-            <%# استدعاء دالة addToCart الموحدة الموجودة في ملف الـ index الرئيسي لمنع التكرار %>
-            <button class="add-to-cart-btn" data-id="<%= product._id %>" onclick="addToCart(this)" style="
+            <button class="add-to-cart-btn" data-id="<%= product._id %>" onclick="addToCartDirect('<%= product._id %>', this)" style="
                 width: 100%;
-                padding: 12px;
+                padding: 14px;
                 background: linear-gradient(135deg, #1a1a2e, #0f3460);
                 color: white;
                 border: none;
-                border-radius: 25px;
-                font-size: 15px;
+                border-radius: 30px;
+                font-size: 16px;
                 font-weight: 700;
                 cursor: pointer;
                 transition: all 0.3s ease;
@@ -101,20 +100,21 @@
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
-                box-shadow: 0 4px 6px rgba(15, 52, 96, 0.2);
-            " onmouseover="this.style.background='linear-gradient(135deg, #ffd700, #b89700)'; this.style.color='#111'; this.style.transform='translateY(-2px)';" 
-               onmouseout="this.style.background='linear-gradient(135deg, #1a1a2e, #0f3460)'; this.style.color='white'; this.style.transform='translateY(0)';">
-                <i class="fas fa-shopping-cart"></i> شراء الآن
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 15px rgba(15, 52, 96, 0.3);
+            " onmouseover="this.style.background='linear-gradient(135deg, #ffd700, #ffaa00)'; this.style.color='#111'; this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(255, 215, 0, 0.4)';" 
+               onmouseout="this.style.background='linear-gradient(135deg, #1a1a2e, #0f3460)'; this.style.color='white'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(15, 52, 96, 0.3)';">
+                <i class="fas fa-shopping-cart"></i> أضف إلى السلة
             </button>
         <% } else { %>
             <button disabled style="
                 width: 100%; 
-                padding: 12px; 
+                padding: 14px; 
                 background: #e0e0e0; 
                 color: #a0a0a0; 
                 border: none; 
-                border-radius: 25px; 
-                font-size: 15px; 
+                border-radius: 30px; 
+                font-size: 16px; 
                 font-weight: 700;
                 cursor: not-allowed;
                 display: flex;
@@ -127,3 +127,63 @@
         <% } %>
     </div>
 </div>
+
+<script>
+async function addToCartDirect(productId, btn) {
+    if (!productId) {
+        alert('عذراً، لم نتمكن من العثور على معرّف هذا المنتج');
+        return;
+    }
+
+    btn.disabled = true;
+    const originalHTML = btn.innerHTML;
+    const originalBg = btn.style.background;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإضافة...';
+    btn.style.background = '#6c757d';
+
+    try {
+        const response = await fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: productId, quantity: 1 })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            btn.innerHTML = '<i class="fas fa-check"></i> تمت الإضافة ✅';
+            btn.style.background = '#28a745';
+            
+            const cartBadges = document.querySelectorAll('.badge-count, .cart-count-badge');
+            cartBadges.forEach(badge => {
+                if (badge) {
+                    badge.innerText = data.cartCount || 0;
+                    badge.style.display = (data.cartCount || 0) > 0 ? 'flex' : 'none';
+                }
+            });
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = originalBg;
+                btn.disabled = false;
+            }, 2500);
+        } else {
+            btn.innerHTML = originalHTML;
+            btn.style.background = originalBg;
+            btn.disabled = false;
+            
+            if (data.requireLogin) {
+                window.location.href = '/auth/login';
+            } else {
+                alert(data.message || 'حدث خطأ غير متوقع');
+            }
+        }
+    } catch (error) {
+        console.error('خطأ في الاتصال بالسيرفر:', error);
+        btn.innerHTML = originalHTML;
+        btn.style.background = originalBg;
+        btn.disabled = false;
+        alert('فشل الاتصال بالسيرفر. تأكد من اتصالك بالإنترنت وحاول مجدداً.');
+    }
+}
+</script>
