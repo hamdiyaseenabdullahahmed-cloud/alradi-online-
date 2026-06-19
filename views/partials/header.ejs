@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# ترويسة الموقع - كاملة مع الشعار                  %>
+<%# ترويسة الموقع                                  %>
 <%# ============================================= %>
 
 <!DOCTYPE html>
@@ -9,11 +9,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="<%= store.storeDescription || 'متجر إلكتروني متكامل للتسوق العالمي' %>">
-    <meta name="keywords" content="متجر, الرعدي, تسوق, إلكتروني, أون لاين">
-    <meta name="author" content="متجر الرعدي أون لاين">
     <meta name="theme-color" content="#1a1a2e">
     
-    <% if (store.storeLogo && store.storeLogo !== '/images/default-logo.png') { %>
+    <% if (store.storeLogo && store.storeLogo.length > 5) { %>
         <link rel="icon" href="<%= store.storeLogo %>">
     <% } else { %>
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
@@ -41,7 +39,7 @@
     <div class="promo-banner" id="promoBanner">
         <span>
             <i class="fas fa-truck"></i>
-            <%= currentLanguage === 'en' ? (store.promoBannerTextEn || 'Free shipping over 300 SAR') : (store.promoBannerText || '🚀 شحن مجاني للطلبات فوق 300 ريال | خصم 15% على أول طلب') %>
+            <%= currentLanguage === 'en' ? (store.promoBannerTextEn || 'Free shipping over 300 SAR') : (store.promoBannerText || '🚀 شحن مجاني للطلبات فوق 300 ريال') %>
         </span>
         <button class="close-banner" onclick="document.getElementById('promoBanner').style.display='none'" aria-label="إغلاق">
             <i class="fas fa-times"></i>
@@ -57,10 +55,9 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 
-                <%# الشعار والاسم %>
                 <div class="logo-container">
                     <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
-                        <% if (store.storeLogo && store.storeLogo !== '/images/default-logo.png') { %>
+                        <% if (store.storeLogo && store.storeLogo.length > 5) { %>
                             <img src="<%= store.storeLogo %>" alt="الشعار" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--gold-color); box-shadow: 0 0 15px rgba(255,215,0,0.4);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
                             <span style="font-size: 40px; animation: pulse 2s infinite; display: none;">🦅</span>
                         <% } else { %>
@@ -94,7 +91,7 @@
                         <i class="fas fa-language"></i>
                     </a>
                     
-                    <a href="/toggle-dark-mode" class="header-icon" id="dark-mode-toggle" title="الوضع الليلي">
+                    <a href="/toggle-dark-mode" class="header-icon" title="الوضع الليلي">
                         <i class="fas fa-moon"></i>
                     </a>
                     
@@ -131,17 +128,11 @@
                 </div>
             </div>
             
-            <%# القائمة الرئيسية مع الأقسام %>
             <nav class="main-nav" id="mainNav">
                 <ul>
-                    <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">
-                        <i class="fas fa-home"></i> الرئيسية
-                    </a></li>
-                    
+                    <li><a href="/"><i class="fas fa-home"></i> الرئيسية</a></li>
                     <li class="dropdown">
-                        <a href="/products" class="<%= currentPath.startsWith('/products') ? 'active' : '' %>">
-                            <i class="fas fa-th-large"></i> المنتجات <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i>
-                        </a>
+                        <a href="/products"><i class="fas fa-th-large"></i> المنتجات <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i></a>
                         <div class="dropdown-menu">
                             <a href="/products">📦 جميع المنتجات</a>
                             <a href="/products?sort=newest">🆕 وصل حديثاً</a>
@@ -150,22 +141,8 @@
                             <a href="/products?onSale=true">🏷️ العروض والتخفيضات</a>
                         </div>
                     </li>
-                    
-                    <li class="dropdown">
-                        <a href="/products">
-                            <i class="fas fa-list"></i> الأقسام <i class="fas fa-chevron-down" style="font-size: 10px; margin-right: 3px;"></i>
-                        </a>
-                        <div class="dropdown-menu" id="categoriesMenu">
-                            <a href="/products">📂 جميع الأقسام</a>
-                        </div>
-                    </li>
-                    
-                    <li><a href="/offers" class="<%= currentPath === '/offers' ? 'active' : '' %>">
-                        <i class="fas fa-tags" style="color: var(--gold-color);"></i> العروض
-                    </a></li>
-                    <li><a href="/contact">
-                        <i class="fas fa-envelope"></i> اتصل بنا
-                    </a></li>
+                    <li><a href="/offers"><i class="fas fa-tags" style="color: var(--gold-color);"></i> العروض</a></li>
+                    <li><a href="/contact"><i class="fas fa-envelope"></i> اتصل بنا</a></li>
                 </ul>
             </nav>
         </div>
