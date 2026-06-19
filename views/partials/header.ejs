@@ -17,8 +17,7 @@
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦅</text></svg>">
     <% } %>
     
-    <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : '' %><%= store.storeName || 'متجر الرعدي أون لاين' %></title>
-    
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : '' %><%= store.storeName || 'متجر الرعدي أونلاين' %></title>  
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -58,13 +57,13 @@
                 <div class="logo-container">
                     <a href="/" class="logo-link" title="<%= store.storeName || 'متجر الرعدي أون لاين' %>">
                         <% if (store.storeLogo && store.storeLogo.length > 10) { %>
-                            <img src="<%= store.storeLogo %>" alt="الشعار" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--gold-color); box-shadow: 0 0 20px rgba(255,215,0,0.5);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                            <span style="font-size: 40px; animation: pulse 2s infinite; display: none;">🦅</span>
+                            <img src="<%= store.storeLogo %>" alt="الشعار" style="width:150px; height:150px; border-radius:50%; object-fit:cover; border:3px solid var(--gold-color); box-shadow: 0 0 20px rgba(255,215,0,0.5);" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                            <span style="font-size: 60px; animation: pulse 2s infinite; display: none;">🦅</span>
                         <% } else { %>
-                            <span style="font-size: 40px; animation: pulse 2s infinite;">🦅</span>
+                            <span style="font-size: 60px; animation: pulse 2s infinite;">🦅</span>
                         <% } %>
                         <span class="store-name" style="
-                            font-size: 26px;
+                            font-size: 30px;
                             font-weight: 900;
                             background: linear-gradient(135deg, #ffd700, #ff6b6b, #ffd700);
                             background-size: 200% auto;
@@ -74,7 +73,7 @@
                             animation: shimmer 3s linear infinite;
                             text-shadow: none;
                             letter-spacing: 1px;
-                        "><%= store.storeName || 'متجر الرعدي أون لاين' %></span>
+                        "><%= store.storeName || 'متجر الرعدي أونلاين' %></span>
                     </a>
                 </div>
                 
