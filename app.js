@@ -1,6 +1,6 @@
 // =============================================
 // متجر الرعدي أون لاين - alradi-online
-// الملف الرئيسي للسيرفر - كامل
+// الملف الرئيسي للسيرفر
 // =============================================
 
 const express = require('express');
@@ -26,7 +26,7 @@ require('dotenv').config();
 
 const app = express();
 
-// ⭐ هذا هو السطر الجديد اللي أضفناه
+// ⭐ مهم لـ Render
 app.set('trust proxy', 1);
 
 // =============================================
@@ -48,25 +48,19 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-app.use(cors({
-    origin: '*',
-    credentials: true
-}));
+app.use(cors({ origin: '*', credentials: true }));
 
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
-    message: 'عدد الطلبات كبير جداً، الرجاء المحاولة لاحقاً',
-    standardHeaders: true,
-    legacyHeaders: false
+    message: 'عدد الطلبات كبير جداً، الرجاء المحاولة لاحقاً'
 });
 app.use('/api', globalLimiter);
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
-    message: 'محاولات تسجيل دخول كثيرة جداً، الرجاء الانتظار 15 دقيقة',
-    skipSuccessfulRequests: true
+    message: 'محاولات تسجيل دخول كثيرة جداً'
 });
 app.use('/auth/login', loginLimiter);
 
@@ -74,12 +68,7 @@ app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
 app.use(compression());
-
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-} else {
-    app.use(morgan('combined'));
-}
+app.use(morgan('dev'));
 
 // =============================================
 // إعدادات قاعدة البيانات
@@ -148,10 +137,6 @@ mongoose.connect(MONGODB_URI)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// =============================================
-// Middleware
-// =============================================
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -159,12 +144,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET || 'alradi-cookie-secret'));
 
+// ⭐ إعدادات الجلسة - معدلة للعمل مع Render
 app.use(session({
     secret: process.env.SESSION_SECRET || 'alradi-session-secret',
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000,
         sameSite: 'lax'
@@ -233,10 +219,7 @@ app.use('/api', require('./routes/api'));
 
 const server = http.createServer(app);
 const io = socketIo(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+    cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
 const connectedUsers = new Map();
@@ -263,8 +246,7 @@ io.on('connection', (socket) => {
                 senderName: sender.name,
                 senderRole: sender.role,
                 content: messageData.content,
-                timestamp: new Date(),
-                socketId: socket.id
+                timestamp: new Date()
             };
             
             if (sender.role === 'admin' && messageData.recipientSocketId) {
@@ -306,6 +288,20 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
     console.error('❌ خطأ:', err.message);
+    
+    try {
+        const ErrorLog = require('./models/ErrorLog');
+        const errorLog = new ErrorLog({
+            message: err.message,
+            stack: err.stack || '',
+            url: req.url,
+            method: req.method,
+            userAgent: req.headers['user-agent'] || '',
+            ip: req.ip || '',
+            userId: req.session && req.session.user ? req.session.user._id : null
+        });
+        errorLog.save().catch(() => {});
+    } catch (logError) {}
     
     res.status(err.statusCode || 500).render('error', {
         pageTitle: 'خطأ في الخادم',
