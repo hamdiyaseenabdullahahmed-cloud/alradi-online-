@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# بطاقة المنتج الموحدة - النسخة النهائية الكاملة     %>
+<%# بطاقة المنتج الموحدة                            %>
 <%# ============================================= %>
 
 <div class="product-card animate-fadeIn">
@@ -27,11 +27,6 @@
             <% if (product.stockStatus === 'out_of_stock') { %>
                 <span class="badge badge-out-of-stock"><i class="fas fa-times-circle"></i> نفد</span>
             <% } %>
-            <% if (product.stockStatus === 'low_stock' && product.stock > 0) { %>
-                <span class="badge" style="background: var(--warning-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold;">
-                    <i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> فقط
-                </span>
-            <% } %>
         </div>
         
         <div class="product-actions">
@@ -49,70 +44,38 @@
     
     <div class="product-info">
         <% if (product.category && product.category.name) { %>
-            <span class="product-category">
-                <i class="fas fa-folder"></i> 
-                <%= product.category.name %>
-            </span>
+            <span class="product-category"><i class="fas fa-folder"></i> <%= product.category.name %></span>
         <% } %>
         
         <h3 class="product-name">
-            <a href="/products/<%= product.slug || product._id %>">
-                <%= product.name %>
-            </a>
+            <a href="/products/<%= product.slug || product._id %>"><%= product.name %></a>
         </h3>
-        
-        <div class="product-rating">
-            <% if (product.rating && product.rating.average > 0) { %>
-                <div class="stars">
-                    <% for (var i = 1; i <= 5; i++) { %>
-                        <% if (i <= Math.floor(product.rating.average)) { %>
-                            <i class="fas fa-star"></i>
-                        <% } else if (i - 0.5 <= product.rating.average) { %>
-                            <i class="fas fa-star-half-alt"></i>
-                        <% } else { %>
-                            <i class="far fa-star"></i>
-                        <% } %>
-                    <% } %>
-                </div>
-                <span class="rating-count">(<%= product.rating.count || 0 %>)</span>
-            <% } else { %>
-                <div class="stars">
-                    <i class="far fa-star" style="color: #ddd;"></i>
-                    <i class="far fa-star" style="color: #ddd;"></i>
-                    <i class="far fa-star" style="color: #ddd;"></i>
-                    <i class="far fa-star" style="color: #ddd;"></i>
-                    <i class="far fa-star" style="color: #ddd;"></i>
-                </div>
-                <span class="rating-count" style="font-size: 11px; color: var(--text-muted);">جديد</span>
-            <% } %>
-        </div>
         
         <div class="product-price-container">
             <% if (product.isOnSale && product.comparePrice) { %>
                 <span class="current-price"><%= product.price %> ر.س</span>
                 <span class="old-price"><%= product.comparePrice %> ر.س</span>
-                <span class="discount-percentage">-<%= Math.round((1 - product.price / product.comparePrice) * 100) %>%</span>
             <% } else { %>
                 <span class="current-price"><%= product.price %> ر.س</span>
             <% } %>
         </div>
         
-        <div class="stock-status <%= product.stockStatus === 'out_of_stock' ? 'out-of-stock' : (product.stockStatus === 'low_stock' ? 'low-stock' : 'in-stock') %>">
+        <div class="stock-status">
             <% if (product.stockStatus === 'in_stock') { %>
-                <i class="fas fa-check-circle"></i> متوفر<% if (product.stock && product.stock > 0) { %>: <%= product.stock %> قطعة<% } %>
+                <i class="fas fa-check-circle"></i> متوفر
             <% } else if (product.stockStatus === 'low_stock') { %>
-                <i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> قطعة فقط
+                <i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> فقط
             <% } else { %>
-                <i class="fas fa-times-circle"></i> نفد من المخزون
+                <i class="fas fa-times-circle"></i> نفد
             <% } %>
         </div>
         
         <% if (product.stockStatus !== 'out_of_stock') { %>
-            <a href="/cart/add?productId=<%= product._id %>&quantity=1" class="add-to-cart-btn" style="text-decoration: none; width:100%; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 600; padding: 12px; border-radius: 10px;">
+            <a href="/cart/add?productId=<%= product._id %>&quantity=1" style="display:block; width:100%; padding:12px; background:var(--primary-color); color:white; text-align:center; border-radius:10px; text-decoration:none; font-weight:bold; font-size:15px; margin-top:10px;">
                 <i class="fas fa-shopping-cart"></i> أضف إلى السلة
             </a>
         <% } else { %>
-            <button class="add-to-cart-btn" disabled style="background: #999; cursor: not-allowed; width: 100%;">
+            <button disabled style="width:100%; padding:12px; background:#999; color:white; border:none; border-radius:10px; font-weight:bold; font-size:15px; margin-top:10px;">
                 <i class="fas fa-times-circle"></i> نفد من المخزون
             </button>
         <% } %>
