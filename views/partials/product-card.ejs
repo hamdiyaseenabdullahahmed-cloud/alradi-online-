@@ -1,128 +1,228 @@
-<%# ============================================= %>
-<%# متجر الرعدي أون لاين - alradi-online          %>
-<%# بطاقة المنتج الموحدة - بتأثيرات جميلة            %>
-<%# ============================================= %>
+<%# ======================================================= %>
+<%# متجر الرعدي أون لاين (Al-Radi Online) - البطاقة الهندسية %>
+<%# ======================================================= %>
 
-<div class="product-card animate-fadeIn">
+<style>
+    .complex-card { position: relative; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: all 0.3s ease; }
+    .complex-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+    
+    .product-image-container { position: relative; overflow: hidden; height: 240px; background: #f8f9fb; }
+    .product-img-link { display: block; width: 100%; height: 100%; }
+    .main-product-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease; }
+    .hover-product-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s ease; }
+    .complex-card:hover .main-product-img { opacity: 0; }
+    .complex-card:hover .hover-product-img { opacity: 1; }
+    .complex-card:hover .main-product-img:only-child { opacity: 1; }
+    
+    .product-badges { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 3; }
+    .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: white; display: inline-flex; align-items: center; gap: 5px; }
+    .badge-sale { background: #e94560; }
+    .badge-bestseller { background: #ff6b35; }
+    .badge-featured { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #333; }
+    .badge-shipping { background: #28a745; }
+    .badge-out-of-stock { background: #6c757d; }
+    
+    .product-actions-overlay { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; opacity: 0; transition: all 0.3s ease; z-index: 3; }
+    .complex-card:hover .product-actions-overlay { opacity: 1; }
+    .action-btn { width: 38px; height: 38px; border-radius: 50%; background: white; border: none; cursor: pointer; font-size: 14px; color: #333; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-decoration: none; }
+    .action-btn:hover { background: #e94560; color: white; transform: scale(1.1); }
+    .action-btn.active { background: #e94560; color: white; }
+    
+    .product-info-wrapper { padding: 18px; }
+    .product-meta { margin-bottom: 6px; }
+    .product-category { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .product-title { margin: 0 0 10px 0; font-size: 15px; font-weight: 700; line-height: 1.4; }
+    .product-title a { color: #1a1a2e; text-decoration: none; }
+    .product-title a:hover { color: #e94560; }
+    
+    .product-rating-box { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .stars-rating { display: flex; gap: 2px; }
+    .stars-rating .filled { color: #ffd700; font-size: 12px; }
+    .stars-rating .empty { color: #ddd; font-size: 12px; }
+    .rating-voters { font-size: 11px; color: #999; }
+    
+    .product-price-row { margin-bottom: 12px; }
+    .price-current { font-size: 20px; font-weight: 900; color: #e94560; }
+    .price-current small { font-size: 12px; font-weight: 600; }
+    .price-old { font-size: 13px; color: #bbb; text-decoration: line-through; margin-right: 8px; }
+    .money-saved-tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; margin-top: 5px; }
+    
+    .stock-management-status { margin-bottom: 14px; }
+    .stock-indicator { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .stock-indicator.in-stock { color: #28a745; }
+    .stock-indicator.low-stock { color: #ff6b35; }
+    .stock-indicator.out-of-stock { color: #dc3545; }
+    .stock-progress-bar { height: 4px; background: #eee; border-radius: 2px; margin-top: 5px; }
+    .stock-progress-fill { height: 100%; background: #ff6b35; border-radius: 2px; transition: width 0.3s; }
+    
+    .dual-buttons-container { display: flex; gap: 8px; margin-top: 5px; }
+    .btn-action-cart { width: 45px; height: 45px; border-radius: 50%; background: #1a1a2e; color: white; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .btn-action-cart:hover { background: #e94560; transform: scale(1.1); box-shadow: 0 5px 20px rgba(233,69,96,0.4); }
+    .btn-action-buy { flex: 1; height: 45px; border-radius: 25px; background: linear-gradient(135deg, #ffd700, #ffaa00); color: #1a1a2e; border: none; cursor: pointer; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; }
+    .btn-action-buy:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.5); }
+    .btn-action-buy:active { transform: scale(0.95); }
+    .disabled-btn { width: 100%; padding: 12px; border-radius: 25px; background: #ccc; color: #999; border: none; font-size: 14px; font-weight: 700; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
+    
+    @media (max-width: 576px) {
+        .product-image-container { height: 180px; }
+        .product-title { font-size: 13px; }
+        .price-current { font-size: 17px; }
+    }
+</style>
+
+<div class="product-card complex-card animate-fadeIn" data-product-id="<%= product._id %>">
     
     <div class="product-image-container">
-        <a href="/products/<%= product.slug || product._id %>">
+        <a href="/products/<%= product.slug || product._id %>" class="product-img-link">
             <img src="<%= product.images && product.images.length > 0 ? product.images[0].url : '/images/default-product.png' %>" 
                  alt="<%= product.name %>"
                  loading="lazy"
+                 class="main-product-img"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div style="display: none; width: 100%; height: 100%; background: #f0f0f0; align-items: center; justify-content: center; font-size: 50px;">📦</div>
+            <% if (product.images && product.images.length > 1) { %>
+                <img src="<%= product.images[1].url %>" alt="<%= product.name %>" loading="lazy" class="hover-product-img" onerror="this.style.display='none';">
+            <% } %>
+            <div class="fallback-avatar-icon" style="display: none; width:100%; height:100%; background:#f0f0f0; display:none; align-items:center; justify-content:center; font-size:50px;">📦</div>
         </a>
         
         <div class="product-badges">
-            <% if (product.isOnSale) { %>
-                <span class="badge badge-sale"><i class="fas fa-tag"></i> تخفيض</span>
+            <% if (product.isOnSale && product.comparePrice && product.comparePrice > product.price) { %>
+                <span class="badge badge-sale">
+                    <i class="fas fa-bolt"></i> خصم <%= Math.round((1 - product.price / product.comparePrice) * 100) %>%
+                </span>
             <% } %>
-            <% if (product.isNewArrival) { %>
-                <span class="badge badge-new"><i class="fas fa-bolt"></i> جديد</span>
+            <% if (product.isBestSeller) { %>
+                <span class="badge badge-bestseller"><i class="fas fa-fire"></i> الأكثر مبيعاً</span>
             <% } %>
             <% if (product.isFeatured) { %>
-                <span class="badge badge-featured"><i class="fas fa-star"></i> مميز</span>
+                <span class="badge badge-featured"><i class="fas fa-crown"></i> مـلكي</span>
             <% } %>
-            <% if (product.stockStatus === 'out_of_stock') { %>
+            <% if (product.freeShipping) { %>
+                <span class="badge badge-shipping"><i class="fas fa-truck"></i> شحن مجاني</span>
+            <% } %>
+            <% if (product.stockStatus === 'out_of_stock' || product.stock <= 0) { %>
                 <span class="badge badge-out-of-stock"><i class="fas fa-times-circle"></i> نفد</span>
-            <% } %>
-            <% if (product.stockStatus === 'low_stock' && product.stock > 0) { %>
-                <span class="badge" style="background: var(--warning-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold;">
-                    <i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> فقط
-                </span>
             <% } %>
         </div>
         
-        <div class="product-actions">
-            <button class="action-btn wishlist-btn" 
-                    data-product-id="<%= product._id %>"
-                    onclick="toggleWishlist('<%= product._id %>')"
-                    title="أضف للمفضلة">
+        <div class="product-actions-overlay">
+            <button class="action-btn wishlist-btn" data-action="wishlist" title="أضف للمفضلة" onclick="toggleWishlist('<%= product._id %>')">
                 <i class="far fa-heart"></i>
             </button>
-            <a href="/products/<%= product.slug || product._id %>" class="action-btn quick-view-btn" title="عرض التفاصيل">
-                <i class="fas fa-eye"></i>
+            <a href="/products/<%= product.slug || product._id %>" class="action-btn quick-view-btn" title="عرض تفاصيل المنتج">
+                <i class="fas fa-expand-alt"></i>
             </a>
         </div>
     </div>
     
-    <div class="product-info">
+    <div class="product-info-wrapper">
         <% if (product.category && product.category.name) { %>
-            <span class="product-category"><i class="fas fa-folder"></i> <%= product.category.name %></span>
+            <div class="product-meta">
+                <span class="product-category"><i class="fas fa-tags"></i> <%= product.category.name %></span>
+            </div>
         <% } %>
         
-        <h3 class="product-name">
+        <h3 class="product-title">
             <a href="/products/<%= product.slug || product._id %>"><%= product.name %></a>
         </h3>
         
-        <div class="product-rating">
-            <% if (product.rating && product.rating.average > 0) { %>
-                <div class="stars">
-                    <% for (var i = 1; i <= 5; i++) { %>
-                        <% if (i <= Math.floor(product.rating.average)) { %>
-                            <i class="fas fa-star"></i>
-                        <% } else if (i - 0.5 <= product.rating.average) { %>
-                            <i class="fas fa-star-half-alt"></i>
-                        <% } else { %>
-                            <i class="far fa-star"></i>
-                        <% } %>
+        <div class="product-rating-box">
+            <div class="stars-rating">
+                <% var avgRating = (product.rating && product.rating.average) ? product.rating.average : 0; %>
+                <% for (var i = 1; i <= 5; i++) { %>
+                    <% if (i <= Math.floor(avgRating)) { %>
+                        <i class="fas fa-star filled"></i>
+                    <% } else if (i - 0.5 <= avgRating) { %>
+                        <i class="fas fa-star-half-alt filled"></i>
+                    <% } else { %>
+                        <i class="far fa-star empty"></i>
                     <% } %>
+                <% } %>
+            </div>
+            <span class="rating-voters">(<%= (product.rating && product.rating.count) ? product.rating.count : 0 %>)</span>
+        </div>
+        
+        <div class="product-price-row">
+            <% if (product.isOnSale && product.comparePrice && product.comparePrice > product.price) { %>
+                <span class="price-current"><%= product.price.toLocaleString('en-US') %> <small>ر.س</small></span>
+                <span class="price-old"><%= product.comparePrice.toLocaleString('en-US') %> ر.س</span>
+                <div class="money-saved-tag">وفرت <%= (product.comparePrice - product.price).toLocaleString('en-US') %> ر.س</div>
+            <% } else { %>
+                <span class="price-current"><%= product.price.toLocaleString('en-US') %> <small>ر.س</small></span>
+            <% } %>
+        </div>
+
+        <div class="stock-management-status">
+            <% if (product.stockStatus === 'in_stock' && product.stock > 10) { %>
+                <span class="stock-indicator in-stock"><i class="fas fa-check-circle"></i> متوفر في المخازن</span>
+            <% } else if (product.stock > 0 && (product.stockStatus === 'low_stock' || product.stock <= 10)) { %>
+                <span class="stock-indicator low-stock"><i class="fas fa-fire"></i> كمية محدودة! (تبقت <%= product.stock %>)</span>
+                <div class="stock-progress-bar"><div class="stock-progress-fill" style="width: <%= Math.min(100, (product.stock / 10) * 100) %>%;"></div></div>
+            <% } else { %>
+                <span class="stock-indicator out-of-stock"><i class="fas fa-times-circle"></i> غير متوفر حالياً</span>
+            <% } %>
+        </div>
+        
+        <div class="product-card-footer-buttons">
+            <% if (product.stockStatus !== 'out_of_stock' && product.stock > 0) { %>
+                <div class="dual-buttons-container">
+                    <button class="btn-action-cart" onclick="addToCartAndStay('<%= product._id %>', this)" title="إضافة للسلة">
+                        <i class="fas fa-shopping-bag"></i>
+                    </button>
+                    <button class="btn-action-buy" onclick="buyNow('<%= product._id %>')" title="شراء الآن">
+                        <i class="fas fa-bolt"></i>
+                        <span>شراء الآن</span>
+                    </button>
                 </div>
-                <span class="rating-count">(<%= product.rating.count || 0 %>)</span>
-            <% } %>
-        </div>
-        
-        <div class="product-price-container">
-            <% if (product.isOnSale && product.comparePrice) { %>
-                <span class="current-price"><%= product.price %> ر.س</span>
-                <span class="old-price"><%= product.comparePrice %> ر.س</span>
-                <span class="discount-percentage">-<%= Math.round((1 - product.price / product.comparePrice) * 100) %>%</span>
             <% } else { %>
-                <span class="current-price"><%= product.price %> ر.س</span>
+                <button disabled class="disabled-btn">
+                    <i class="fas fa-ban"></i> إنتهت الكمية
+                </button>
             <% } %>
         </div>
-        
-        <div class="stock-status <%= product.stockStatus === 'out_of_stock' ? 'out-of-stock' : (product.stockStatus === 'low_stock' ? 'low-stock' : 'in-stock') %>">
-            <% if (product.stockStatus === 'in_stock') { %>
-                <i class="fas fa-check-circle"></i> متوفر
-            <% } else if (product.stockStatus === 'low_stock') { %>
-                <i class="fas fa-exclamation-circle"></i> تبقت <%= product.stock %> فقط
-            <% } else { %>
-                <i class="fas fa-times-circle"></i> نفد
-            <% } %>
-        </div>
-        
-        <% if (product.stockStatus !== 'out_of_stock') { %>
-            <button onclick="addToCartAndStay('<%= product._id %>', this)" class="add-to-cart-btn" style="
-                width:100%; 
-                padding:12px 20px; 
-                background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-                color: white; 
-                border: none; 
-                border-radius: 25px; 
-                font-size: 16px; 
-                font-weight: 700; 
-                cursor: pointer; 
-                font-family: inherit;
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                gap: 10px;
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
-                margin-top: 12px;
-            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 10px 25px rgba(233,69,96,0.4)'; this.style.background='linear-gradient(135deg, var(--secondary-color), #ff6b6b)';" 
-               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.background='linear-gradient(135deg, var(--primary-color), var(--accent-color))';"
-               onmousedown="this.style.transform='scale(0.95)';"
-               onmouseup="this.style.transform='scale(1)';">
-                <i class="fas fa-shopping-cart"></i> أضف إلى السلة
-            </button>
-        <% } else { %>
-            <button disabled style="width:100%; padding:12px; background:#999; color:white; border:none; border-radius:25px; font-weight:bold; font-size:16px; margin-top:12px;">
-                <i class="fas fa-times-circle"></i> نفد من المخزون
-            </button>
-        <% } %>
     </div>
 </div>
+
+<script>
+function addToCartAndStay(productId, btn) {
+    var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
+    
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: productId, quantity: 1 })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            cart = data.cart;
+            cartCount = data.cartCount;
+            updateCartUI();
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.style.background = '#28a745';
+            showToast('تمت الإضافة ✅', 'success');
+            
+            setTimeout(function() {
+                btn.innerHTML = '<i class="fas fa-shopping-bag"></i>';
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 1500);
+        } else {
+            btn.innerHTML = '<i class="fas fa-shopping-bag"></i>';
+            btn.disabled = false;
+            showToast(data.message || 'خطأ', 'error');
+        }
+    })
+    .catch(function() {
+        btn.innerHTML = '<i class="fas fa-shopping-bag"></i>';
+        btn.disabled = false;
+    });
+}
+
+function buyNow(productId) {
+    addToCartAndStay(productId, document.querySelector('.btn-action-cart'));
+    setTimeout(function() { window.location.href = '/cart/checkout'; }, 800);
+}
+</script>
