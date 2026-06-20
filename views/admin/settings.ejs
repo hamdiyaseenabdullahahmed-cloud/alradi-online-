@@ -1,6 +1,5 @@
 <%# ============================================= %>
-<%# متجر الرعدي أون لاين - alradi-online          %>
-<%# لوحة تحكم المدير - إعدادات المتجر الشاملة        %>
+<%# إعدادات المتجر الشاملة - نسخة مستقرة             %>
 <%# ============================================= %>
 
 <%- include('../partials/header') %>
@@ -25,7 +24,7 @@
             <i class="fas fa-cog" style="color: var(--secondary-color); margin-left: 10px;"></i>
             إعدادات المتجر الشاملة
         </h1>
-        <p style="color: var(--text-muted);">تحكم في جميع جوانب متجر الرعدي أون لاين - كل التغييرات تحفظ مباشرة</p>
+        <p style="color: var(--text-muted);">تحكم في جميع جوانب متجر الرعدي أون لاين</p>
     </div>
     
     <div class="admin-layout">
@@ -57,8 +56,8 @@
                     <h3><i class="fas fa-store" style="color: var(--secondary-color); margin-left: 8px;"></i> هوية المتجر</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
-                            <label class="form-label">اسم المتجر (عربي) *</label>
-                            <input type="text" name="storeName" class="form-control" value="<%= settings.storeName || 'متجر الرعدي أون لاين' %>">
+                            <label class="form-label">اسم المتجر (عربي)</label>
+                            <input type="text" name="storeName" class="form-control" value="<%= settings.storeName || '' %>">
                         </div>
                         <div class="form-group">
                             <label class="form-label">اسم المتجر (إنجليزي)</label>
@@ -67,7 +66,6 @@
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label class="form-label">🖼️ رابط شعار المتجر (رابط مباشر للصورة)</label>
                             <input type="text" name="storeLogoUrl" class="form-control" value="<%= settings.storeLogo || '' %>" placeholder="https://i.postimg.cc/xxxxx/logo.png">
-                            <small style="color: var(--text-muted);">ارفع صورتك على <a href="https://postimages.org" target="_blank">postimages.org</a> والصق الرابط المباشر هنا</small>
                             <% if (settings.storeLogo && settings.storeLogo.length > 10) { %>
                                 <img src="<%= settings.storeLogo %>" style="width:80px; height:80px; object-fit:cover; border-radius:50%; margin-top:10px; border:2px solid var(--gold-color);">
                             <% } %>
@@ -75,36 +73,36 @@
                     </div>
                 </div>
                 
-                <%# ========== 2. ألوان المتجر ========== %>
+                <%# ========== 2. ألوان المتجر (تم إصلاحها) ========== %>
                 <div class="settings-section">
                     <h3><i class="fas fa-palette" style="color: var(--secondary-color); margin-left: 8px;"></i> ألوان المتجر</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                         <div class="form-group">
                             <label class="form-label">🎨 اللون الأساسي</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="color" name="primaryColor" class="color-picker" value="<%= settings.primaryColor || '#1a1a2e' %>">
-                                <input type="text" name="primaryColor" class="form-control" value="<%= settings.primaryColor || '#1a1a2e' %>">
+                                <input type="color" value="<%= settings.primaryColor || '#1a1a2e' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value;">
+                                <input type="text" name="primaryColor" class="form-control" value="<%= settings.primaryColor || '#1a1a2e' %>" style="flex:1;">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">🔴 اللون الثانوي</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="color" name="secondaryColor" class="color-picker" value="<%= settings.secondaryColor || '#e94560' %>">
-                                <input type="text" name="secondaryColor" class="form-control" value="<%= settings.secondaryColor || '#e94560' %>">
+                                <input type="color" value="<%= settings.secondaryColor || '#e94560' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value;">
+                                <input type="text" name="secondaryColor" class="form-control" value="<%= settings.secondaryColor || '#e94560' %>" style="flex:1;">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">🟡 اللون الذهبي</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="color" name="goldColor" class="color-picker" value="<%= settings.goldColor || '#ffd700' %>">
-                                <input type="text" name="goldColor" class="form-control" value="<%= settings.goldColor || '#ffd700' %>">
+                                <input type="color" value="<%= settings.goldColor || '#ffd700' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value;">
+                                <input type="text" name="goldColor" class="form-control" value="<%= settings.goldColor || '#ffd700' %>" style="flex:1;">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">🔵 لون الخلفية</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="color" name="backgroundColor" class="color-picker" value="<%= settings.backgroundColor || '#f8f9fa' %>">
-                                <input type="text" name="backgroundColor" class="form-control" value="<%= settings.backgroundColor || '#f8f9fa' %>">
+                                <input type="color" value="<%= settings.backgroundColor || '#f8f9fa' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value;">
+                                <input type="text" name="backgroundColor" class="form-control" value="<%= settings.backgroundColor || '#f8f9fa' %>" style="flex:1;">
                             </div>
                         </div>
                     </div>
