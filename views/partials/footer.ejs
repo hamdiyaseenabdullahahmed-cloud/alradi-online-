@@ -1,4 +1,167 @@
-<script src="/js/main.js"></script>
+<%# ============================================= %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# تذييل الموقع الكامل والمطور مع الشات الذكي      %>
+<%# ============================================= %>
+
+    </main>
+    <%# نهاية المحتوى الرئيسي %>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                
+                <%# عمود: عن المتجر %>
+                <div class="footer-section">
+                    <span style="font-size: 50px;">🦅</span>
+                    <h3><%= store.storeName || 'متجر الرعدي أون لاين' %></h3>
+                    <p class="footer-description">
+                        <%= currentLanguage === 'en' ? 
+                            (store.storeDescriptionEn || 'Your integrated destination for global online shopping') : 
+                            (store.storeDescription || 'وجهتك المتكاملة للتسوق الإلكتروني العالمي - تجربة تسوق فائقة وآمنة') %>
+                    </p>
+                    
+                    <div class="social-links">
+                        <% if (store.socialMedia && store.socialMedia.facebook) { %>
+                            <a href="<%= store.socialMedia.facebook %>" class="social-link" target="_blank" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        <% } %>
+                        <% if (store.socialMedia && store.socialMedia.twitter) { %>
+                            <a href="<%= store.socialMedia.twitter %>" class="social-link" target="_blank" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        <% } %>
+                        <% if (store.socialMedia && store.socialMedia.instagram) { %>
+                            <a href="<%= store.socialMedia.instagram %>" class="social-link" target="_blank" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        <% } %>
+                        <% if (store.whatsappNumber) { %>
+                            <a href="https://wa.me/<%= store.whatsappNumber %>" class="social-link" target="_blank" title="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <%# عمود: روابط سريعة %>
+                <div class="footer-section">
+                    <h3><%= currentLanguage === 'en' ? 'Quick Links' : 'روابط سريعة' %></h3>
+                    <ul class="footer-links">
+                        <li><a href="/"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                        <li><a href="/products"><i class="fas fa-chevron-left"></i> جميع المنتجات</a></li>
+                        <li><a href="/offers"><i class="fas fa-chevron-left"></i> العروض والتخفيضات</a></li>
+                        <li><a href="/about"><i class="fas fa-chevron-left"></i> من نحن</a></li>
+                        <li><a href="/contact"><i class="fas fa-chevron-left"></i> اتصل بنا</a></li>
+                        <li><a href="/track-order"><i class="fas fa-chevron-left"></i> تتبع الطلب</a></li>
+                        <li><a href="/sitemap"><i class="fas fa-chevron-left"></i> خريطة الموقع</a></li>
+                    </ul>
+                </div>
+                
+                <%# عمود: السياسات %>
+                <div class="footer-section">
+                    <h3><%= currentLanguage === 'en' ? 'Policies' : 'السياسات' %></h3>
+                    <ul class="footer-links">
+                        <li><a href="/privacy-policy"><i class="fas fa-chevron-left"></i> سياسة الخصوصية</a></li>
+                        <li><a href="/terms"><i class="fas fa-chevron-left"></i> الشروط والأحكام</a></li>
+                        <li><a href="/shipping-policy"><i class="fas fa-chevron-left"></i> سياسة الشحن والتسليم</a></li>
+                        <li><a href="/return-policy"><i class="fas fa-chevron-left"></i> سياسة الاستبدال والاسترجاع</a></li>
+                    </ul>
+                </div>
+                
+                <%# عمود: معلومات الاتصال %>
+                <div class="footer-section">
+                    <h3><%= currentLanguage === 'en' ? 'Contact Info' : 'معلومات الاتصال' %></h3>
+                    <ul class="footer-links">
+                        <% if (store.contactEmail) { %>
+                            <li>
+                                <a href="mailto:<%= store.contactEmail %>">
+                                    <i class="fas fa-envelope"></i> <%= store.contactEmail %>
+                                </a>
+                            </li>
+                        <% } %>
+                        <% if (store.phoneNumber) { %>
+                            <li>
+                                <a href="tel:<%= store.phoneNumber %>">
+                                    <i class="fas fa-phone"></i> <%= store.phoneNumber %>
+                                </a>
+                            </li>
+                        <% } %>
+                        <% if (store.whatsappNumber) { %>
+                            <li>
+                                <a href="https://wa.me/<%= store.whatsappNumber %>" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> <%= store.whatsappNumber %>
+                                </a>
+                            </li>
+                        <% } %>
+                        <% if (store.address) { %>
+                            <li>
+                                <i class="fas fa-map-marker-alt"></i> 
+                                <%= store.address %>
+                            </li>
+                        <% } %>
+                    </ul>
+                    
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 13px; margin-bottom: 8px; color: rgba(255,255,255,0.6);">طرق الدفع</p>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 24px;">
+                            <i class="fab fa-cc-visa" style="color: #1a1f71;"></i>
+                            <i class="fab fa-cc-mastercard" style="color: #eb001b;"></i>
+                            <span style="background: white; color: #0066c1; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">مدى</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <%# حقوق الملكية %>
+            <div class="footer-bottom">
+                <p>
+                    <%= currentLanguage === 'en' ? 
+                        (store.copyrightTextEn || 'All Rights Reserved © 2026 Al-Radi Online Luxury Stores Group - Superior and Safe Shopping Experience.') : 
+                        (store.copyrightText || 'جميع الحقوق محفوظة © 2026 لمجموعة متاجر الرعدي أونلاين الفاخرة - تجربة تسوق فائقة وآمنة.') %>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <%# زر العودة للأعلى %>
+    <button class="back-to-top" id="backToTop" title="العودة للأعلى" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <div id="toast-container"></div>
+
+    <script>
+        const storeSettings = {
+            voiceGreetingEnabled: <%= store.voiceGreetingEnabled ? 'true' : 'false' %>,
+            voiceInteractionsEnabled: <%= store.voiceInteractionsEnabled ? 'true' : 'false' %>,
+            voiceGreetingFile: '<%= store.voiceGreetingFile || "/audio/welcome.mp3" %>'
+        };
+        const currentUserId = '<%= user ? user._id : "" %>';
+        const currentUserName = '<%= user ? user.name : "" %>';
+        const currentUserRole = '<%= user ? user.role : "visitor" %>';
+    </script>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/main.js"></script>
+    
+    <% if (store.voiceGreetingEnabled !== false) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const greetingPlayed = sessionStorage.getItem('voiceGreetingPlayed');
+            if (!greetingPlayed) {
+                setTimeout(function() {
+                    try {
+                        const audio = new Audio(storeSettings.voiceGreetingFile);
+                        audio.volume = 0.5;
+                        audio.play().catch(function() {});
+                        sessionStorage.setItem('voiceGreetingPlayed', 'true');
+                    } catch(e) {}
+                }, 2000);
+            }
+        });
+    </script>
+    <% } %>
 
 <%# ========== نظام المحادثة الحية الفوري والذكي لمتجر الرعدي ========== %>
 <% if (user && user.role !== 'admin') { %>
@@ -72,7 +235,6 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
     
-    <%# --- فرز اتجاهات وألوان الفقاعات بدقة متناهية --- %>
     /* فقاعة العميل (أنت): يسار الشاشة بلون كحلي فخم */
     .chat-widget-messages .message.sent {
         background: linear-gradient(135deg, #1a1a2e, #0f3460);
@@ -187,7 +349,7 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
         const messagesDiv = document.getElementById('chatWidgetMessages');
         const currentTime = new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'});
         
-        // عرض رسالة العميل (أنت) في جهة اليسار باللون الكحلي
+        // عرض رسالة العميل في جهة اليسار باللون الكحلي
         messagesDiv.innerHTML += `
             <div class="message sent">
                 <strong>أنت:</strong><br>${msg}
@@ -197,7 +359,7 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
         input.value = '';
         
-        // إرسال البيانات بشكل حقيقي وفعال إلى السيرفر عبر الـ Socket
+        // إرسال البيانات الحي عبر السوكيت
         if (typeof socket !== 'undefined' && socket) {
             socket.emit('send-message', { 
                 senderId: currentUserId,
@@ -207,7 +369,7 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
             });
         }
 
-        // تفعيل الرد التلقائي الذكي عند غياب رد المدير لـ 7 ثوانٍ
+        // الرد التلقائي الذكي عند غياب رد المدير لـ 7 ثوانٍ
         if(autoReplyTimer) clearTimeout(autoReplyTimer);
         autoReplyTimer = setTimeout(function() {
             messagesDiv.innerHTML += `
@@ -222,10 +384,9 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
     }
 });
 
-// استماع حقيقي وفعال لاستقبال ردود المدير وعرضها فوراً في جهة اليمين بالذهبي
+// استقبال ردود المدير وعرضها فوراً في جهة اليمين بالذهبي
 if (typeof socket !== 'undefined' && socket) {
     socket.on('receive-message', function(data) {
-        // إلغاء مؤقت الرد التلقائي فوراً لأن الإدارة استجابت للمحادثة حياً
         if(autoReplyTimer) clearTimeout(autoReplyTimer);
         
         if (data.isAdmin) {
