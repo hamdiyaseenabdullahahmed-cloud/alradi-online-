@@ -1,0 +1,143 @@
+<%# ============================================= %>
+<%# لوحة تحكم المدير - التقارير والإحصائيات        %>
+<%# ============================================= %>
+
+<%- include('../partials/header') %>
+
+<style>
+    .reports-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
+    .admin-sidebar { background: white; border-radius: 15px; padding: 0; box-shadow: 0 2px 15px rgba(0,0,0,0.08); height: fit-content; position: sticky; top: 100px; overflow: hidden; }
+    .admin-sidebar .sidebar-header { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; padding: 25px 20px; text-align: center; }
+    .admin-sidebar .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 14px 25px; color: var(--text-color); text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s; border-right: 3px solid transparent; }
+    .admin-sidebar .sidebar-nav a:hover { background: rgba(233,69,96,0.05); color: var(--secondary-color); border-right-color: var(--secondary-color); }
+    .admin-sidebar .sidebar-nav a.active { background: rgba(233,69,96,0.1); color: var(--secondary-color); border-right-color: var(--secondary-color); font-weight: 700; }
+    .report-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px; }
+    .stat-box { background: var(--bg-color); padding: 18px; border-radius: 12px; text-align: center; }
+    .stat-box h2 { font-size: 28px; font-weight: 900; color: var(--primary-color); margin-bottom: 4px; }
+    .stat-box p { font-size: 13px; color: var(--text-muted); margin: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--bg-color); padding: 12px 15px; text-align: right; border-bottom: 2px solid var(--border-color); font-weight: 700; }
+    td { padding: 10px 15px; border-bottom: 1px solid var(--border-light); }
+    @media (max-width: 900px) { .reports-layout { grid-template-columns: 1fr; } .admin-sidebar { position: static; } }
+</style>
+
+<div class="container">
+    
+    <div style="margin-bottom: 25px;">
+        <h1 style="font-size: 26px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
+            <i class="fas fa-chart-bar" style="color: var(--secondary-color); margin-left: 10px;"></i>
+            التقارير والإحصائيات
+        </h1>
+        <p style="color: var(--text-muted);">تحليلات شاملة لأداء متجرك</p>
+    </div>
+    
+    <div class="reports-layout">
+        
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-chart-pie" style="font-size: 40px;"></i>
+                <h3 style="margin-top:10px;">التقارير</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard"><i class="fas fa-th-large"></i> لوحة المعلومات</a>
+                <a href="/admin/products"><i class="fas fa-boxes"></i> المنتجات</a>
+                <a href="/admin/categories"><i class="fas fa-folder-tree"></i> الأقسام</a>
+                <a href="/admin/orders"><i class="fas fa-receipt"></i> الطلبات</a>
+                <a href="/admin/customers"><i class="fas fa-users"></i> العملاء</a>
+                <a href="/admin/settings"><i class="fas fa-cog"></i> الإعدادات</a>
+                <a href="/admin/reports" class="active"><i class="fas fa-chart-bar"></i> التقارير</a>
+                <a href="/auth/logout" style="color: var(--danger-color);"><i class="fas fa-sign-out-alt"></i> خروج</a>
+            </nav>
+        </aside>
+        
+        <main>
+            
+            <%# أزرار اختيار نوع التقرير %>
+            <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                <a href="/admin/reports?type=sales" class="btn <%= type === 'sales' ? 'btn-primary' : 'btn-outline' %>">
+                    <i class="fas fa-shopping-cart"></i> المبيعات
+                </a>
+                <a href="/admin/reports?type=products" class="btn <%= type === 'products' ? 'btn-primary' : 'btn-outline' %>">
+                    <i class="fas fa-box"></i> المنتجات
+                </a>
+                <a href="/admin/reports?type=customers" class="btn <%= type === 'customers' ? 'btn-primary' : 'btn-outline' %>">
+                    <i class="fas fa-users"></i> العملاء
+                </a>
+                <a href="/admin/reports?type=orders" class="btn <%= type === 'orders' ? 'btn-primary' : 'btn-outline' %>">
+                    <i class="fas fa-receipt"></i> الطلبات
+                </a>
+            </div>
+            
+            <%# محتوى التقرير %>
+            <div class="report-card">
+                <h3 style="font-weight: 700; margin-bottom: 20px;">
+                    <%= type === 'sales' ? '📊 تقرير المبيعات' : type === 'products' ? '📦 تقرير المنتجات' : type === 'customers' ? '👥 تقرير العملاء' : '🧾 تقرير الطلبات' %>
+                </h3>
+                
+                <% if (type === 'sales' && reportData) { %>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                        <div class="stat-box">
+                            <h2><%= reportData.totalOrders || 0 %></h2>
+                            <p>إجمالي الطلبات</p>
+                        </div>
+                        <div class="stat-box">
+                            <h2><%= (reportData.totalRevenue || 0).toFixed(0) %> ر.س</h2>
+                            <p>إجمالي الإيرادات</p>
+                        </div>
+                        <div class="stat-box">
+                            <h2><%= (reportData.averageOrderValue || 0).toFixed(0) %> ر.س</h2>
+                            <p>متوسط قيمة الطلب</p>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <% if (type === 'products' && reportData && reportData.topProducts) { %>
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>المنتج</th><th>السعر</th><th>المبيعات</th><th>الإيرادات</th></tr>
+                        </thead>
+                        <tbody>
+                            <% reportData.topProducts.forEach(function(p, i) { %>
+                                <tr>
+                                    <td><%= i + 1 %></td>
+                                    <td><strong><%= p.name %></strong></td>
+                                    <td><%= p.price %> ر.س</td>
+                                    <td><%= p.sales || 0 %></td>
+                                    <td><%= (p.revenue || 0).toFixed(0) %> ر.س</td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+                
+                <% if (type === 'customers' && reportData && reportData.topCustomers) { %>
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>العميل</th><th>البريد</th><th>الطلبات</th><th>الإنفاق</th></tr>
+                        </thead>
+                        <tbody>
+                            <% reportData.topCustomers.forEach(function(c, i) { %>
+                                <tr>
+                                    <td><%= i + 1 %></td>
+                                    <td><strong><%= c.name %></strong></td>
+                                    <td><%= c.email %></td>
+                                    <td><%= c.totalOrders || 0 %></td>
+                                    <td><%= (c.totalSpent || 0).toFixed(0) %> ر.س</td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+                
+                <% if (!reportData || Object.keys(reportData).length === 0) { %>
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-chart-line" style="font-size: 50px; margin-bottom: 15px; display: block; opacity: 0.3;"></i>
+                        لا توجد بيانات كافية لهذا التقرير بعد.
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
