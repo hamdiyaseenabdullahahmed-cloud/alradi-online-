@@ -1,5 +1,6 @@
 <%# ============================================= %>
-<%# إعدادات المتجر الشاملة - نسخة مستقرة             %>
+<%# متجر الرعدي أون لاين - alradi-online          %>
+<%# لوحة تحكم المدير - إعدادات المتجر الشاملة        %>
 <%# ============================================= %>
 
 <%- include('../partials/header') %>
@@ -24,7 +25,7 @@
             <i class="fas fa-cog" style="color: var(--secondary-color); margin-left: 10px;"></i>
             إعدادات المتجر الشاملة
         </h1>
-        <p style="color: var(--text-muted);">تحكم في جميع جوانب متجر الرعدي أون لاين</p>
+        <p style="color: var(--text-muted);">تحكم في جميع جوانب متجر الرعدي أون لاين - كل التغييرات تحفظ مباشرة</p>
     </div>
     
     <div class="admin-layout">
@@ -66,6 +67,7 @@
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label class="form-label">🖼️ رابط شعار المتجر (رابط مباشر للصورة)</label>
                             <input type="text" name="storeLogoUrl" class="form-control" value="<%= settings.storeLogo || '' %>" placeholder="https://i.postimg.cc/xxxxx/logo.png">
+                            <small style="color: var(--text-muted);">ارفع صورتك على <a href="https://postimages.org" target="_blank">postimages.org</a> والصق الرابط المباشر هنا</small>
                             <% if (settings.storeLogo && settings.storeLogo.length > 10) { %>
                                 <img src="<%= settings.storeLogo %>" style="width:80px; height:80px; object-fit:cover; border-radius:50%; margin-top:10px; border:2px solid var(--gold-color);">
                             <% } %>
@@ -73,7 +75,7 @@
                     </div>
                 </div>
                 
-                <%# ========== 2. ألوان المتجر (تم إصلاحها) ========== %>
+                <%# ========== 2. ألوان المتجر (تم إصلاحها بالكامل) ========== %>
                 <div class="settings-section">
                     <h3><i class="fas fa-palette" style="color: var(--secondary-color); margin-left: 8px;"></i> ألوان المتجر</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
