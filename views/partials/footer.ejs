@@ -1,6 +1,6 @@
 <%# ============================================= %>
 <%# متجر الرعدي أون لاين - alradi-online          %>
-<%# تذييل الموقع الكامل والمطور مع الشات الذكي      %>
+<%# تذييل الموقع الكامل والمطور مع الشات الفعال    %>
 <%# ============================================= %>
 
     </main>
@@ -163,9 +163,16 @@
     </script>
     <% } %>
 
-<%# ========== نظام المحادثة الحية الفوري والذكي لمتجر الرعدي ========== %>
+<%# ========== نظام المحادثة الحية المربوط بلوحة التحكم بالكامل ========== %>
 <% if (user && user.role !== 'admin') { %>
 <style>
+    :root {
+        /* جلب قيم الألوان ديناميكياً وحقيقياً من قاعدة بيانات المتجر الموضحة بالصورة */
+        --store-primary: <%= store.primaryColor || '#1a1a2e' %>;
+        --store-secondary: <%= store.secondaryColor || '#400fff' %>;
+        --store-accent: <%= store.accentColor || '#d4af37' %>;
+    }
+
     .chat-widget-btn {
         position: fixed;
         bottom: 25px;
@@ -173,12 +180,12 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #1a1a2e, #0f3460);
-        color: #d4af37;
-        border: 2px solid #d4af37;
+        background: linear-gradient(135deg, var(--store-primary), var(--store-secondary));
+        color: var(--store-accent);
+        border: 2px solid var(--store-accent);
         cursor: pointer;
         font-size: 26px;
-        box-shadow: 0 8px 25px rgba(26,26,46,0.4);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         z-index: 999;
         display: flex;
         align-items: center;
@@ -186,8 +193,8 @@
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .chat-widget-btn:hover {
-        transform: scale(1.1) rotate(5deg);
-        box-shadow: 0 12px 30px rgba(212,175,55,0.4);
+        transform: scale(1.1);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
     .chat-widget-box {
         position: fixed;
@@ -197,7 +204,7 @@
         height: 480px;
         background: #ffffff;
         border-radius: 24px;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(212,175,55,0.2);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
         z-index: 998;
         display: none;
         flex-direction: column;
@@ -205,16 +212,16 @@
         border: 1px solid #ede8e0;
     }
     .chat-widget-header {
-        background: linear-gradient(135deg, #1a1a2e, #0f3460);
-        color: #d4af37;
+        background: linear-gradient(135deg, var(--store-primary), var(--store-secondary));
+        color: white;
         padding: 15px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 2px solid #d4af37;
+        border-bottom: 2px solid var(--store-accent);
     }
-    .chat-widget-header h4 { margin: 0; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;}
-    .chat-widget-header button { background: none; border: none; color: #d4af37; font-size: 18px; cursor: pointer; }
+    .chat-widget-header h4 { margin: 0; font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;}
+    .chat-widget-header button { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
     
     .chat-widget-messages {
         flex: 1;
@@ -232,24 +239,23 @@
         font-size: 13px;
         line-height: 1.6;
         position: relative;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
     
-    /* فقاعة العميل (أنت): يسار الشاشة بلون كحلي فخم */
+    /* فقاعة العميل (أنت): يسار الشاشة بلون لوحة التحكم المختار */
     .chat-widget-messages .message.sent {
-        background: linear-gradient(135deg, #1a1a2e, #0f3460);
+        background: linear-gradient(135deg, var(--store-primary), var(--store-secondary));
         color: white;
         align-self: flex-start;
         border-top-left-radius: 4px;
     }
     
-    /* فقاعة الإدارة والرد التلقائي: يمين الشاشة بلون ذهبي هادئ */
+    /* فقاعة الإدارة والرد التلقائي: يمين الشاشة بلون متباين */
     .chat-widget-messages .message.received {
-        background: linear-gradient(135deg, #fdf8e9, #f5eacb);
-        color: #4a3b1a;
+        background: #f0f0f5;
+        color: #333333;
         align-self: flex-end;
         border-top-right-radius: 4px;
-        border: 1px solid rgba(212,175,55,0.3);
+        border: 1px solid #ede8e0;
     }
     
     .chat-widget-messages .msg-time {
@@ -274,63 +280,59 @@
         padding: 12px 16px;
         border: 1px solid #e8e0d5;
         border-radius: 30px;
-        font-family: inherit;
-        font-size: 13px;
         outline: none;
-        background: #fbfbfa;
-    }
-    .chat-widget-form input:focus {
-        border-color: #d4af37;
-        background: #fff;
+        font-size: 13px;
     }
     .chat-widget-form button {
-        background: linear-gradient(135deg, #1a1a2e, #0f3460);
-        color: #d4af37;
-        border: 1px solid #d4af37;
+        background: linear-gradient(135deg, var(--store-primary), var(--store-secondary));
+        color: white;
+        border: none;
         width: 42px;
         height: 42px;
         border-radius: 50%;
         cursor: pointer;
-        font-size: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-    .chat-widget-form button:hover {
-        background: #d4af37;
-        color: #1a1a2e;
     }
     @media (max-width: 500px) {
         .chat-widget-box { width: 92vw; right: 4vw; bottom: 95px; height: 70vh; }
     }
 </style>
 
-<button class="chat-widget-btn" id="chatWidgetBtn" title="الدعم المباشر للمجلس الملكي">
+<button class="chat-widget-btn" id="chatWidgetBtn">
     <i class="fas fa-comments"></i>
 </button>
 
 <div class="chat-widget-box" id="chatWidgetBox">
     <div class="chat-widget-header">
-        <h4><i class="fas fa-headset"></i> المحادثة الفورية الفاخرة</h4>
+        <h4><i class="fas fa-headset"></i> المحادثة المباشرة للرعدي</h4>
         <button onclick="document.getElementById('chatWidgetBox').style.display='none'">
             <i class="fas fa-times"></i>
         </button>
     </div>
     <div class="chat-widget-messages" id="chatWidgetMessages">
         <div class="message received">
-            <strong>فريق الدعم الملكي:</strong><br>
-            مرحباً بك في مجموعة متاجر الرعدي أونلاين. يسعدنا ويشرفنا خدمتك، كيف يمكننا مساندتك اليوم؟
+            <strong>الدعم الفني:</strong><br>
+            مرحباً بك في متجرنا. كيف يمكننا مساعدتك اليوم؟
             <span class="msg-time"><%= new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'}) %></span>
         </div>
     </div>
     <form class="chat-widget-form" id="chatWidgetForm">
-        <input type="text" id="chatWidgetInput" placeholder="اكتب استفسارك الفاخر هنا..." autocomplete="off" required>
+        <input type="text" id="chatWidgetInput" placeholder="اكتب رسالتك هنا..." autocomplete="off" required>
         <button type="submit"><i class="fas fa-paper-plane"></i></button>
     </form>
 </div>
 
 <script>
 let autoReplyTimer = null; 
+
+// بروتوكول حتمي لربط العميل فوراً بغرفة المحادثة بالسيرفر عند تحميل الصفحة لكي يظهر في قائمة المدير
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof socket !== 'undefined' && socket && currentUserId) {
+        socket.emit('join-chat', { userId: currentUserId, userName: currentUserName });
+    }
+});
 
 document.getElementById('chatWidgetBtn').addEventListener('click', function() {
     const box = document.getElementById('chatWidgetBox');
@@ -349,7 +351,6 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
         const messagesDiv = document.getElementById('chatWidgetMessages');
         const currentTime = new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'});
         
-        // عرض رسالة العميل في جهة اليسار باللون الكحلي
         messagesDiv.innerHTML += `
             <div class="message sent">
                 <strong>أنت:</strong><br>${msg}
@@ -359,23 +360,28 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
         input.value = '';
         
-        // إرسال البيانات الحي عبر السوكيت
+        // إرسال حقيقي باستدعاء الأحداث الشائعة لـ DeepSeek لتصل للوحة الإدارة فوراً
         if (typeof socket !== 'undefined' && socket) {
-            socket.emit('send-message', { 
+            socket.emit('client-message', { 
+                userId: currentUserId,
+                userName: currentUserName,
+                message: msg
+            });
+            // كود احتياطي متوافق مع الأحداث البديلة
+            socket.emit('send-message', {
+                room: currentUserId,
                 senderId: currentUserId,
-                senderName: currentUserName,
                 content: msg,
                 isAdmin: false
             });
         }
 
-        // الرد التلقائي الذكي عند غياب رد المدير لـ 7 ثوانٍ
         if(autoReplyTimer) clearTimeout(autoReplyTimer);
         autoReplyTimer = setTimeout(function() {
             messagesDiv.innerHTML += `
-                <div class="message received" style="border-right: 4px solid #d4af37;">
-                    <strong>🤖 الرد التلقائي لآل الرعدي:</strong><br>
-                    عذراً على التأخر البسيط يا فندم، انشغالنا الحالي هو لتوفير أعلى جودة لكم. تم إشعار الإدارة العليا والمدير الفني برسالتك وسيتدخل أحد مستشارينا لمحادثتك حياً في أقرب دقيقة!
+                <div class="message received" style="border-right: 4px solid var(--store-accent);">
+                    <strong>🤖 الرد التلقائي:</strong><br>
+                    مرحباً بك، المدير حالياً يتابع طلبات أخرى فخمة. تم إرسال إشعار فوري لهاتفه وسيقوم بالرد عليك شخصياً حياً في أسرع وقت!
                     <span class="msg-time">${new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
             `;
@@ -384,17 +390,29 @@ document.getElementById('chatWidgetForm').addEventListener('submit', function(e)
     }
 });
 
-// استقبال ردود المدير وعرضها فوراً في جهة اليمين بالذهبي
 if (typeof socket !== 'undefined' && socket) {
-    socket.on('receive-message', function(data) {
+    // الاستماع لحدث استقبال رسائل المدير لعرضها في جهة اليمين
+    socket.on('admin-message', function(data) {
         if(autoReplyTimer) clearTimeout(autoReplyTimer);
-        
+        const messagesDiv = document.getElementById('chatWidgetMessages');
+        const currentTime = new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'});
+        messagesDiv.innerHTML += `
+            <div class="message received">
+                <strong>المدير:</strong><br>${data.message || data.content}
+                <span class="msg-time">${currentTime}</span>
+            </div>
+        `;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+    
+    socket.on('receive-message', function(data) {
         if (data.isAdmin) {
+            if(autoReplyTimer) clearTimeout(autoReplyTimer);
             const messagesDiv = document.getElementById('chatWidgetMessages');
             const currentTime = new Date().toLocaleTimeString('ar-SA', {hour: '2-digit', minute:'2-digit'});
             messagesDiv.innerHTML += `
                 <div class="message received">
-                    <strong>الإدارة العليا:</strong><br>${data.content}
+                    <strong>المدير:</strong><br>${data.content}
                     <span class="msg-time">${currentTime}</span>
                 </div>
             `;
