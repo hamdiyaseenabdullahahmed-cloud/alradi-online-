@@ -128,7 +128,7 @@ router.post('/login', isGuest, async (req, res) => {
         
     } catch (error) {
         // معالجة الأخطاء غير المتوقعة
-        console.error('خطأ في تسجيل الدخول:', error);
+        console.error('❌ خطأ في تسجيل الدخول:', error.message || error);
         req.flash('error_msg', 'حدث خطأ غير متوقع');
         return res.redirect('/auth/login');
     }
@@ -179,7 +179,7 @@ router.post('/register', isGuest, async (req, res) => {
         // التحقق من صحة اسم المستخدم (أحرف إنجليزية وأرقام فقط)
         const usernameRegex = /^[a-zA-Z0-9_]+$/;
         if (!usernameRegex.test(username)) {
-            req.flash('error_msg', 'اسم المستخدم: أحرف إنجليزية وأرقام فقط');
+            req.flash('error_msg', 'اسم المستخدم: أحرف إنجليزية وأرقام فقط بدون مسافات');
             return res.redirect('/auth/register');
         }
         
@@ -202,7 +202,8 @@ router.post('/register', isGuest, async (req, res) => {
             name: name.trim(), // اسم المستخدم
             username: username.toLowerCase().trim(), // اسم المستخدم (بحروف صغيرة)
             email: email.toLowerCase().trim(), // البريد الإلكتروني (بحروف صغيرة)
-            phone: phone ? phone.trim() : '', // رقم الهاتف (اختياري)
+            // استخدام undefined بدلاً من مسافة فارغة لتجنب خطأ التكرار في قاعدة البيانات
+            phone: phone && phone.trim() !== '' ? phone.trim() : undefined, 
             password: password, // كلمة المرور (سيتم تشفيرها تلقائياً في النموذج)
             role: 'customer', // دور المستخدم (عميل افتراضياً)
             isActive: true // تفعيل الحساب تلقائياً
@@ -234,8 +235,8 @@ router.post('/register', isGuest, async (req, res) => {
         return res.redirect('/');
         
     } catch (error) {
-        // معالجة أخطاء التحقق من الصحة
-        console.error('خطأ في إنشاء الحساب:', error);
+        // إضافة تفاصيل الخطأ للكونسول لتسهيل تتبعه في سجلات السيرفر
+        console.error('❌ تفاصيل خطأ إنشاء الحساب:', error.message || error);
         
         // معالجة أخطاء التحقق من الصحة (ValidationError)
         if (error.name === 'ValidationError') {
@@ -246,12 +247,14 @@ router.post('/register', isGuest, async (req, res) => {
         
         // معالجة أخطاء التكرار (Duplicate Key)
         if (error.code === 11000) {
-            req.flash('error_msg', 'البريد أو اسم المستخدم مسجل مسبقاً');
+            // جلب الحقل المتكرر لإظهار رسالة أدق
+            const duplicateField = Object.keys(error.keyValue)[0];
+            req.flash('error_msg', `عذراً، هذا الـ ${duplicateField} مسجل مسبقاً لدينا.`);
             return res.redirect('/auth/register');
         }
         
         // معالجة أي خطأ غير متوقع
-        req.flash('error_msg', 'حدث خطأ غير متوقع');
+        req.flash('error_msg', 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى.');
         return res.redirect('/auth/register');
     }
 });
@@ -264,7 +267,7 @@ router.post('/register', isGuest, async (req, res) => {
 router.get('/logout', (req, res) => {
     // تدمير الجلسة
     req.session.destroy((err) => {
-        if (err) console.error('خطأ في تسجيل الخروج:', err);
+        if (err) console.error('❌ خطأ في تسجيل الخروج:', err);
         res.clearCookie('connect.sid'); // مسح الكوكيز
         res.redirect('/auth/login'); // توجيه لصفحة تسجيل الدخول
     });
@@ -325,7 +328,7 @@ router.post('/forgot-password', isGuest, async (req, res) => {
         
     } catch (error) {
         // معالجة الأخطاء
-        console.error('خطأ في استعادة كلمة المرور:', error);
+        console.error('❌ خطأ في استعادة كلمة المرور:', error.message || error);
         req.flash('error_msg', 'حدث خطأ غير متوقع');
         return res.redirect('/auth/forgot-password');
     }
@@ -395,7 +398,7 @@ router.post('/verify-otp', isGuest, async (req, res) => {
         
     } catch (error) {
         // معالجة الأخطاء
-        console.error('خطأ في التحقق من OTP:', error);
+        console.error('❌ خطأ في التحقق من OTP:', error.message || error);
         req.flash('error_msg', 'حدث خطأ غير متوقع');
         return res.redirect('/auth/verify-otp');
     }
@@ -478,7 +481,7 @@ router.post('/reset-password', isGuest, async (req, res) => {
         
     } catch (error) {
         // معالجة الأخطاء
-        console.error('خطأ في إعادة تعيين كلمة المرور:', error);
+        console.error('❌ خطأ في إعادة تعيين كلمة المرور:', error.message || error);
         req.flash('error_msg', 'حدث خطأ غير متوقع');
         return res.redirect('/auth/reset-password');
     }
