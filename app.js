@@ -1,12 +1,13 @@
 // =============================================
 // متجر الرعدي أون لاين - Al-Radi Online
-// الملف الرئيسي للسيرفر | إصدار Premium Masterpiece
+// الملف الرئيسي للسيرفر | الإصدار النهائي مع حل الجلسات
 // =============================================
 
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-// const MongoStore = require('connect-mongo'); // <-- سيتم تفعيلها لاحقاً لحفظ الجلسات للأبد
+// [✅ التعديل السحري] استيراد مكتبة حفظ الجلسات في قاعدة البيانات
+const MongoStore = require('connect-mongo'); 
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const path = require('path');
@@ -17,10 +18,11 @@ const compression = require('compression');
 require('dotenv').config();
 
 const app = express();
-app.set('trust proxy', 1); // ثقة بروكسي Render الإجباري
+// [✅ مهم جداً] تفعيل الثقة بالخادم الوكيل (Render)
+app.set('trust proxy', 1); 
 
 // =============================================
-// 1. درع الحماية المتكامل (Security Shield)
+// 1. درع الحماية
 // =============================================
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(mongoSanitize());
@@ -28,7 +30,7 @@ app.use(xss());
 app.use(compression());
 
 // =============================================
-// 2. الاتصال بقاعدة البيانات وخلق البيانات الأولية
+// 2. الاتصال بقاعدة البيانات
 // =============================================
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/alradi_online';
 
@@ -38,7 +40,7 @@ mongoose.connect(MONGODB_URI).then(async () => {
         const User = require('./models/User');
         const StoreSettings = require('./models/StoreSettings');
         
-        // خلق إعدادات المتجر الافتراضية إذا لم تكن موجودة
+        // إعدادات المتجر الافتراضية
         if (!await StoreSettings.findOne()) {
             await new StoreSettings({
                 storeName: 'متجر الرعدي أون لاين',
@@ -46,17 +48,18 @@ mongoose.connect(MONGODB_URI).then(async () => {
                 shippingInternational: 75,
                 freeShippingMin: 300
             }).save();
-            console.log('⚙️ تم إنشاء إعدادات المتجر الافتراضية');
+            console.log('⚙️ تم إنشاء إعدادات المتجر');
         }
 
-        // خلق حساب المدير الأسطوري
+        // [✅ مهم] إنشاء حساب المدير تلقائياً (البريد: alradi@gmil.com / كلمة السر: admin123)
         const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmil.com';
+        const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
         if (!await User.findOne({ email: adminEmail })) {
             await new User({
                 name: 'مدير النظام',
                 username: 'AlRadiAdmin',
                 email: adminEmail,
-                password: process.env.ADMIN_PASSWORD || 'admin123',
+                password: adminPassword,
                 role: 'admin',
                 isActive: true
             }).save();
@@ -66,44 +69,45 @@ mongoose.connect(MONGODB_URI).then(async () => {
 }).catch(err => console.error('❌ فشل اتصال MongoDB:', err.message));
 
 // =============================================
-// 3. إعدادات المحرك والملفات (Engine & Storage)
+// 3. إعدادات المحرك والملفات
 // =============================================
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// حل سحري لدعم الصور المحلية والخارجية
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET || 'alradi-cookie-secret'));
 
 // =============================================
-// 4. جلسات المستخدم (مؤقتاً بالذاكرة)
+// 4. [✅ التعديل الأهم] إعدادات جلسات المستخدم (حفظ في MongoDB)
 // =============================================
 app.use(session({
     secret: process.env.SESSION_SECRET || 'alradi-thunder-secret',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,          // تم التعديل
+    saveUninitialized: false, // تم التعديل
+    // [✅ الكود السحري] هنا نقول للخادم يحفظ الجلسات في قاعدة البيانات بدل الذاكرة
+    store: MongoStore.create({
+        mongoUrl: MONGODB_URI,
+        ttl: 30 * 24 * 60 * 60 // صلاحية الجلسة 30 يوماً
+    }),
     cookie: {
-        secure: false, // false لأن Render يستخدم HTTP
+        secure: false, // يبقى false لأن Render يستخدم HTTP داخلياً
         httpOnly: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 يوماً
+        maxAge: 30 * 24 * 60 * 60 * 1000
     }
 }));
 
 app.use(flash());
 
 // =============================================
-// 5. متغيرات القوالب العامة (Template Variables)
+// 5. متغيرات القوالب العامة
 // =============================================
 app.use(async (req, res, next) => {
     try {
         const StoreSettings = require('./models/StoreSettings');
         let store = await StoreSettings.findOne() || { storeName: 'متجر الرعدي أون لاين', currency: 'SAR' };
         
-        // حساب عداد السلة بدقة
         let cartCount = 0;
         if (req.session && req.session.cart) {
             cartCount = req.session.cart.reduce((total, item) => total + (item.quantity || 0), 0);
@@ -121,7 +125,7 @@ app.use(async (req, res, next) => {
 });
 
 // =============================================
-// 6. تشغيل جميع المسارات (Routes)
+// 6. تشغيل المسارات
 // =============================================
 app.use('/', require('./routes/index'));
 app.use('/products', require('./routes/products'));
@@ -133,7 +137,7 @@ app.use('/chat', require('./routes/chat'));
 app.use('/api', require('./routes/api'));
 
 // =============================================
-// 7. معالجات الأخطاء (404 & 500)
+// 7. معالجة الأخطاء
 // =============================================
 app.use((req, res) => res.status(404).render('404', { pageTitle: 'الصفحة غير موجودة' }));
 app.use((err, req, res, next) => {
