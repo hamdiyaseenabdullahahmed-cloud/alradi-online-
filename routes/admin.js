@@ -1,6 +1,6 @@
 // =============================================
 // متجر الرعدي أون لاين - Al-Radi Online
-// مسارات لوحة تحكم المدير - الإصدار الكامل
+// مسارات لوحة تحكم المدير - النسخة المطورة الكاملة
 // =============================================
 
 const express = require('express');
@@ -15,8 +15,6 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const StoreSettings = require('../models/StoreSettings');
 const ErrorLog = require('../models/ErrorLog');
-const PDFDocument = require('pdfkit');
-const ExcelJS = require('exceljs');
 
 // =============================================
 // إعدادات رفع الملفات (Multer)
@@ -79,13 +77,14 @@ router.get('/dashboard', async (req, res) => {
             error_msg: req.flash('error_msg')
         });
     } catch (err) {
-        console.error(err);
+        console.error('❌ خطأ في لوحة التحكم:', err.message);
+        req.flash('error_msg', 'حدث خطأ في تحميل لوحة التحكم');
         res.redirect('/');
     }
 });
 
 // =============================================
-// 2. إدارة المنتجات (عرض، إضافة، تعديل، حذف)
+// 2. إدارة المنتجات
 // =============================================
 router.get('/products', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -139,7 +138,7 @@ router.post('/products/add', upload.array('images', 10), async (req, res) => {
         req.flash('success_msg', 'تم إضافة المنتج بنجاح ✅');
         res.redirect('/admin/products');
     } catch (err) {
-        console.error(err);
+        console.error('❌ خطأ في إضافة المنتج:', err.message);
         req.flash('error_msg', 'خطأ: ' + err.message);
         res.redirect('/admin/products/add');
     }
@@ -172,40 +171,197 @@ router.post('/products/edit/:id', upload.array('images', 10), async (req, res) =
         req.flash('success_msg', 'تم التحديث ✅');
         res.redirect('/admin/products');
     } catch (err) {
-        console.error(err);
+        console.error('❌ خطأ في تحديث المنتج:', err.message);
         req.flash('error_msg', 'خطأ: ' + err.message);
         res.redirect('back');
     }
 });
 
 router.delete('/products/delete/:id', async (req, res) => {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
 });
 
 // =============================================
-// 3. إدارة الأقسام
+// 3. إدارة الأقسام (المطورة والكاملة) 🔥
 // =============================================
+
+// عرض قائمة الأقسام
 router.get('/categories', async (req, res) => {
-    const categories = await Category.find().sort('order').populate('parent', 'name');
-    res.render('admin/categories', { pageTitle: 'إدارة الأقسام', categories, success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') });
+    try {
+        const categories = await Category.find().sort('order').populate('parent', 'name');
+        res.render('admin/categories', {
+            pageTitle: 'إدارة الأقسام',
+            categories,
+            success_msg: req.flash('success_msg'),
+            error_msg: req.flash('error_msg')
+        });
+    } catch (error) {
+        console.error('❌ خطأ في عرض الأقسام:', error.message);
+        req.flash('error_msg', 'حدث خطأ في تحميل الأقسام');
+        res.redirect('/admin/dashboard');
+    }
 });
 
+// عرض نموذج إضافة قسم جديد
 router.get('/categories/add', async (req, res) => {
-    const categories = await Category.find({ isActive: true }).select('name');
-    res.render('admin/category-form', { pageTitle: 'إضافة قسم', isEdit: false, category: null, categories, success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') });
+    try {
+        const categories = await Category.find({ isActive: true }).select('name _id');
+        res.render('admin/category-form', {
+            pageTitle: 'إضافة قسم جديد',
+            isEdit: false,
+            category: null,
+            categories,
+            success_msg: req.flash('success_msg'),
+            error_msg: req.flash('error_msg')
+        });
+    } catch (error) {
+        console.error('❌ خطأ في عرض نموذج الإضافة:', error.message);
+        req.flash('error_msg', 'حدث خطأ');
+        res.redirect('/admin/categories');
+    }
 });
 
+// معالجة إضافة قسم جديد (نسخة مطورة بالكامل)
 router.post('/categories/add', async (req, res) => {
-    const { name, isActive, isFeatured, showInMenu, icon } = req.body;
-    await Category.create({ name, isActive: isActive === 'on', isFeatured: isFeatured === 'on', showInMenu: showInMenu === 'on', icon: icon || 'fa-folder' });
-    req.flash('success_msg', 'تم إضافة القسم ✅');
-    res.redirect('/admin/categories');
+    try {
+        const { name, nameEn, description, icon, order, parent, isActive, isFeatured, showInMenu } = req.body;
+
+        // =============================================
+        // [🔥 التحقق الأساسي] هل اسم القسم موجود؟
+        // =============================================
+        if (!name || name.trim() === '') {
+            req.flash('error_msg', 'اسم القسم مطلوب');
+            return res.redirect('/admin/categories/add');
+        }
+
+        // =============================================
+        // [🔥 التحقق من التكرار] هل يوجد قسم بنفس الاسم؟
+        // =============================================
+        const existingCategory = await Category.findOne({ name: name.trim() });
+        if (existingCategory) {
+            req.flash('error_msg', 'يوجد قسم بنفس الاسم بالفعل، اختر اسماً آخر');
+            return res.redirect('/admin/categories/add');
+        }
+
+        // =============================================
+        // إنشاء القسم الجديد
+        // =============================================
+        const newCategory = new Category({
+            name: name.trim(),
+            nameEn: nameEn ? nameEn.trim() : '',
+            description: description || '',
+            icon: icon || 'fa-folder',
+            order: parseInt(order) || 0,
+            parent: parent || null,
+            isActive: isActive === 'on',
+            isFeatured: isFeatured === 'on',
+            showInMenu: showInMenu === 'on'
+        });
+
+        await newCategory.save();
+
+        console.log('✅ تم إضافة قسم جديد: ' + newCategory.name);
+        req.flash('success_msg', 'تم إضافة القسم "' + newCategory.name + '" بنجاح ✅');
+        res.redirect('/admin/categories');
+
+    } catch (error) {
+        console.error('❌ خطأ في إضافة القسم:', error.message);
+        req.flash('error_msg', 'حدث خطأ أثناء إضافة القسم: ' + error.message);
+        res.redirect('/admin/categories/add');
+    }
 });
 
+// عرض نموذج تعديل قسم
+router.get('/categories/edit/:id', async (req, res) => {
+    try {
+        const category = await Category.findById(req.params.id);
+        if (!category) {
+            req.flash('error_msg', 'القسم غير موجود');
+            return res.redirect('/admin/categories');
+        }
+        const categories = await Category.find({ isActive: true, _id: { $ne: category._id } }).select('name _id');
+        res.render('admin/category-form', {
+            pageTitle: 'تعديل القسم',
+            isEdit: true,
+            category,
+            categories,
+            success_msg: req.flash('success_msg'),
+            error_msg: req.flash('error_msg')
+        });
+    } catch (error) {
+        console.error('❌ خطأ في عرض نموذج التعديل:', error.message);
+        req.flash('error_msg', 'حدث خطأ');
+        res.redirect('/admin/categories');
+    }
+});
+
+// معالجة تعديل قسم
+router.post('/categories/edit/:id', async (req, res) => {
+    try {
+        const category = await Category.findById(req.params.id);
+        if (!category) {
+            req.flash('error_msg', 'القسم غير موجود');
+            return res.redirect('/admin/categories');
+        }
+
+        const { name, nameEn, description, icon, order, parent, isActive, isFeatured, showInMenu } = req.body;
+
+        // التحقق من وجود اسم
+        if (!name || name.trim() === '') {
+            req.flash('error_msg', 'اسم القسم مطلوب');
+            return res.redirect('/admin/categories/edit/' + req.params.id);
+        }
+
+        // التحقق من عدم تكرار الاسم (باستثناء نفسه)
+        const existingCategory = await Category.findOne({ name: name.trim(), _id: { $ne: category._id } });
+        if (existingCategory) {
+            req.flash('error_msg', 'يوجد قسم بنفس الاسم بالفعل');
+            return res.redirect('/admin/categories/edit/' + req.params.id);
+        }
+
+        // تحديث البيانات
+        category.name = name.trim();
+        category.nameEn = nameEn ? nameEn.trim() : '';
+        category.description = description || '';
+        category.icon = icon || 'fa-folder';
+        category.order = parseInt(order) || 0;
+        category.parent = parent || null;
+        category.isActive = isActive === 'on';
+        category.isFeatured = isFeatured === 'on';
+        category.showInMenu = showInMenu === 'on';
+
+        await category.save();
+
+        console.log('✅ تم تحديث القسم: ' + category.name);
+        req.flash('success_msg', 'تم تحديث القسم "' + category.name + '" بنجاح ✅');
+        res.redirect('/admin/categories');
+
+    } catch (error) {
+        console.error('❌ خطأ في تحديث القسم:', error.message);
+        req.flash('error_msg', 'حدث خطأ أثناء تحديث القسم: ' + error.message);
+        res.redirect('/admin/categories/edit/' + req.params.id);
+    }
+});
+
+// حذف قسم
 router.delete('/categories/delete/:id', async (req, res) => {
-    await Category.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        const category = await Category.findById(req.params.id);
+        if (!category) {
+            return res.json({ success: false, message: 'القسم غير موجود' });
+        }
+        await Category.findByIdAndDelete(req.params.id);
+        console.log('🗑️ تم حذف القسم: ' + category.name);
+        res.json({ success: true, message: 'تم حذف القسم بنجاح' });
+    } catch (error) {
+        console.error('❌ خطأ في حذف القسم:', error.message);
+        res.json({ success: false, message: error.message });
+    }
 });
 
 // =============================================
@@ -271,7 +427,7 @@ router.get('/customers/:id', async (req, res) => {
 });
 
 // =============================================
-// 6. إعدادات المتجر المتقدمة (شعار، صوتيات، ألوان...)
+// 6. إعدادات المتجر
 // =============================================
 router.get('/settings', async (req, res) => {
     const settings = await StoreSettings.getSettings();
@@ -291,21 +447,17 @@ router.post('/settings', upload.fields([
 ]), async (req, res) => {
     try {
         const updateData = { ...req.body };
-        // تحويل checkboxes
         ['voiceGreetingEnabled', 'voiceInteractionsEnabled'].forEach(f => updateData[f] = req.body[f] === 'on');
 
-        // رفع الشعار
         if (req.files?.storeLogo?.[0]) {
             updateData.storeLogo = '/' + req.files.storeLogo[0].path.replace(/\\/g, '/').replace('public/', '');
         }
-        // رفع الصوتيات
         ['voiceGreeting', 'voiceAddToCart', 'voiceSave', 'voicePrint', 'voiceSort', 'voiceSuccess', 'voiceError', 'voiceNotification'].forEach(f => {
             const field = f + 'File';
             if (req.files?.[field]?.[0]) {
                 updateData[field] = '/' + req.files[field][0].path.replace(/\\/g, '/').replace('public/', '');
             }
         });
-        // روابط صوتية مباشرة
         ['voiceGreetingUrl', 'voiceAddToCartUrl', 'voiceSaveUrl', 'voicePrintUrl', 'voiceSortUrl', 'voiceSuccessUrl', 'voiceErrorUrl', 'voiceNotificationUrl'].forEach(urlField => {
             if (req.body[urlField]?.trim()) {
                 const dbField = urlField.replace('Url', 'File');
@@ -317,20 +469,22 @@ router.post('/settings', upload.fields([
         req.flash('success_msg', 'تم حفظ الإعدادات بنجاح ✅');
         res.redirect('/admin/settings');
     } catch (err) {
-        console.error(err);
+        console.error('❌ خطأ في حفظ الإعدادات:', err.message);
         req.flash('error_msg', 'خطأ في الحفظ: ' + err.message);
         res.redirect('/admin/settings');
     }
 });
 
 // =============================================
-// 7. الأدوات الأخرى (المحادثات، السجلات، التقارير)
+// 7. الأدوات الأخرى
 // =============================================
 router.get('/chat', (req, res) => res.render('admin/chat', { pageTitle: 'المحادثات', success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') }));
+
 router.get('/activity-log', async (req, res) => {
     const errors = await ErrorLog.find().sort('-createdAt').limit(50);
     res.render('admin/activity-log', { pageTitle: 'سجل النشاطات', errors, success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') });
 });
+
 router.get('/reports', (req, res) => res.render('admin/reports', { pageTitle: 'التقارير', success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') }));
 
 module.exports = router;
