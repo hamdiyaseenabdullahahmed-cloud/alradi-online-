@@ -1,13 +1,12 @@
 // =============================================
 // متجر الرعدي أون لاين - Al-Radi Online
-// الملف الرئيسي للسيرفر | الإصدار النهائي مع حل الجلسات
+// الملف الرئيسي للسيرفر (نسخة مطورة مع إعادة تعيين كلمة المرور)
 // =============================================
 
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-// [✅ التعديل السحري] استيراد مكتبة حفظ الجلسات في قاعدة البيانات
-const MongoStore = require('connect-mongo'); 
+const MongoStore = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const path = require('path');
@@ -18,8 +17,7 @@ const compression = require('compression');
 require('dotenv').config();
 
 const app = express();
-// [✅ مهم جداً] تفعيل الثقة بالخادم الوكيل (Render)
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1);
 
 // =============================================
 // 1. درع الحماية
@@ -51,20 +49,32 @@ mongoose.connect(MONGODB_URI).then(async () => {
             console.log('⚙️ تم إنشاء إعدادات المتجر');
         }
 
-        // [✅ مهم] إنشاء حساب المدير تلقائياً (البريد: alradi@gmil.com / كلمة السر: admin123)
-        const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmil.com';
+        // =============================================
+        // [🔥 التعديل السحري] إعادة تعيين كلمة مرور المدير
+        // =============================================
+        const adminEmail = process.env.ADMIN_EMAIL || 'alradi@gmail.com';
         const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-        if (!await User.findOne({ email: adminEmail })) {
-            await new User({
+        
+        let adminUser = await User.findOne({ email: adminEmail });
+        if (!adminUser) {
+            // إنشاء حساب المدير إذا لم يكن موجوداً
+            adminUser = new User({
                 name: 'مدير النظام',
                 username: 'AlRadiAdmin',
                 email: adminEmail,
                 password: adminPassword,
                 role: 'admin',
                 isActive: true
-            }).save();
+            });
+            await adminUser.save();
             console.log('👑 تم إنشاء حساب المدير. البريد: ' + adminEmail);
+        } else {
+            // ✅ إعادة تعيين كلمة المرور إلى admin123
+            adminUser.password = adminPassword;
+            await adminUser.save();
+            console.log('🔄 تم إعادة تعيين كلمة مرور المدير إلى: ' + adminPassword);
         }
+
     } catch (err) { console.error('خطأ في التهيئة:', err.message); }
 }).catch(err => console.error('❌ فشل اتصال MongoDB:', err.message));
 
@@ -80,19 +90,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET || 'alradi-cookie-secret'));
 
 // =============================================
-// 4. [✅ التعديل الأهم] إعدادات جلسات المستخدم (حفظ في MongoDB)
+// 4. إعدادات الجلسات (حفظ في MongoDB)
 // =============================================
 app.use(session({
     secret: process.env.SESSION_SECRET || 'alradi-thunder-secret',
-    resave: false,          // تم التعديل
-    saveUninitialized: false, // تم التعديل
-    // [✅ الكود السحري] هنا نقول للخادم يحفظ الجلسات في قاعدة البيانات بدل الذاكرة
+    resave: false,
+    saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: MONGODB_URI,
-        ttl: 30 * 24 * 60 * 60 // صلاحية الجلسة 30 يوماً
+        ttl: 30 * 24 * 60 * 60
     }),
     cookie: {
-        secure: false, // يبقى false لأن Render يستخدم HTTP داخلياً
+        secure: false,
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000
     }
