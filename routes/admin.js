@@ -1,7 +1,7 @@
-// =============================================
+// ============================================================
 // متجر الرعدي أون لاين - Al-Radi Online
-// مسارات لوحة تحكم المدير - النسخة المطورة الكاملة
-// =============================================
+// مسارات لوحة تحكم المدير - الإصدار العملاق المطور
+// ============================================================
 
 const express = require('express');
 const router = express.Router();
@@ -16,9 +16,9 @@ const User = require('../models/User');
 const StoreSettings = require('../models/StoreSettings');
 const ErrorLog = require('../models/ErrorLog');
 
-// =============================================
+// ============================================================
 // إعدادات رفع الملفات (Multer)
-// =============================================
+// ============================================================
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         let dir = 'public/uploads/';
@@ -37,9 +37,9 @@ const upload = multer({ storage });
 // تطبيق middleware المشدد
 router.use(isAdmin);
 
-// =============================================
-// 1. لوحة المعلومات الرئيسية
-// =============================================
+// ============================================================
+// 1. لوحة المعلومات الرئيسية (Dashboard)
+// ============================================================
 router.get('/dashboard', async (req, res) => {
     try {
         const today = new Date(); today.setHours(0,0,0,0);
@@ -83,9 +83,9 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-// =============================================
-// 2. إدارة المنتجات
-// =============================================
+// ============================================================
+// 2. إدارة المنتجات (كاملة ومطورة)
+// ============================================================
 router.get('/products', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
@@ -186,14 +186,18 @@ router.delete('/products/delete/:id', async (req, res) => {
     }
 });
 
-// =============================================
-// 3. إدارة الأقسام (المطورة والكاملة) 🔥
-// =============================================
+// ============================================================
+// 3. إدارة الأقسام (النسخة العملاقة المطورة) 🔥🔥🔥
+// ============================================================
 
-// عرض قائمة الأقسام
+// عرض قائمة الأقسام مع عدد المنتجات في كل قسم
 router.get('/categories', async (req, res) => {
     try {
         const categories = await Category.find().sort('order').populate('parent', 'name');
+        // حساب عدد المنتجات في كل قسم
+        for (let cat of categories) {
+            cat.productCount = await Product.countDocuments({ category: cat._id, isActive: true });
+        }
         res.render('admin/categories', {
             pageTitle: 'إدارة الأقسام',
             categories,
@@ -207,15 +211,20 @@ router.get('/categories', async (req, res) => {
     }
 });
 
-// عرض نموذج إضافة قسم جديد
+// عرض نموذج إضافة قسم جديد (مع ترتيب تلقائي)
 router.get('/categories/add', async (req, res) => {
     try {
-        const categories = await Category.find({ isActive: true }).select('name _id');
+        const categories = await Category.find({ isActive: true }).select('name _id order').sort('order');
+        // حساب الترتيب التلقائي للقسم الجديد (أعلى ترتيب موجود + 1)
+        const maxOrder = await Category.findOne().sort('-order').select('order');
+        const nextOrder = (maxOrder && maxOrder.order !== undefined) ? maxOrder.order + 1 : 1;
+        
         res.render('admin/category-form', {
             pageTitle: 'إضافة قسم جديد',
             isEdit: false,
             category: null,
             categories,
+            nextOrder, // إرسال الترتيب التلقائي للواجهة
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
@@ -226,37 +235,46 @@ router.get('/categories/add', async (req, res) => {
     }
 });
 
-// معالجة إضافة قسم جديد (نسخة مطورة بالكامل)
+// معالجة إضافة قسم جديد (نسخة عملاقة مع كل التحسينات)
 router.post('/categories/add', async (req, res) => {
     try {
         const { name, nameEn, description, icon, order, parent, isActive, isFeatured, showInMenu } = req.body;
 
-        // =============================================
+        // ============================================================
         // [🔥 التحقق الأساسي] هل اسم القسم موجود؟
-        // =============================================
+        // ============================================================
         if (!name || name.trim() === '') {
-            req.flash('error_msg', 'اسم القسم مطلوب');
+            req.flash('error_msg', '⚠️ اسم القسم مطلوب');
             return res.redirect('/admin/categories/add');
         }
 
-        // =============================================
+        // ============================================================
         // [🔥 التحقق من التكرار] هل يوجد قسم بنفس الاسم؟
-        // =============================================
-        const existingCategory = await Category.findOne({ name: name.trim() });
+        // ============================================================
+        const existingCategory = await Category.findOne({ name: { $regex: new RegExp('^' + name.trim() + '$', 'i') } });
         if (existingCategory) {
-            req.flash('error_msg', 'يوجد قسم بنفس الاسم بالفعل، اختر اسماً آخر');
+            req.flash('error_msg', '⚠️ يوجد قسم بنفس الاسم بالفعل، اختر اسماً آخر');
             return res.redirect('/admin/categories/add');
         }
 
-        // =============================================
+        // ============================================================
+        // [🔥 حساب الترتيب التلقائي] إذا لم يرسل المستخدم ترتيباً
+        // ============================================================
+        let finalOrder = parseInt(order) || 0;
+        if (finalOrder === 0) {
+            const maxOrder = await Category.findOne().sort('-order').select('order');
+            finalOrder = (maxOrder && maxOrder.order !== undefined) ? maxOrder.order + 1 : 1;
+        }
+
+        // ============================================================
         // إنشاء القسم الجديد
-        // =============================================
+        // ============================================================
         const newCategory = new Category({
             name: name.trim(),
             nameEn: nameEn ? nameEn.trim() : '',
             description: description || '',
             icon: icon || 'fa-folder',
-            order: parseInt(order) || 0,
+            order: finalOrder,
             parent: parent || null,
             isActive: isActive === 'on',
             isFeatured: isFeatured === 'on',
@@ -265,13 +283,13 @@ router.post('/categories/add', async (req, res) => {
 
         await newCategory.save();
 
-        console.log('✅ تم إضافة قسم جديد: ' + newCategory.name);
-        req.flash('success_msg', 'تم إضافة القسم "' + newCategory.name + '" بنجاح ✅');
+        console.log('✅ تم إضافة قسم جديد: ' + newCategory.name + ' (الترتيب: ' + finalOrder + ')');
+        req.flash('success_msg', '✅ تم إضافة القسم "' + newCategory.name + '" بنجاح (الترتيب: ' + finalOrder + ')');
         res.redirect('/admin/categories');
 
     } catch (error) {
         console.error('❌ خطأ في إضافة القسم:', error.message);
-        req.flash('error_msg', 'حدث خطأ أثناء إضافة القسم: ' + error.message);
+        req.flash('error_msg', '❌ حدث خطأ أثناء إضافة القسم: ' + error.message);
         res.redirect('/admin/categories/add');
     }
 });
@@ -284,12 +302,13 @@ router.get('/categories/edit/:id', async (req, res) => {
             req.flash('error_msg', 'القسم غير موجود');
             return res.redirect('/admin/categories');
         }
-        const categories = await Category.find({ isActive: true, _id: { $ne: category._id } }).select('name _id');
+        const categories = await Category.find({ isActive: true, _id: { $ne: category._id } }).select('name _id order');
         res.render('admin/category-form', {
             pageTitle: 'تعديل القسم',
             isEdit: true,
             category,
             categories,
+            nextOrder: category.order || 0,
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg')
         });
@@ -313,14 +332,17 @@ router.post('/categories/edit/:id', async (req, res) => {
 
         // التحقق من وجود اسم
         if (!name || name.trim() === '') {
-            req.flash('error_msg', 'اسم القسم مطلوب');
+            req.flash('error_msg', '⚠️ اسم القسم مطلوب');
             return res.redirect('/admin/categories/edit/' + req.params.id);
         }
 
         // التحقق من عدم تكرار الاسم (باستثناء نفسه)
-        const existingCategory = await Category.findOne({ name: name.trim(), _id: { $ne: category._id } });
+        const existingCategory = await Category.findOne({ 
+            name: { $regex: new RegExp('^' + name.trim() + '$', 'i') },
+            _id: { $ne: category._id }
+        });
         if (existingCategory) {
-            req.flash('error_msg', 'يوجد قسم بنفس الاسم بالفعل');
+            req.flash('error_msg', '⚠️ يوجد قسم بنفس الاسم بالفعل');
             return res.redirect('/admin/categories/edit/' + req.params.id);
         }
 
@@ -338,23 +360,33 @@ router.post('/categories/edit/:id', async (req, res) => {
         await category.save();
 
         console.log('✅ تم تحديث القسم: ' + category.name);
-        req.flash('success_msg', 'تم تحديث القسم "' + category.name + '" بنجاح ✅');
+        req.flash('success_msg', '✅ تم تحديث القسم "' + category.name + '" بنجاح');
         res.redirect('/admin/categories');
 
     } catch (error) {
         console.error('❌ خطأ في تحديث القسم:', error.message);
-        req.flash('error_msg', 'حدث خطأ أثناء تحديث القسم: ' + error.message);
+        req.flash('error_msg', '❌ حدث خطأ أثناء تحديث القسم: ' + error.message);
         res.redirect('/admin/categories/edit/' + req.params.id);
     }
 });
 
-// حذف قسم
+// حذف قسم مع التحقق من وجود منتجات تابعة له
 router.delete('/categories/delete/:id', async (req, res) => {
     try {
         const category = await Category.findById(req.params.id);
         if (!category) {
             return res.json({ success: false, message: 'القسم غير موجود' });
         }
+
+        // التحقق من وجود منتجات تابعة لهذا القسم
+        const productsCount = await Product.countDocuments({ category: category._id });
+        if (productsCount > 0) {
+            return res.json({ 
+                success: false, 
+                message: `لا يمكن حذف هذا القسم لأنه يحتوي على ${productsCount} منتج(ـات) تابعة له. قم بنقل المنتجات أو حذفها أولاً.` 
+            });
+        }
+
         await Category.findByIdAndDelete(req.params.id);
         console.log('🗑️ تم حذف القسم: ' + category.name);
         res.json({ success: true, message: 'تم حذف القسم بنجاح' });
@@ -364,9 +396,9 @@ router.delete('/categories/delete/:id', async (req, res) => {
     }
 });
 
-// =============================================
+// ============================================================
 // 4. إدارة الطلبات
-// =============================================
+// ============================================================
 router.get('/orders', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
@@ -399,9 +431,9 @@ router.post('/orders/update-status/:id', async (req, res) => {
     res.json({ success: true });
 });
 
-// =============================================
+// ============================================================
 // 5. إدارة العملاء
-// =============================================
+// ============================================================
 router.get('/customers', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
@@ -426,9 +458,9 @@ router.get('/customers/:id', async (req, res) => {
     res.render('admin/customer-detail', { pageTitle: 'تفاصيل العميل', customer, orders, success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') });
 });
 
-// =============================================
+// ============================================================
 // 6. إعدادات المتجر
-// =============================================
+// ============================================================
 router.get('/settings', async (req, res) => {
     const settings = await StoreSettings.getSettings();
     res.render('admin/settings', { pageTitle: 'إعدادات المتجر', settings, success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') });
@@ -475,9 +507,9 @@ router.post('/settings', upload.fields([
     }
 });
 
-// =============================================
-// 7. الأدوات الأخرى
-// =============================================
+// ============================================================
+// 7. الأدوات الأخرى (المحادثات، السجلات، التقارير)
+// ============================================================
 router.get('/chat', (req, res) => res.render('admin/chat', { pageTitle: 'المحادثات', success_msg: req.flash('success_msg'), error_msg: req.flash('error_msg') }));
 
 router.get('/activity-log', async (req, res) => {
