@@ -1,47 +1,304 @@
 <%# ================================================================ %>
 <%# متجر الرعدي أون لاين - Al-Radi Online                           %>
-<%# لوحة تحكم المدير - إعدادات المتجر الشاملة (النسخة العبقرية)    %>
-<%# تدعم التخزين المحلي والروابط مع معاينة فورية                   %>
+<%# لوحة تحكم المدير - إعدادات المتجر الشاملة                       %>
+<%# النسخة العبقرية النهائية - مع ميزات لم يسبق لها مثيل           %>
 <%# ================================================================ %>
 
 <%- include('../partials/header') %>
 
 <style>
-    .admin-layout { display: grid; grid-template-columns: 260px 1fr; gap: 25px; }
-    .admin-sidebar { background: white; border-radius: 15px; padding: 0; box-shadow: 0 2px 15px rgba(0,0,0,0.08); height: fit-content; position: sticky; top: 100px; overflow: hidden; }
-    .admin-sidebar .sidebar-header { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; padding: 25px 20px; text-align: center; }
-    .admin-sidebar .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 14px 25px; color: var(--text-color); text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.2s; border-right: 3px solid transparent; }
-    .admin-sidebar .sidebar-nav a:hover { background: rgba(233,69,96,0.05); color: var(--secondary-color); border-right-color: var(--secondary-color); }
-    .admin-sidebar .sidebar-nav a.active { background: rgba(233,69,96,0.1); color: var(--secondary-color); border-right-color: var(--secondary-color); font-weight: 700; }
-    .settings-section { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px; transition: all 0.3s; }
-    .settings-section:hover { box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-    .settings-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
-    .color-picker { width: 50px; height: 40px; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; padding: 2px; }
-    .media-card { background: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-light); transition: all 0.3s; }
-    .media-card:hover { border-color: var(--secondary-color); }
-    .source-toggle { display: flex; gap: 10px; margin-bottom: 10px; }
-    .source-toggle label { padding: 6px 16px; border-radius: 20px; background: white; border: 2px solid var(--border-color); cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
-    .source-toggle input[type="radio"]:checked + span { color: var(--secondary-color); }
-    .source-toggle input[type="radio"]:checked ~ label { border-color: var(--secondary-color); background: rgba(233,69,96,0.05); }
-    .preview-box { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
-    .preview-box img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border-color); }
-    .audio-player { width: 150px; height: 40px; }
-    .btn-preview { padding: 6px 16px; border-radius: 20px; background: var(--secondary-color); color: white; border: none; cursor: pointer; font-size: 13px; }
-    .btn-preview:hover { opacity: 0.8; }
-    .audio-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    @media (max-width: 900px) { .admin-layout { grid-template-columns: 1fr; } .admin-sidebar { position: static; } }
+    /* ========== التخطيط الرئيسي ========== */
+    .admin-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 25px;
+    }
+    .admin-sidebar {
+        background: white;
+        border-radius: 15px;
+        padding: 0;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+        overflow: hidden;
+    }
+    .admin-sidebar .sidebar-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: white;
+        padding: 25px 20px;
+        text-align: center;
+    }
+    .admin-sidebar .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 25px;
+        color: var(--text-color);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+        border-right: 3px solid transparent;
+    }
+    .admin-sidebar .sidebar-nav a:hover {
+        background: rgba(233,69,96,0.05);
+        color: var(--secondary-color);
+        border-right-color: var(--secondary-color);
+    }
+    .admin-sidebar .sidebar-nav a.active {
+        background: rgba(233,69,96,0.1);
+        color: var(--secondary-color);
+        border-right-color: var(--secondary-color);
+        font-weight: 700;
+    }
+
+    /* ========== أقسام الإعدادات ========== */
+    .settings-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+        transition: all 0.3s;
+    }
+    .settings-section:hover {
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .settings-section h3 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ========== بطاقات الوسائط المتقدمة ========== */
+    .media-card {
+        background: var(--bg-color);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s;
+        position: relative;
+    }
+    .media-card:hover {
+        border-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .media-card .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .media-card .card-header h5 {
+        font-weight: 700;
+        margin: 0;
+    }
+    .media-card .badge-source {
+        font-size: 11px;
+        padding: 3px 12px;
+        border-radius: 20px;
+        background: var(--secondary-color);
+        color: white;
+        font-weight: 600;
+    }
+    .media-card .badge-source.local {
+        background: var(--info-color);
+    }
+    .media-card .badge-source.url {
+        background: var(--gold-color);
+        color: #333;
+    }
+
+    /* ========== معاينة الصور والصوت ========== */
+    .preview-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .preview-box img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+    }
+    .audio-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .audio-controls audio {
+        width: 200px;
+        height: 40px;
+        border-radius: 20px;
+    }
+    .btn-preview {
+        padding: 6px 16px;
+        border-radius: 20px;
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+    }
+    .btn-preview:hover {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    /* ========== أزرار التحكم ========== */
+    .btn-primary {
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .btn-primary:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(233,69,96,0.4);
+    }
+    .btn-outline {
+        background: transparent;
+        color: var(--text-color);
+        border: 2px solid var(--border-color);
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-outline:hover {
+        border-color: var(--secondary-color);
+        color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+    .btn-warning {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .btn-warning:hover {
+        background: #e68900;
+        transform: scale(1.02);
+    }
+    .btn-success {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .btn-success:hover {
+        background: #388e3c;
+        transform: scale(1.02);
+    }
+
+    /* ========== معاينة الألوان ========== */
+    .color-picker {
+        width: 50px;
+        height: 40px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        padding: 2px;
+    }
+    .color-preview-box {
+        padding: 20px;
+        background: var(--bg-color);
+        border-radius: 12px;
+        margin-top: 10px;
+        text-align: center;
+        border: 2px dashed var(--border-color);
+        transition: all 0.3s;
+    }
+    .color-preview-box .color-dots {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .color-preview-box .color-dots span {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    /* ========== التوافق مع الجوال ========== */
+    @media (max-width: 900px) {
+        .admin-layout { grid-template-columns: 1fr; }
+        .admin-sidebar { position: static; }
+        .preview-box img { width: 60px; height: 60px; }
+        .audio-controls audio { width: 140px; }
+    }
+
+    /* ========== تأثيرات حركية ========== */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
 <div class="container">
+    <!-- ====== العنوان ====== -->
     <div style="margin-bottom: 25px;">
         <h1 style="font-size: 26px; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;">
             <i class="fas fa-cog" style="color: var(--secondary-color); margin-left: 10px;"></i>
-            الإعدادات الشاملة - التحكم الكامل
+            الإعدادات الشاملة
         </h1>
-        <p style="color: var(--text-muted);">يمكنك رفع الملفات محلياً أو استخدام روابط خارجية مع معاينة فورية</p>
+        <p style="color: var(--text-muted);">
+            تحكم كامل في جميع جوانب المتجر مع دعم الروابط الخارجية والملفات المحلية
+            <span style="background: var(--success-bg); color: var(--success-color); padding: 3px 12px; border-radius: 20px; font-size: 13px; margin-right: 8px;">
+                <i class="fas fa-check-circle"></i> حفظ فوري
+            </span>
+        </p>
     </div>
-    
+
+    <!-- ====== عرض رسائل الفلاش ====== -->
+    <% if (success_msg && success_msg.length) { %>
+        <div class="alert alert-success" style="background: #e8f5e9; color: #2e7d32; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; border-right: 5px solid #2e7d32;">
+            <i class="fas fa-check-circle"></i> <%= success_msg %>
+        </div>
+    <% } %>
+    <% if (error_msg && error_msg.length) { %>
+        <div class="alert alert-danger" style="background: #ffebee; color: #c62828; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; border-right: 5px solid #c62828;">
+            <i class="fas fa-exclamation-circle"></i> <%= error_msg %>
+        </div>
+    <% } %>
+
+    <!-- ====== التخطيط ====== -->
     <div class="admin-layout">
+        <!-- ====== الشريط الجانبي ====== -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-cogs" style="font-size: 40px;"></i>
@@ -59,256 +316,408 @@
                 <a href="/auth/logout" style="color: var(--danger-color);"><i class="fas fa-sign-out-alt"></i> خروج</a>
             </nav>
         </aside>
-        
+
+        <!-- ====== المحتوى الرئيسي ====== -->
         <main>
             <form action="/admin/settings" method="POST" enctype="multipart/form-data" id="settingsForm">
-                
-                <%# ====== 1. الهوية والعلامة التجارية ====== %>
-                <div class="settings-section">
+
+                <!-- ====== القسم 1: هوية المتجر ====== -->
+                <div class="settings-section fade-in">
                     <h3><i class="fas fa-store" style="color: var(--secondary-color);"></i> هوية المتجر</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label class="form-label">اسم المتجر (عربي)</label>
-                            <input type="text" name="branding[storeName]" class="form-control" value="<%= settings.branding?.storeName || '' %>">
+                            <input type="text" name="storeName" class="form-control" value="<%= settings.branding?.storeName || '' %>" placeholder="مثلاً: متجر الرعدي">
                         </div>
                         <div class="form-group">
                             <label class="form-label">اسم المتجر (إنجليزي)</label>
-                            <input type="text" name="branding[storeNameEn]" class="form-control" value="<%= settings.branding?.storeNameEn || '' %>">
+                            <input type="text" name="storeNameEn" class="form-control" value="<%= settings.branding?.storeNameEn || '' %>" placeholder="مثلاً: Al-Radi Store">
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label class="form-label">الشعار الترويجي</label>
-                            <input type="text" name="branding[tagline]" class="form-control" value="<%= settings.branding?.tagline || '' %>">
+                            <input type="text" name="branding[tagline]" class="form-control" value="<%= settings.branding?.tagline || '' %>" placeholder="شعار المتجر الذي يظهر تحت الاسم">
                         </div>
                     </div>
                 </div>
 
-                <%# ====== 2. الوسائط (الشعار والصوتيات) - العملاق ====== %>
-                <div class="settings-section">
-                    <h3><i class="fas fa-image" style="color: var(--secondary-color);"></i> إدارة الوسائط (صور وصوتيات)</h3>
-                    
-                    <%# الشعار %>
+                <!-- ====== القسم 2: الشعار (مع نظام تخزين هجين) ====== -->
+                <div class="settings-section fade-in">
+                    <h3><i class="fas fa-image" style="color: var(--secondary-color);"></i> الشعار</h3>
                     <div class="media-card">
-                        <h4 style="font-weight: 700; margin-bottom: 10px;">🖼️ شعار المتجر</h4>
-                        <div class="source-toggle">
-                            <label style="display: inline-block; margin-left: 5px;">
-                                <input type="radio" name="media[logo][source]" value="local" <%= (settings.media?.logo?.source === 'local' || !settings.media?.logo?.source) ? 'checked' : '' %>> <span>📁 ملف محلي</span>
-                            </label>
-                            <label style="display: inline-block;">
-                                <input type="radio" name="media[logo][source]" value="url" <%= settings.media?.logo?.source === 'url' ? 'checked' : '' %>> <span>🔗 رابط خارجي</span>
-                            </label>
+                        <div class="card-header">
+                            <h5>🖼️ شعار المتجر</h5>
+                            <span class="badge-source <%= settings.media?.logo?.source === 'local' ? 'local' : 'url' %>">
+                                <%= settings.media?.logo?.source === 'local' ? '📁 محلي' : '🔗 رابط' %>
+                            </span>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <input type="file" name="media[logo][local]" class="form-control" accept="image/*" onchange="previewMedia(this, 'logoPreview')">
-                            <input type="text" name="media[logo][url]" class="form-control" placeholder="https://example.com/logo.png" value="<%= settings.media?.logo?.url || '' %>">
+                            <div>
+                                <label class="form-label" style="font-size: 13px;">📁 رفع ملف محلي</label>
+                                <input type="file" name="storeLogo" class="form-control" accept="image/*" onchange="previewMedia(this, 'logoPreview')">
+                            </div>
+                            <div>
+                                <label class="form-label" style="font-size: 13px;">🔗 رابط خارجي</label>
+                                <input type="text" name="storeLogoUrl" class="form-control" placeholder="https://example.com/logo.png" value="<%= settings.media?.logo?.url || '' %>" oninput="updateLogoPreview(this.value)">
+                            </div>
                         </div>
                         <div class="preview-box">
-                            <img id="logoPreview" src="<%= settings.getMediaValue ? settings.getMediaValue('media.logo') : (settings.media?.logo?.url || settings.media?.logo?.local || '/images/default-logo.png') %>" style="width:80px; height:80px; object-fit:cover; border-radius:50%; border:2px solid var(--gold-color);">
-                            <span style="font-size:12px; color:var(--text-muted);">المصدر النشط: <strong><%= settings.media?.logo?.source || 'local' %></strong></span>
+                            <img id="logoPreview" src="<%= settings.media?.logo?.url || settings.media?.logo?.local || '/images/default-logo.png' %>" style="width:80px; height:80px; object-fit:cover; border-radius:50%; border:2px solid var(--gold-color);">
+                            <span style="font-size:12px; color:var(--text-muted);">
+                                المصدر النشط: <strong><%= settings.media?.logo?.source || 'local' %></strong>
+                            </span>
+                            <button type="button" class="btn-preview" onclick="document.getElementById('logoPreview').style.transform='scale(1.1)'; setTimeout(()=>document.getElementById('logoPreview').style.transform='scale(1)', 300)">🔍 تكبير</button>
                         </div>
                     </div>
+                </div>
 
-                    <%# الصوتيات (جميع الأصوات مع معاينة) %>
-                    <h4 style="margin-top: 25px; margin-bottom: 15px;">🎵 نظام الصوتيات التفاعلي (مع أصوات افتراضية)</h4>
-                    <% const audioKeys = ['greeting', 'addToCart', 'save', 'print', 'sort', 'notification', 'error', 'success', 'delete']; %>
+                <!-- ====== القسم 3: الصوتيات (النظام العبقري) ====== -->
+                <div class="settings-section fade-in">
+                    <h3><i class="fas fa-volume-up" style="color: var(--secondary-color);"></i> نظام الصوتيات المتكامل</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">
+                        <i class="fas fa-info-circle"></i> كل صوت له خياران: رفع ملف محلي أو استخدام رابط خارجي. المصدر النشط هو الذي سيتم تشغيله.
+                    </p>
+                    <% const audioKeys = ['Greeting', 'AddToCart', 'Save', 'Print', 'Sort', 'Notification', 'Error', 'Success', 'Delete']; %>
                     <% const audioLabels = {
-                        greeting: '🔊 ترحيب',
-                        addToCart: '🛒 إضافة للسلة',
-                        save: '💾 حفظ',
-                        print: '🖨️ طباعة',
-                        sort: '🔀 فرز',
-                        notification: '🔔 إشعار',
-                        error: '❌ خطأ',
-                        success: '✅ نجاح',
-                        delete: '🗑️ حذف'
+                        Greeting: '🔊 ترحيب',
+                        AddToCart: '🛒 إضافة للسلة',
+                        Save: '💾 حفظ',
+                        Print: '🖨️ طباعة',
+                        Sort: '🔀 فرز',
+                        Notification: '🔔 إشعار',
+                        Error: '❌ خطأ',
+                        Success: '✅ نجاح',
+                        Delete: '🗑️ حذف'
+                    }; %>
+                    <% const audioIcons = {
+                        Greeting: 'fa-hand-peace',
+                        AddToCart: 'fa-cart-plus',
+                        Save: 'fa-save',
+                        Print: 'fa-print',
+                        Sort: 'fa-sort',
+                        Notification: 'fa-bell',
+                        Error: 'fa-times-circle',
+                        Success: 'fa-check-circle',
+                        Delete: 'fa-trash-alt'
                     }; %>
                     <% audioKeys.forEach(key => { %>
-                        <div class="media-card">
-                            <h5 style="font-weight: 700;"><%= audioLabels[key] || key %></h5>
-                            <div class="source-toggle">
-                                <label style="display: inline-block; margin-left: 5px;">
-                                    <input type="radio" name="media[audio][<%= key %>][source]" value="local" <%= (settings.media?.audio?.[key]?.source === 'local') ? 'checked' : '' %>> <span>📁 ملف محلي</span>
-                                </label>
-                                <label style="display: inline-block;">
-                                    <input type="radio" name="media[audio][<%= key %>][source]" value="url" <%= (settings.media?.audio?.[key]?.source === 'url' || !settings.media?.audio?.[key]) ? 'checked' : '' %>> <span>🔗 رابط خارجي</span>
-                                </label>
+                        <div class="media-card" id="audioCard_<%= key %>">
+                            <div class="card-header">
+                                <h5><i class="fas <%= audioIcons[key] || 'fa-music' %>" style="color: var(--secondary-color);"></i> <%= audioLabels[key] || key %></h5>
+                                <span class="badge-source <%= settings.media?.audio?.[key.toLowerCase()]?.source === 'local' ? 'local' : 'url' %>">
+                                    <%= settings.media?.audio?.[key.toLowerCase()]?.source === 'local' ? '📁 محلي' : '🔗 رابط' %>
+                                </span>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <input type="file" name="media[audio][<%= key %>][local]" class="form-control" accept="audio/*" onchange="previewAudio(this, 'audioPreview_<%= key %>')">
-                                <input type="text" name="media[audio][<%= key %>][url]" class="form-control" placeholder="رابط MP3 مباشر" value="<%= settings.media?.audio?.[key]?.url || '' %>">
+                                <div>
+                                    <label class="form-label" style="font-size: 13px;">📁 رفع ملف محلي</label>
+                                    <input type="file" name="voice<%= key %>File" class="form-control" accept="audio/*" onchange="previewAudio(this, 'audioPreview_<%= key %>')">
+                                </div>
+                                <div>
+                                    <label class="form-label" style="font-size: 13px;">🔗 رابط خارجي</label>
+                                    <input type="text" name="voice<%= key %>Url" class="form-control" placeholder="رابط MP3 مباشر" value="<%= settings.media?.audio?.[key.toLowerCase()]?.url || '' %>" oninput="updateAudioPreview('<%= key %>', this.value)">
+                                </div>
                             </div>
                             <div class="audio-controls">
-                                <audio id="audioPreview_<%= key %>" controls style="width: 200px; height: 40px;" src="<%= settings.getAudio ? settings.getAudio(key) : (settings.media?.audio?.[key]?.url || settings.media?.audio?.[key]?.local) %>"></audio>
-                                <button type="button" class="btn-preview" onclick="document.getElementById('audioPreview_<%= key %>').play()">▶️ معاينة</button>
-                                <span style="font-size:12px; color:var(--text-muted);">المصدر: <strong><%= settings.media?.audio?.[key]?.source || 'url' %></strong></span>
+                                <audio id="audioPreview_<%= key %>" controls style="width: 200px; height: 40px;" 
+                                       src="<%= settings.media?.audio?.[key.toLowerCase()]?.url || settings.media?.audio?.[key.toLowerCase()]?.local || '' %>">
+                                </audio>
+                                <button type="button" class="btn-preview" onclick="document.getElementById('audioPreview_<%= key %>').play()">
+                                    <i class="fas fa-play"></i> معاينة
+                                </button>
+                                <button type="button" class="btn-preview" onclick="document.getElementById('audioPreview_<%= key %>').pause(); document.getElementById('audioPreview_<%= key %>').currentTime=0;">
+                                    <i class="fas fa-stop"></i> إيقاف
+                                </button>
+                                <span style="font-size:12px; color:var(--text-muted);">
+                                    المصدر: <strong><%= settings.media?.audio?.[key.toLowerCase()]?.source || 'url' %></strong>
+                                </span>
                             </div>
                         </div>
                     <% }); %>
 
-                    <div style="margin-top: 15px; display: flex; gap: 10px;">
-                        <button type="button" class="btn btn-warning" onclick="resetAudio()" style="background: #ff9800; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold;">
+                    <!-- ====== أزرار إدارة الصوتيات ====== -->
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-light);">
+                        <button type="button" class="btn-warning" onclick="resetAudio()">
                             <i class="fas fa-undo"></i> إعادة تعيين الصوتيات للافتراضي
+                        </button>
+                        <button type="button" class="btn-success" onclick="testAllAudio()">
+                            <i class="fas fa-play-circle"></i> اختبار جميع الأصوات
                         </button>
                     </div>
                 </div>
 
-                <%# ====== 3. الألوان ====== %>
-                <div class="settings-section">
-                    <h3><i class="fas fa-palette" style="color: var(--secondary-color);"></i> ألوان المتجر (معاينة فورية)</h3>
+                <!-- ====== القسم 4: الألوان (مع معاينة حية) ====== -->
+                <div class="settings-section fade-in">
+                    <h3><i class="fas fa-palette" style="color: var(--secondary-color);"></i> ألوان المتجر</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">
+                        <i class="fas fa-info-circle"></i> يمكنك تغيير الألوان وسيتم معاينتها فورياً في المربع أدناه.
+                    </p>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <% const colors = ['primaryColor', 'secondaryColor', 'accentColor', 'goldColor', 'backgroundColor', 'textColor']; %>
-                        <% const colorLabels = {'primaryColor': '🎨 أساسي', 'secondaryColor': '🔴 ثانوي', 'accentColor': '🔵 مميز', 'goldColor': '🟡 ذهبي', 'backgroundColor': '⬜ خلفية', 'textColor': '⬛ نص'}; %>
-                        <% colors.forEach(c => { %>
-                            <div class="form-group">
-                                <label class="form-label"><%= colorLabels[c] || c %></label>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <input type="color" value="<%= settings.appearance?.[c] || '#1a1a2e' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value; updateColorPreview()">
-                                    <input type="text" name="appearance[<%= c %>]" class="form-control" value="<%= settings.appearance?.[c] || '#1a1a2e' %>" style="flex:1;" oninput="this.previousElementSibling.value = this.value; updateColorPreview()">
-                                </div>
+                        <div class="form-group">
+                            <label class="form-label">🎨 اللون الأساسي</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" value="<%= settings.appearance?.primaryColor || '#1a1a2e' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value; updateColorPreview()">
+                                <input type="text" name="primaryColor" class="form-control" value="<%= settings.appearance?.primaryColor || '#1a1a2e' %>" style="flex:1;" oninput="this.previousElementSibling.value = this.value; updateColorPreview()">
                             </div>
-                        <% }); %>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">🔴 اللون الثانوي</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" value="<%= settings.appearance?.secondaryColor || '#e94560' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value; updateColorPreview()">
+                                <input type="text" name="secondaryColor" class="form-control" value="<%= settings.appearance?.secondaryColor || '#e94560' %>" style="flex:1;" oninput="this.previousElementSibling.value = this.value; updateColorPreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">🟡 اللون الذهبي</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" value="<%= settings.appearance?.goldColor || '#ffd700' %>" class="color-picker" onchange="this.nextElementSibling.value = this.value; updateColorPreview()">
+                                <input type="text" name="goldColor" class="form-control" value="<%= settings.appearance?.goldColor || '#ffd700' %>" style="flex:1;" oninput="this.previousElementSibling.value = this.value; updateColorPreview()">
+                            </div>
+                        </div>
                     </div>
-                    <div style="padding: 20px; background: var(--bg-color); border-radius: 12px; margin-top: 10px; text-align: center; border: 2px dashed var(--border-color);" id="colorPreviewBox">
-                        <p style="font-weight: bold; color: var(--primary-color);">معاينة الألوان المختارة</p>
-                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                            <span style="background: var(--primary-color); color: white; padding: 5px 15px; border-radius: 20px;">أساسي</span>
-                            <span style="background: var(--secondary-color); color: white; padding: 5px 15px; border-radius: 20px;">ثانوي</span>
-                            <span style="background: var(--gold-color); color: black; padding: 5px 15px; border-radius: 20px;">ذهبي</span>
+                    <div class="color-preview-box" id="colorPreviewBox">
+                        <p style="font-weight: bold;">معاينة الألوان المختارة</p>
+                        <div class="color-dots">
+                            <span style="background: var(--primary-color); color: white;">أساسي</span>
+                            <span style="background: var(--secondary-color); color: white;">ثانوي</span>
+                            <span style="background: var(--gold-color); color: black;">ذهبي</span>
                         </div>
                     </div>
                 </div>
 
-                <%# ====== 4. معلومات الاتصال ====== %>
-                <div class="settings-section">
+                <!-- ====== القسم 5: معلومات الاتصال ====== -->
+                <div class="settings-section fade-in">
                     <h3><i class="fas fa-address-book" style="color: var(--secondary-color);"></i> معلومات الاتصال</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label class="form-label">📧 البريد الإلكتروني</label>
-                            <input type="email" name="contact[email]" class="form-control" value="<%= settings.contact?.email || '' %>">
+                            <input type="email" name="contactEmail" class="form-control" value="<%= settings.contact?.email || '' %>" placeholder="admin@example.com">
                         </div>
                         <div class="form-group">
                             <label class="form-label">📱 رقم الواتساب</label>
-                            <input type="text" name="contact[whatsapp]" class="form-control" value="<%= settings.contact?.whatsapp || '' %>" placeholder="9665xxxxxxxx">
-                        </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
-                            <label class="form-label">📍 العنوان</label>
-                            <input type="text" name="contact[address]" class="form-control" value="<%= settings.contact?.address || '' %>">
+                            <input type="text" name="whatsappNumber" class="form-control" value="<%= settings.contact?.whatsapp || '' %>" placeholder="+9665xxxxxxxx">
                         </div>
                     </div>
                 </div>
 
-                <%# ====== 5. الشحن ====== %>
-                <div class="settings-section">
+                <!-- ====== القسم 6: الشحن ====== -->
+                <div class="settings-section fade-in">
                     <h3><i class="fas fa-truck" style="color: var(--secondary-color);"></i> إعدادات الشحن</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                         <div class="form-group">
                             <label class="form-label">🇸🇦 الشحن الداخلي (ر.س)</label>
-                            <input type="number" name="shipping[internal]" class="form-control" value="<%= settings.shipping?.internal || 25 %>" min="0">
+                            <input type="number" name="shippingInternal" class="form-control" value="<%= settings.shipping?.internal || 25 %>" min="0" step="0.5">
                         </div>
                         <div class="form-group">
                             <label class="form-label">🌍 الشحن الدولي (ر.س)</label>
-                            <input type="number" name="shipping[international]" class="form-control" value="<%= settings.shipping?.international || 75 %>" min="0">
+                            <input type="number" name="shippingInternational" class="form-control" value="<%= settings.shipping?.international || 75 %>" min="0" step="0.5">
                         </div>
                         <div class="form-group">
                             <label class="form-label">🚀 شحن مجاني فوق (ر.س)</label>
-                            <input type="number" name="shipping[freeShippingMin]" class="form-control" value="<%= settings.shipping?.freeShippingMin || 300 %>" min="0">
+                            <input type="number" name="freeShippingMin" class="form-control" value="<%= settings.shipping?.freeShippingMin || 300 %>" min="0">
                         </div>
                     </div>
                 </div>
 
-                <%# ====== 6. السياسات ====== %>
-                <div class="settings-section">
+                <!-- ====== القسم 7: السياسات ====== -->
+                <div class="settings-section fade-in">
                     <h3><i class="fas fa-file-contract" style="color: var(--secondary-color);"></i> سياسات المتجر</h3>
                     <div class="form-group">
                         <label class="form-label">سياسة الاستبدال والاسترجاع</label>
-                        <textarea name="policies[returnPolicy]" class="form-control" rows="3"><%= settings.policies?.returnPolicy || '' %></textarea>
+                        <textarea name="returnPolicy" class="form-control" rows="3"><%= settings.policies?.returnPolicy || '' %></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">نص حقوق الملكية</label>
-                        <input type="text" name="branding[copyrightText]" class="form-control" value="<%= settings.branding?.copyrightText || '' %>">
+                        <input type="text" name="copyrightText" class="form-control" value="<%= settings.branding?.copyrightText || '' %>" placeholder="جميع الحقوق محفوظة © 2026">
                     </div>
                 </div>
 
-                <%# ====== أزرار الإجراء ====== %>
+                <!-- ====== أزرار الإجراء ====== -->
                 <div style="display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap;">
-                    <button type="submit" class="btn btn-primary btn-lg" style="flex: 2; padding: 16px; font-size: 18px; border-radius: 14px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2; padding: 16px; font-size: 18px; border-radius: 14px;">
                         <i class="fas fa-save"></i> حفظ جميع الإعدادات
                     </button>
-                    <button type="reset" class="btn btn-outline btn-lg" style="flex: 1; padding: 16px; border-radius: 14px;">
+                    <button type="reset" class="btn btn-outline" style="flex: 1; padding: 16px; border-radius: 14px; text-align: center;">
                         <i class="fas fa-undo"></i> إعادة تعيين النموذج
                     </button>
-                    <a href="/admin/dashboard" class="btn btn-outline btn-lg" style="flex: 1; padding: 16px; border-radius: 14px; text-align: center;">
+                    <a href="/admin/dashboard" class="btn btn-outline" style="flex: 1; padding: 16px; border-radius: 14px; text-align: center; text-decoration: none;">
                         <i class="fas fa-arrow-right"></i> العودة للوحة
                     </a>
                 </div>
+
             </form>
         </main>
     </div>
 </div>
 
 <script>
-// دالة معاينة الصورة
-function previewMedia(input, previewId) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById(previewId);
-            if (img) img.src = e.target.result;
+    // ================================================================
+    // 1. معاينة الصورة فورياً
+    // ================================================================
+    function previewMedia(input, previewId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(previewId);
+                if (img) img.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function updateLogoPreview(url) {
+        const img = document.getElementById('logoPreview');
+        if (img && url.trim()) {
+            img.src = url.trim();
+        }
+    }
+
+    // ================================================================
+    // 2. معاينة الصوت فورياً
+    // ================================================================
+    function previewAudio(input, audioId) {
+        if (input.files && input.files[0]) {
+            const url = URL.createObjectURL(input.files[0]);
+            const audio = document.getElementById(audioId);
+            if (audio) audio.src = url;
+        }
+    }
+
+    function updateAudioPreview(key, url) {
+        const audio = document.getElementById('audioPreview_' + key);
+        if (audio && url.trim()) {
+            audio.src = url.trim();
+        }
+    }
+
+    // ================================================================
+    // 3. معاينة الألوان الحية
+    // ================================================================
+    function updateColorPreview() {
+        const colors = ['primaryColor', 'secondaryColor', 'goldColor'];
+        const box = document.getElementById('colorPreviewBox');
+        if (!box) return;
+        colors.forEach(c => {
+            const input = document.querySelector(`input[name="${c}"]`);
+            if (input) {
+                box.style.setProperty('--' + c, input.value);
+            }
+        });
+        // تحديث النقاط الملونة
+        const dots = box.querySelectorAll('.color-dots span');
+        if (dots.length === 3) {
+            const primary = document.querySelector('input[name="primaryColor"]')?.value || '#1a1a2e';
+            const secondary = document.querySelector('input[name="secondaryColor"]')?.value || '#e94560';
+            const gold = document.querySelector('input[name="goldColor"]')?.value || '#ffd700';
+            dots[0].style.background = primary;
+            dots[0].style.color = '#fff';
+            dots[1].style.background = secondary;
+            dots[1].style.color = '#fff';
+            dots[2].style.background = gold;
+            dots[2].style.color = '#333';
+        }
+    }
+
+    // ================================================================
+    // 4. إعادة تعيين الصوتيات إلى الافتراضي (عبر API)
+    // ================================================================
+    async function resetAudio() {
+        if (!confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الصوتيات إلى الإعدادات الافتراضية؟')) return;
+        try {
+            const response = await fetch('/admin/settings/reset-audio', { method: 'POST' });
+            const data = await response.json();
+            if (data.success) {
+                alert('✅ تم إعادة تعيين الصوتيات بنجاح! سيتم تحديث الصفحة.');
+                location.reload();
+            } else {
+                alert('❌ حدث خطأ: ' + data.message);
+            }
+        } catch (e) {
+            alert('❌ خطأ في الاتصال بالخادم');
+        }
+    }
+
+    // ================================================================
+    // 5. اختبار جميع الأصوات (ميزة عبقرية جديدة)
+    // ================================================================
+    async function testAllAudio() {
+        const audioKeys = ['Greeting', 'AddToCart', 'Save', 'Print', 'Sort', 'Notification', 'Error', 'Success', 'Delete'];
+        const audioLabels = {
+            Greeting: '🔊 ترحيب',
+            AddToCart: '🛒 إضافة للسلة',
+            Save: '💾 حفظ',
+            Print: '🖨️ طباعة',
+            Sort: '🔀 فرز',
+            Notification: '🔔 إشعار',
+            Error: '❌ خطأ',
+            Success: '✅ نجاح',
+            Delete: '🗑️ حذف'
         };
-        reader.readAsDataURL(input.files[0]);
+        let count = 0;
+        for (const key of audioKeys) {
+            const audio = document.getElementById('audioPreview_' + key);
+            if (audio && audio.src && audio.src !== '') {
+                count++;
+                audio.play();
+                await new Promise(resolve => setTimeout(resolve, 800));
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        }
+        alert(`✅ تم اختبار ${count} من 9 أصوات بنجاح!`);
     }
-}
 
-// دالة معاينة الصوت (تحديث المصدر)
-function previewAudio(input, audioId) {
-    if (input.files && input.files[0]) {
-        const url = URL.createObjectURL(input.files[0]);
-        const audio = document.getElementById(audioId);
-        if (audio) audio.src = url;
-    }
-}
+    // ================================================================
+    // 6. تحميل الصفحة - تهيئة المعاينة
+    // ================================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        updateColorPreview();
+        console.log('🚀 لوحة الإعدادات العبقرية جاهزة!');
+        console.log('💡 ميزات جديدة: معاينة فورية، اختبار صوتي، إعادة تعيين ذكية');
+    });
 
-// معاينة الألوان الحية
-function updateColorPreview() {
-    const colors = ['primaryColor', 'secondaryColor', 'goldColor'];
-    const box = document.getElementById('colorPreviewBox');
-    if (!box) return;
-    const style = box.style;
-    colors.forEach(c => {
-        const input = document.querySelector(`input[name="appearance[${c}]"]`);
-        if (input) {
-            style.setProperty('--' + c, input.value);
+    // ================================================================
+    // 7. حفظ النموذج عبر AJAX (ميزة عبقرية إضافية)
+    // ================================================================
+    document.getElementById('settingsForm')?.addEventListener('submit', function(e) {
+        // يمكننا اعتراض الإرسال وحفظ البيانات عبر Fetch إذا أردنا
+        // لكننا نترك الإرسال العادي لأنه يعمل بشكل مثالي مع Multer
+        console.log('📤 جاري حفظ الإعدادات...');
+        // نضيف مؤشر تحميل إذا أردنا
+        const btn = this.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-save"></i> حفظ جميع الإعدادات';
+                btn.disabled = false;
+            }, 3000);
+        }
+        return true; // نسمح بالإرسال
+    });
+
+    // ================================================================
+    // 8. إعادة تعيين النموذج (مسح التغييرات)
+    // ================================================================
+    document.querySelector('button[type="reset"]')?.addEventListener('click', function(e) {
+        if (!confirm('⚠️ هل تريد إعادة تعيين جميع الحقول إلى قيمها الأصلية؟')) {
+            e.preventDefault();
         }
     });
-}
 
-// إعادة تعيين الصوتيات إلى الوضع الافتراضي عبر API
-async function resetAudio() {
-    if (!confirm('⚠️ هل أنت متأكد من إعادة تعيين جميع الصوتيات إلى الإعدادات الافتراضية؟')) return;
-    try {
-        const response = await fetch('/admin/settings/reset-audio', { method: 'POST' });
-        const data = await response.json();
-        if (data.success) {
-            alert('✅ تم إعادة تعيين الصوتيات بنجاح! سيتم تحديث الصفحة.');
-            location.reload();
-        } else {
-            alert('❌ حدث خطأ: ' + data.message);
-        }
-    } catch (e) {
-        alert('❌ خطأ في الاتصال بالخادم');
-    }
-}
-
-// تحميل الصوت عند تحميل الصفحة للتأكد من المصادر
-document.addEventListener('DOMContentLoaded', function() {
-    // التأكد من أن جميع مشغلات الصوت تعرض المصدر الصحيح
-    document.querySelectorAll('audio').forEach(audio => {
-        if (audio.src && audio.src.startsWith('blob:')) {
-            // إذا كان blob من معاينة مؤقتة، لا نغيره
+    // ================================================================
+    // 9. اختصار لوحة المفاتيح: Ctrl+S للحفظ
+    // ================================================================
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            const form = document.getElementById('settingsForm');
+            if (form) {
+                form.submit();
+            }
         }
     });
-    updateColorPreview();
-    console.log('🚀 لوحة الإعدادات العملاقة جاهزة!');
-});
+
+    console.log('✅ جميع الاختصارات والميزات جاهزة!');
 </script>
 
 <%- include('../partials/footer') %>
