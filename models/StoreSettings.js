@@ -1,18 +1,17 @@
 // ================================================================
 // متجر الرعدي أون لاين - Al-Radi Online
-// نموذج إعدادات المتجر - النسخة العبقرية الشاملة (v4.0)
-// تدعم التخزين المحلي والروابط مع نظام إدارة وسائط متكامل
+// نموذج إعدادات المتجر - النسخة العبقرية النهائية
 // ================================================================
 
 const mongoose = require('mongoose');
 
 // ================================================================
-// مخطط مساعد لعنصر الوسائط (صورة أو صوت) لدعم التخزين المزدوج
+// مخطط مساعد لعنصر الوسائط (يدعم التخزين المزدوج)
 // ================================================================
 const MediaItemSchema = new mongoose.Schema({
-    local: { type: String, default: '' },      // المسار المحلي (ملف مرفوع)
-    url: { type: String, default: '' },        // الرابط الخارجي
-    source: { type: String, enum: ['local', 'url'], default: 'local' } // المصدر النشط
+    local: { type: String, default: '' },
+    url: { type: String, default: '' },
+    source: { type: String, enum: ['local', 'url'], default: 'local' }
 }, { _id: false });
 
 // ================================================================
@@ -20,92 +19,75 @@ const MediaItemSchema = new mongoose.Schema({
 // ================================================================
 const storeSettingsSchema = new mongoose.Schema({
 
-    // ========== الهوية الأساسية ==========
+    // ========== الهوية والعلامة التجارية ==========
     branding: {
         storeName: { type: String, default: 'متجر الرعدي أون لاين' },
         storeNameEn: { type: String, default: 'Al-Radi Online Store' },
         tagline: { type: String, default: 'تسوق بثقة واستمتع بتجربة فاخرة' },
         taglineEn: { type: String, default: 'Shop with confidence and enjoy a luxury experience' },
-        storeDescription: { type: String, default: 'متجر إلكتروني متكامل للتسوق العالمي - تجربة فائقة وآمنة' },
-        storeDescriptionEn: { type: String, default: 'Integrated online store for global shopping' },
         copyrightText: { type: String, default: 'جميع الحقوق محفوظة © 2026 لمجموعة متاجر الرعدي أونلاين الفاخرة' },
         copyrightTextEn: { type: String, default: 'All Rights Reserved © 2026 Al-Radi Online Luxury Stores Group' },
     },
 
-    // ========== الوسائط المتعددة (الشعار، الأيقونات، الصور، الصوتيات) ==========
+    // ========== الوسائط المتعددة (الشعار، الصور، الصوتيات) ==========
     media: {
-        // الشعار
         logo: MediaItemSchema,
-        // الأيقونة المفضلة
         favicon: MediaItemSchema,
-        // صورة القسم الافتراضية
         defaultCategoryImage: MediaItemSchema,
-        // صورة المنتج الافتراضية
         defaultProductImage: MediaItemSchema,
-        // خلفية الهيدر
         heroBackground: MediaItemSchema,
-        // صورة البانر الترويجي
         promoBannerImage: MediaItemSchema,
 
-        // ====== نظام الصوتيات العملاق (مع أصوات افتراضية مدمجة) ======
+        // نظام الصوتيات المتكامل (مع أصوات افتراضية)
         audio: {
-            // صوت الترحيب
             greeting: { 
                 local: { type: String, default: '/audio/welcome.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الإضافة للسلة
             addToCart: { 
                 local: { type: String, default: '/audio/add-to-cart.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-09.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الحفظ
             save: { 
                 local: { type: String, default: '/audio/save.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-19.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الطباعة
             print: { 
                 local: { type: String, default: '/audio/print.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-15.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الفرز
             sort: { 
                 local: { type: String, default: '/audio/sort.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-12.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الإشعار
             notification: { 
                 local: { type: String, default: '/audio/notification.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-10.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الخطأ
             error: { 
                 local: { type: String, default: '/audio/error.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-20.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت النجاح
             success: { 
                 local: { type: String, default: '/audio/success.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-13.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             },
-            // صوت الحذف
             delete: { 
                 local: { type: String, default: '/audio/delete.mp3' },
                 url: { type: String, default: 'https://www.soundjay.com/button/sounds/button-21.mp3' },
                 source: { type: String, enum: ['local', 'url'], default: 'url' }
             }
         },
-        
-        // الإعدادات العامة للصوتيات
+
+        // إعدادات الصوتيات العامة
         voiceSettings: {
             greetingEnabled: { type: Boolean, default: true },
             interactionsEnabled: { type: Boolean, default: true },
@@ -115,7 +97,7 @@ const storeSettingsSchema = new mongoose.Schema({
 
     // ========== معلومات الاتصال ==========
     contact: {
-        email: { type: String, default: 'alradi@gmil.com' },
+        email: { type: String, default: 'alradi@gmail.com' },
         phone: { type: String, default: '+966500000000' },
         whatsapp: { type: String, default: '+966500000000' },
         telegram: { type: String, default: '' },
@@ -155,7 +137,7 @@ const storeSettingsSchema = new mongoose.Schema({
         shippingPolicy: { type: String, default: 'نوفر شحن سريع وآمن لجميع الطلبات' },
     },
 
-    // ========== المظهر والتخصيص ==========
+    // ========== المظهر ==========
     appearance: {
         theme: { type: String, enum: ['default', 'dark', 'golden', 'modern', 'classic', 'custom'], default: 'default' },
         primaryColor: { type: String, default: '#1a1a2e' },
@@ -191,12 +173,12 @@ const storeSettingsSchema = new mongoose.Schema({
 
     // ========== السياسات ==========
     policies: {
-        returnPolicy: { type: String, default: 'يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان. يحق للزبون استبدال السلعة بأخرى خلال 3 أيام فقط من تاريخ الاستلام في حال وجود خلل مصنعي واضح، بشرط ألا يكون الخلل ناتجاً عن سوء الاستخدام. أي كشط أو تلف في ملصقات الضمان أو العبوات الأصلية يلغي الضمان بشكل فوري ويسقط حق الاستبدال.' },
-        returnPolicyEn: { type: String, default: 'Cash refunds are strictly prohibited after purchase for any reason. The customer has the right to exchange the product within 3 days only from the date of receipt in case of a clear manufacturing defect, provided that the defect is not caused by misuse. Any scratching or damage to the warranty stickers or original packaging immediately voids the warranty and cancels the right to exchange.' },
-        privacyPolicy: { type: String, default: 'نحن في متجر الرعدي أون لاين نلتزم بحماية خصوصية عملائنا. جميع البيانات الشخصية تستخدم فقط لأغراض تنفيذ الطلبات وتحسين تجربة التسوق ولا يتم مشاركتها مع أي طرف ثالث.' },
-        privacyPolicyEn: { type: String, default: 'We are committed to protecting our customers\' privacy. All personal data is used only for order fulfillment and improving the shopping experience and is not shared with any third party.' },
-        termsAndConditions: { type: String, default: 'باستخدامك لمتجر الرعدي أون لاين فإنك توافق على جميع الشروط والأحكام. يخضع جميع المستخدمين للقوانين والأنظمة المعمول بها في المملكة العربية السعودية.' },
-        termsAndConditionsEn: { type: String, default: 'By using Al-Radi Online Store, you agree to all terms and conditions. All users are subject to the laws and regulations in force in the Kingdom of Saudi Arabia.' },
+        returnPolicy: { type: String, default: 'يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.' },
+        returnPolicyEn: { type: String, default: 'Cash refunds are strictly prohibited after purchase for any reason.' },
+        privacyPolicy: { type: String, default: 'نحن في متجر الرعدي أون لاين نلتزم بحماية خصوصية عملائنا.' },
+        privacyPolicyEn: { type: String, default: 'We are committed to protecting our customers\' privacy.' },
+        termsAndConditions: { type: String, default: 'باستخدامك لمتجر الرعدي أون لاين فإنك توافق على جميع الشروط والأحكام.' },
+        termsAndConditionsEn: { type: String, default: 'By using Al-Radi Online Store, you agree to all terms and conditions.' },
     },
 
     // ========== وسائل التواصل الاجتماعي ==========
@@ -215,8 +197,8 @@ const storeSettingsSchema = new mongoose.Schema({
     // ========== SEO والتحليلات ==========
     seo: {
         metaTitle: { type: String, default: 'متجر الرعدي أون لاين - التسوق الإلكتروني العالمي' },
-        metaDescription: { type: String, default: 'متجر الرعدي أون لاين - تجربة تسوق فائقة وآمنة مع أفضل المنتجات العالمية' },
-        metaKeywords: { type: String, default: 'متجر, الرعدي, تسوق, إلكتروني, أون لاين, منتجات, عالمي' },
+        metaDescription: { type: String, default: 'متجر الرعدي أون لاين - تجربة تسوق فائقة وآمنة' },
+        metaKeywords: { type: String, default: 'متجر, الرعدي, تسوق, إلكتروني' },
         googleAnalyticsId: { type: String, default: '' },
         facebookPixelId: { type: String, default: '' },
         tiktokPixelId: { type: String, default: '' },
@@ -277,7 +259,7 @@ const storeSettingsSchema = new mongoose.Schema({
         enableDebugMode: { type: Boolean, default: false },
     },
 
-    // ========== بيانات مخصصة للمطورين ==========
+    // ========== بيانات مخصصة ==========
     custom: {
         jsonData: { type: mongoose.Schema.Types.Mixed, default: {} },
         features: { type: Map, of: Boolean, default: {} },
@@ -287,10 +269,10 @@ const storeSettingsSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // ================================================================
-// الدوال المساعدة العملاقة
+// الدوال المساعدة
 // ================================================================
 
-// الحصول على الإعدادات (إنشاء افتراضي إن لم توجد)
+// الحصول على الإعدادات (إنشاء افتراضي إذا لم توجد)
 storeSettingsSchema.statics.getSettings = async function() {
     let settings = await this.findOne();
     if (!settings) {
@@ -301,33 +283,8 @@ storeSettingsSchema.statics.getSettings = async function() {
     return settings;
 };
 
-// تحديث الإعدادات مع دمج عميق
-storeSettingsSchema.statics.updateSettings = async function(updateData) {
-    let settings = await this.findOne();
-    if (!settings) {
-        settings = new this(updateData);
-    } else {
-        // دمج عميق يدوي للتعامل مع الكائنات المتداخلة
-        const deepMerge = (target, source) => {
-            for (const key in source) {
-                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                    if (!target[key]) target[key] = {};
-                    deepMerge(target[key], source[key]);
-                } else {
-                    target[key] = source[key];
-                }
-            }
-        };
-        deepMerge(settings._doc, updateData);
-    }
-    await settings.save();
-    console.log('✅ تم تحديث إعدادات المتجر');
-    return settings;
-};
-
-// الحصول على قيمة الوسائط النشطة (تلقائياً)
+// الحصول على قيمة الوسائط النشطة
 storeSettingsSchema.methods.getMediaValue = function(mediaPath) {
-    // mediaPath مثال: 'media.logo' أو 'media.audio.greeting'
     const parts = mediaPath.split('.');
     let current = this;
     for (const part of parts) {
@@ -335,15 +292,13 @@ storeSettingsSchema.methods.getMediaValue = function(mediaPath) {
         current = current[part];
     }
     if (!current || typeof current !== 'object') return current;
-    // إذا كان كائن MediaItem
     if (current.source === 'url' && current.url) return current.url;
-    if (current.local) return current.local;
-    return current.url || current.local || null;
+    return current.local || current.url || null;
 };
 
 // الحصول على مسار صوتي معين
 storeSettingsSchema.methods.getAudio = function(key) {
-    const audio = this.media.audio[key];
+    const audio = this.media?.audio?.[key];
     if (!audio) return null;
     if (audio.source === 'url' && audio.url) return audio.url;
     return audio.local || null;
