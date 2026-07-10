@@ -1,25 +1,18 @@
 // ================================================================
 // متجر الرعدي أون لاين - Al-Radi Online
-// نموذج إعدادات المتجر - النسخة العبقرية النهائية
+// نموذج إعدادات المتجر - النسخة النهائية
 // ================================================================
 
 const mongoose = require('mongoose');
 
-// ================================================================
-// مخطط مساعد لعنصر الوسائط (يدعم التخزين المزدوج)
-// ================================================================
 const MediaItemSchema = new mongoose.Schema({
     local: { type: String, default: '' },
     url: { type: String, default: '' },
     source: { type: String, enum: ['local', 'url'], default: 'local' }
 }, { _id: false });
 
-// ================================================================
-// مخطط الإعدادات الرئيسي
-// ================================================================
 const storeSettingsSchema = new mongoose.Schema({
 
-    // ========== الهوية والعلامة التجارية ==========
     branding: {
         storeName: { type: String, default: 'متجر الرعدي أون لاين' },
         storeNameEn: { type: String, default: 'Al-Radi Online Store' },
@@ -29,7 +22,6 @@ const storeSettingsSchema = new mongoose.Schema({
         copyrightTextEn: { type: String, default: 'All Rights Reserved © 2026 Al-Radi Online Luxury Stores Group' },
     },
 
-    // ========== الوسائط المتعددة (الشعار، الصور، الصوتيات) ==========
     media: {
         logo: MediaItemSchema,
         favicon: MediaItemSchema,
@@ -38,7 +30,6 @@ const storeSettingsSchema = new mongoose.Schema({
         heroBackground: MediaItemSchema,
         promoBannerImage: MediaItemSchema,
 
-        // نظام الصوتيات المتكامل (مع أصوات افتراضية)
         audio: {
             greeting: { 
                 local: { type: String, default: '/audio/welcome.mp3' },
@@ -87,7 +78,6 @@ const storeSettingsSchema = new mongoose.Schema({
             }
         },
 
-        // إعدادات الصوتيات العامة
         voiceSettings: {
             greetingEnabled: { type: Boolean, default: true },
             interactionsEnabled: { type: Boolean, default: true },
@@ -95,7 +85,6 @@ const storeSettingsSchema = new mongoose.Schema({
         }
     },
 
-    // ========== معلومات الاتصال ==========
     contact: {
         email: { type: String, default: 'alradi@gmail.com' },
         phone: { type: String, default: '+966500000000' },
@@ -107,7 +96,6 @@ const storeSettingsSchema = new mongoose.Schema({
         workingHours: { type: String, default: '9:00 ص - 11:00 م' },
     },
 
-    // ========== المالية والدفع ==========
     finance: {
         currency: { type: String, default: 'SAR' },
         currencySymbol: { type: String, default: 'ر.س' },
@@ -127,7 +115,6 @@ const storeSettingsSchema = new mongoose.Schema({
         }
     },
 
-    // ========== الشحن ==========
     shipping: {
         internal: { type: Number, default: 25 },
         international: { type: Number, default: 75 },
@@ -137,7 +124,6 @@ const storeSettingsSchema = new mongoose.Schema({
         shippingPolicy: { type: String, default: 'نوفر شحن سريع وآمن لجميع الطلبات' },
     },
 
-    // ========== المظهر ==========
     appearance: {
         theme: { type: String, enum: ['default', 'dark', 'golden', 'modern', 'classic', 'custom'], default: 'default' },
         primaryColor: { type: String, default: '#1a1a2e' },
@@ -154,7 +140,6 @@ const storeSettingsSchema = new mongoose.Schema({
         enableRTL: { type: Boolean, default: true },
     },
 
-    // ========== الصفحة الرئيسية ==========
     homepage: {
         showHeroSlider: { type: Boolean, default: true },
         heroSlides: { type: Array, default: [] },
@@ -171,7 +156,6 @@ const storeSettingsSchema = new mongoose.Schema({
         categoriesDisplayLimit: { type: Number, default: 8 },
     },
 
-    // ========== السياسات ==========
     policies: {
         returnPolicy: { type: String, default: 'يمنع منعاً باتاً استرجاع السلع نقداً بعد الشراء لأي سبب كان.' },
         returnPolicyEn: { type: String, default: 'Cash refunds are strictly prohibited after purchase for any reason.' },
@@ -181,7 +165,6 @@ const storeSettingsSchema = new mongoose.Schema({
         termsAndConditionsEn: { type: String, default: 'By using Al-Radi Online Store, you agree to all terms and conditions.' },
     },
 
-    // ========== وسائل التواصل الاجتماعي ==========
     social: {
         facebook: { type: String, default: '' },
         twitter: { type: String, default: '' },
@@ -194,7 +177,6 @@ const storeSettingsSchema = new mongoose.Schema({
         threads: { type: String, default: '' },
     },
 
-    // ========== SEO والتحليلات ==========
     seo: {
         metaTitle: { type: String, default: 'متجر الرعدي أون لاين - التسوق الإلكتروني العالمي' },
         metaDescription: { type: String, default: 'متجر الرعدي أون لاين - تجربة تسوق فائقة وآمنة' },
@@ -207,7 +189,6 @@ const storeSettingsSchema = new mongoose.Schema({
         enableRobots: { type: Boolean, default: true },
     },
 
-    // ========== الأمان ==========
     security: {
         enableOTP: { type: Boolean, default: true },
         otpExpiryMinutes: { type: Number, default: 10 },
@@ -219,7 +200,6 @@ const storeSettingsSchema = new mongoose.Schema({
         captchaSecretKey: { type: String, default: '' },
     },
 
-    // ========== الإشعارات ==========
     notifications: {
         enableEmail: { type: Boolean, default: true },
         enableSMS: { type: Boolean, default: false },
@@ -232,7 +212,6 @@ const storeSettingsSchema = new mongoose.Schema({
         newUserAlert: { type: Boolean, default: false },
     },
 
-    // ========== الولاء والمكافآت ==========
     loyalty: {
         enable: { type: Boolean, default: true },
         pointsPerRiyal: { type: Number, default: 1 },
@@ -243,7 +222,6 @@ const storeSettingsSchema = new mongoose.Schema({
         birthdayPoints: { type: Number, default: 100 },
     },
 
-    // ========== الإعدادات المتقدمة ==========
     advanced: {
         maintenanceMode: { type: Boolean, default: false },
         maintenanceMessage: { type: String, default: 'المتجر قيد الصيانة حالياً، سنعود قريباً' },
@@ -259,7 +237,6 @@ const storeSettingsSchema = new mongoose.Schema({
         enableDebugMode: { type: Boolean, default: false },
     },
 
-    // ========== بيانات مخصصة ==========
     custom: {
         jsonData: { type: mongoose.Schema.Types.Mixed, default: {} },
         features: { type: Map, of: Boolean, default: {} },
@@ -268,11 +245,6 @@ const storeSettingsSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-// ================================================================
-// الدوال المساعدة
-// ================================================================
-
-// الحصول على الإعدادات (إنشاء افتراضي إذا لم توجد)
 storeSettingsSchema.statics.getSettings = async function() {
     let settings = await this.findOne();
     if (!settings) {
@@ -283,7 +255,6 @@ storeSettingsSchema.statics.getSettings = async function() {
     return settings;
 };
 
-// الحصول على قيمة الوسائط النشطة
 storeSettingsSchema.methods.getMediaValue = function(mediaPath) {
     const parts = mediaPath.split('.');
     let current = this;
@@ -296,7 +267,6 @@ storeSettingsSchema.methods.getMediaValue = function(mediaPath) {
     return current.local || current.url || null;
 };
 
-// الحصول على مسار صوتي معين
 storeSettingsSchema.methods.getAudio = function(key) {
     const audio = this.media?.audio?.[key];
     if (!audio) return null;
@@ -304,7 +274,6 @@ storeSettingsSchema.methods.getAudio = function(key) {
     return audio.local || null;
 };
 
-// إعادة تعيين الصوتيات إلى الوضع الافتراضي
 storeSettingsSchema.methods.resetAudioToDefault = async function() {
     const defaults = {
         greeting: { local: '/audio/welcome.mp3', url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3', source: 'url' },
@@ -328,7 +297,4 @@ storeSettingsSchema.methods.resetAudioToDefault = async function() {
     return this;
 };
 
-// ================================================================
-// تصدير النموذج
-// ================================================================
 module.exports = mongoose.model('StoreSettings', storeSettingsSchema);
