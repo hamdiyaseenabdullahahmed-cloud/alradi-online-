@@ -24,14 +24,13 @@ const storeSettingsSchema = new mongoose.Schema({
     },
 
     // ========== إعدادات الوسائط المتعددة (متطورة) ==========
-    // هنا يمكن تخزين الصور والصوتيات إما برابط خارجي أو ملف محلي
     media: {
-        // تحديد طريقة التخزين: 'local' للملفات المرفوعة، 'url' للروابط
+        // تحديد طريقة التخزين: 'local' للملفات المرفوعة، 'url' للروابط، 'hybrid' للمزيج
         storageMode: { type: String, enum: ['local', 'url', 'hybrid'], default: 'local' },
         
         // الشعار والأيقونات
         logo: { type: String, default: '/images/default-logo.png' },
-        logoUrl: { type: String, default: '' }, // رابط خارجي للشعار
+        logoUrl: { type: String, default: '' },
         favicon: { type: String, default: '/images/favicon.png' },
         faviconUrl: { type: String, default: '' },
         
@@ -89,7 +88,7 @@ const storeSettingsSchema = new mongoose.Schema({
         voiceVolume: { type: Number, min: 0, max: 1, default: 0.8 },
     },
 
-    // ========== معلومات الاتصال (مطور) ==========
+    // ========== معلومات الاتصال ==========
     contact: {
         email: { type: String, default: 'alradi@gmil.com' },
         phone: { type: String, default: '+966500000000' },
@@ -97,11 +96,11 @@ const storeSettingsSchema = new mongoose.Schema({
         telegram: { type: String, default: '' },
         address: { type: String, default: 'المملكة العربية السعودية' },
         addressEn: { type: String, default: 'Saudi Arabia' },
-        mapLocation: { type: String, default: '' }, // رابط خرائط جوجل
+        mapLocation: { type: String, default: '' },
         workingHours: { type: String, default: '9:00 ص - 11:00 م' },
     },
 
-    // ========== الإعدادات المالية والدفع (احترافي) ==========
+    // ========== الإعدادات المالية والدفع ==========
     finance: {
         currency: { type: String, default: 'SAR' },
         currencySymbol: { type: String, default: 'ر.س' },
@@ -125,9 +124,7 @@ const storeSettingsSchema = new mongoose.Schema({
                 merchantId: { type: String, default: '' },
                 secretKey: { type: String, default: '' }
             },
-            // يمكن إضافة بوابات أخرى
         },
-        // خصومات تلقائية
         discounts: {
             newUserDiscount: { type: Number, default: 10, min: 0, max: 100 },
             bulkDiscountThreshold: { type: Number, default: 500 },
@@ -145,7 +142,7 @@ const storeSettingsSchema = new mongoose.Schema({
         shippingPolicy: { type: String, default: 'نوفر شحن سريع وآمن لجميع الطلبات' },
     },
 
-    // ========== المظهر والتصميم (تخصيص كامل) ==========
+    // ========== المظهر والتصميم ==========
     appearance: {
         theme: { type: String, enum: ['default', 'dark', 'golden', 'modern', 'classic', 'custom'], default: 'default' },
         primaryColor: { type: String, default: '#1a1a2e' },
@@ -155,8 +152,8 @@ const storeSettingsSchema = new mongoose.Schema({
         backgroundColor: { type: String, default: '#f8f9fa' },
         textColor: { type: String, default: '#333333' },
         fontFamily: { type: String, default: 'Cairo, sans-serif' },
-        customCSS: { type: String, default: '' }, // لتحميل CSS مخصص
-        customJS: { type: String, default: '' }, // لتحميل JS مخصص
+        customCSS: { type: String, default: '' },
+        customJS: { type: String, default: '' },
         layout: { 
             type: String, 
             enum: ['full-width', 'boxed', 'fluid'], 
@@ -169,7 +166,7 @@ const storeSettingsSchema = new mongoose.Schema({
     // ========== الصفحة الرئيسية والمحتوى ==========
     homepage: {
         showHeroSlider: { type: Boolean, default: true },
-        heroSlides: { type: Array, default: [] }, // يمكن تخزين صور ونصوص
+        heroSlides: { type: Array, default: [] },
         showFeaturedProducts: { type: Boolean, default: true },
         showNewArrivals: { type: Boolean, default: true },
         showBestSellers: { type: Boolean, default: true },
@@ -193,7 +190,7 @@ const storeSettingsSchema = new mongoose.Schema({
         termsAndConditionsEn: { type: String, default: 'By using Al-Radi Online Store, you agree to all terms and conditions. All users are subject to the laws and regulations in force in the Kingdom of Saudi Arabia.' },
     },
 
-    // ========== وسائل التواصل الاجتماعي (متكامل) ==========
+    // ========== وسائل التواصل الاجتماعي ==========
     social: {
         facebook: { type: String, default: '' },
         twitter: { type: String, default: '' },
@@ -267,21 +264,19 @@ const storeSettingsSchema = new mongoose.Schema({
         enableMultilingual: { type: Boolean, default: true },
         defaultLanguage: { type: String, enum: ['ar', 'en'], default: 'ar' },
         enableCache: { type: Boolean, default: true },
-        cacheDuration: { type: Number, default: 3600 }, // بالثواني
+        cacheDuration: { type: Number, default: 3600 },
         enableDebugMode: { type: Boolean, default: false },
     },
 
     // ========== إعدادات مخصصة للمطورين ==========
     custom: {
-        // يمكن تخزين أي بيانات إضافية بشكل حر
         jsonData: { type: mongoose.Schema.Types.Mixed, default: {} },
-        features: { type: Map, of: Boolean, default: {} }, // مفاتيح ديناميكية
-        metadata: { type: Map, of: String, default: {} }, // معلومات إضافية
+        features: { type: Map, of: Boolean, default: {} },
+        metadata: { type: Map, of: String, default: {} },
     }
 
 }, { 
     timestamps: true,
-    // إضافة فهارس لتحسين الأداء
     indexes: [
         { fields: { 'branding.storeName': 1 } },
         { fields: { 'contact.email': 1 } },
@@ -310,7 +305,6 @@ storeSettingsSchema.statics.updateSettings = async function(updateData) {
     if (!settings) {
         settings = new this(updateData);
     } else {
-        // دمج عميق للكائنات المتداخلة لتجنب فقدان البيانات
         Object.keys(updateData).forEach(key => {
             if (updateData[key] && typeof updateData[key] === 'object' && !Array.isArray(updateData[key])) {
                 settings[key] = { ...settings[key], ...updateData[key] };
@@ -328,11 +322,9 @@ storeSettingsSchema.statics.updateSettings = async function(updateData) {
 storeSettingsSchema.methods.getMediaPath = function(mediaKey) {
     const media = this.media;
     if (media.storageMode === 'url') {
-        // إذا كان هناك رابط خارجي، استخدمه
         const urlKey = mediaKey + 'Url';
         if (media[urlKey]) return media[urlKey];
     }
-    // وإلا استخدم المسار المحلي
     return media[mediaKey] || null;
 };
 
@@ -371,11 +363,9 @@ storeSettingsSchema.methods.getMapLink = function() {
 // إضافة مسار وسائط جديد (للصور والصوتيات)
 storeSettingsSchema.methods.updateMedia = async function(key, value, isUrl = false) {
     if (isUrl) {
-        // إذا كان رابطاً، نخزنه في الحقل المخصص للروابط
         const urlKey = key + 'Url';
         this.media[urlKey] = value;
     } else {
-        // تخزين محلي
         this.media[key] = value;
     }
     await this.save();
